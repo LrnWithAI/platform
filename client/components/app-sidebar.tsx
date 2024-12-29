@@ -1,9 +1,26 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { Users, Home, Folder, FilePlus, SquarePlus, LogOut, } from "lucide-react";
+import {
+  Users,
+  Home,
+  Folder,
+  FilePlus,
+  SquarePlus,
+  LogOut,
+} from "lucide-react";
 
-import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar"
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from "@/components/ui/sidebar";
 import NavLogo from "./nav-logo";
 import { Separator } from "./ui/separator";
 
@@ -50,7 +67,6 @@ export function AppSidebar() {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
@@ -77,5 +93,5 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
     </Sidebar>
-  )
+  );
 }

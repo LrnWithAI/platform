@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
-import { SidebarProvider } from "@/components/ui/sidebar"
+import { SidebarProvider } from "@/components/ui/sidebar";
 import NavHeader from "@/components/nav-header";
-import { AppSidebar } from "@/components/app-sidebar"
+import { AppSidebar } from "@/components/app-sidebar";
 
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -23,16 +23,20 @@ export const metadata: Metadata = {
   description: "Make learning fun & easier with AI",
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode; }>) {
+export default function RootLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <ThemeProvider
-        attribute="class"
-        defaultTheme="system"
-        enableSystem
-        disableTransitionOnChange
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
           <SidebarProvider>
             <AppSidebar />
             <main className="w-full">
@@ -40,8 +44,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
               {children}
             </main>
           </SidebarProvider>
-        </body>
-      </ThemeProvider>
-    </html >
+        </ThemeProvider>
+      </body>
+    </html>
   );
 }

@@ -5,7 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Moon, } from "lucide-react";
+import { Moon } from "lucide-react";
 
 import { usePathname } from "next/navigation";
 import { ModeToggle } from "./color-mode-switcher";
@@ -14,7 +14,7 @@ const NavHeader = () => {
   const pathname = usePathname();
 
   return (
-    <header className="flex justify-between h-16 shrink-0 items-center gap-2 border-b px-4">
+    <header className="flex justify-between h-16 shrink-0 items-center gap-2 border-b px-4 sticky top-0 dark:bg-sidebar bg-sidebar">
       <div className="flex gap-2 items-center">
         <SidebarTrigger className="-ml-1" />
         <Separator orientation="vertical" className="mr-2 h-4" />

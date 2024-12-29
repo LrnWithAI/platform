@@ -12,7 +12,7 @@ const NavLogo = () => {
       <SidebarMenuItem>
         <SidebarMenuButton
           variant="outline"
-          className="flex flex-row space-x-2"
+          className="flex flex-row space-x-2 py-6 mb-2"
         >
           <BrainCircuit className="w-8 h-8" />
           <a href="/" className="text-lg">
