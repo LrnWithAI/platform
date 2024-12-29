@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Moon, } from "lucide-react";
 
 import { usePathname } from "next/navigation";
+import { ModeToggle } from "./color-mode-switcher";
 
 const NavHeader = () => {
   const pathname = usePathname();
@@ -27,9 +28,7 @@ const NavHeader = () => {
       </div>
 
       <div className="flex items-center space-x-3">
-        <Button variant="outline" size="icon">
-          <Moon />
-        </Button>
+        <ModeToggle />
 
         <Avatar>
           <AvatarImage
