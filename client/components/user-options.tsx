@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "./ui/button"
-import { LogOut, Settings, User } from "lucide-react"
+import { Headset, LogOut, Settings, User } from "lucide-react"
 import { Separator } from "./ui/separator"
 
 export function UserOptions() {
@@ -28,36 +28,29 @@ export function UserOptions() {
           <AvatarFallback>MBi</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <div className="flex items-center justify-between px-4 py-2 gap-5">
-          <Avatar>
-            <AvatarImage
-              src="teacher_profile_picture.jpg"
-              alt="Teacher profile picture"
-            />
-            <AvatarFallback>MBi</AvatarFallback>
-          </Avatar>
-          <div className="flex flex-col items-end">
+      <DropdownMenuContent align="end" className="p-1">
+        <div className="px-2 py-2">
+          <div className="flex flex-col">
             <span className="text-sm font-semibold">Miroslav Hanisko</span>
             <span className="text-xs text-gray-500">miroslav.hanisko@student.tuke.sk</span>
           </div>
         </div>
-        <DropdownMenuItem >
-          <Button className="w-full">
+        <Separator className="mb-1" />
+        <div className="flex flex-col gap-1">
+          <DropdownMenuItem className="cursor-pointer">
             <User /> Profile
-          </Button>
-        </DropdownMenuItem>
-        <DropdownMenuItem >
-          <Button className="w-full">
+          </DropdownMenuItem>
+          <DropdownMenuItem className="cursor-pointer">
             <Settings /> Settings
-          </Button>
-        </DropdownMenuItem>
-        <Separator />
-        <DropdownMenuItem >
-          <Button className="w-full">
+          </DropdownMenuItem>
+          <DropdownMenuItem className="cursor-pointer">
+            <Headset /> Support
+          </DropdownMenuItem>
+          <Separator />
+          <DropdownMenuItem className="cursor-pointer">
             <LogOut /> Logout
-          </Button>
-        </DropdownMenuItem>
+          </DropdownMenuItem>
+        </div>
       </DropdownMenuContent>
     </DropdownMenu>
   )
