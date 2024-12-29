@@ -14,7 +14,7 @@ const NavHeader = () => {
   const pathname = usePathname();
 
   return (
-    <header className="flex justify-between h-16 shrink-0 items-center gap-2 border-b px-4 sticky top-0 dark:bg-sidebar bg-sidebar">
+    <header className="flex justify-between h-14 shrink-0 items-center gap-2 border-b px-4 sticky top-0 dark:bg-sidebar bg-sidebar">
       <div className="flex gap-2 items-center">
         <SidebarTrigger className="-ml-1" />
         <Separator orientation="vertical" className="mr-2 h-4" />
