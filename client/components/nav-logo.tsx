@@ -4,6 +4,7 @@ import {
   SidebarMenuButton,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { Separator } from "./ui/separator";
 
 import { BrainCircuit } from "lucide-react";
 
@@ -15,8 +16,8 @@ const NavLogo = () => {
       <SidebarMenuItem>
         <SidebarMenuButton
           variant="outline"
-          className={`flex flex-row space-x-2 py-5 ${
-            state == "collapsed" ? "mt-2" : "mt-0"
+          className={`flex flex-row space-x-2 mb-3 mt-1 ${
+            state == "collapsed" ? "mb-3" : ""
           }`}
         >
           <BrainCircuit className="w-8 h-8" />
@@ -24,6 +25,7 @@ const NavLogo = () => {
             LrnWithAI
           </a>
         </SidebarMenuButton>
+        <Separator className="-mb-1" />
       </SidebarMenuItem>
     </SidebarMenu>
   );
