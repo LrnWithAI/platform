@@ -8,6 +8,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 
 import { ModeToggle } from "./color-mode-switcher";
 import { UserOptions } from "./user-options";
+import { CreateOptions } from "./create-options";
 
 const NavHeader = () => {
   const pathname = usePathname();
@@ -26,8 +27,9 @@ const NavHeader = () => {
         </Breadcrumb>
       </div>
 
-      <div className="flex items-center space-x-3">
+      <div className="flex items-center gap-5 pe-3">
         <ModeToggle />
+        <CreateOptions />
         <UserOptions />
       </div>
     </header>

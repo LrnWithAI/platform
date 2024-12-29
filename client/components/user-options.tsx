@@ -1,7 +1,6 @@
 "use client"
 
 import * as React from "react"
-import { useTheme } from "next-themes"
 
 import {
   DropdownMenu,
@@ -10,12 +9,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "./ui/button"
 import { Headset, LogOut, Settings, User } from "lucide-react"
 import { Separator } from "./ui/separator"
 
 export function UserOptions() {
-  const { setTheme } = useTheme()
 
   return (
     <DropdownMenu>
