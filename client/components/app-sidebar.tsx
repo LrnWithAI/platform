@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { Users, Home, Folder, FilePlus, SquarePlus, LogOut, } from "lucide-react";
 
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar"
+import NavLogo from "./nav-logo";
 import { Separator } from "./ui/separator";
 
 const items = [
@@ -45,7 +46,7 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
-        <h1>Logo</h1>
+        <NavLogo />
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>

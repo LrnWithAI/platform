@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
+import { SidebarProvider } from "@/components/ui/sidebar"
+import NavHeader from "@/components/nav-header";
 import { AppSidebar } from "@/components/app-sidebar"
 
 import "./globals.css";
@@ -27,8 +28,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <SidebarProvider>
           <AppSidebar />
-          <SidebarTrigger />
-          {children}
+          <main className="w-full">
+            <NavHeader />
+            {children}
+          </main>
         </SidebarProvider>
       </body>
     </html >
