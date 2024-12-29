@@ -1,37 +1,52 @@
-import { Calendar, Home, Inbox, Search, Settings } from "lucide-react"
-import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar"
+"use client";
+
+import { usePathname } from "next/navigation";
+import { Users, Home, Folder, FilePlus, SquarePlus, LogOut, } from "lucide-react";
+
+import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar"
+import { Separator } from "./ui/separator";
 
 const items = [
   {
     title: "Home",
-    url: "#",
+    url: "home",
     icon: Home,
   },
   {
-    title: "Inbox",
-    url: "#",
-    icon: Inbox,
+    title: "Your Library",
+    url: "library",
+    icon: Folder,
   },
   {
-    title: "Calendar",
-    url: "#",
-    icon: Calendar,
+    title: "Your Classes",
+    url: "classes",
+    icon: Users,
   },
   {
-    title: "Search",
+    title: "Test",
     url: "#",
-    icon: Search,
+    icon: FilePlus,
   },
   {
-    title: "Settings",
+    title: "Flashcards",
     url: "#",
-    icon: Settings,
+    icon: SquarePlus,
   },
-]
+  {
+    title: "Log out",
+    url: "#",
+    icon: LogOut,
+  },
+];
 
 export function AppSidebar() {
+  const pathname = usePathname();
+
   return (
     <Sidebar collapsible="icon">
+      <SidebarHeader>
+        <h1>Logo</h1>
+      </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Application</SidebarGroupLabel>
@@ -39,8 +54,17 @@ export function AppSidebar() {
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <a href={item.url}>
+                  {item.title === "Test" && <Separator className="mb-1" />}
+                  {item.title === "Log out" && <Separator className="mb-1" />}
+                  <SidebarMenuButton
+                    asChild
+                    tooltip={item.title}
+                    isActive={
+                      (item.url === "/" && pathname === "/") ||
+                      `/${item.url}` === pathname
+                    }
+                  >
+                    <a href={`/${item.url.replace(/^\/+/, "")}`}>
                       <item.icon />
                       <span>{item.title}</span>
                     </a>
