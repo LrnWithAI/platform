@@ -27,7 +27,7 @@ const NavHeader = () => {
         </Breadcrumb>
       </div>
 
-      <div className="flex items-center gap-5 pe-3">
+      <div className="flex items-center gap-3 md:pr-4">
         <ModeToggle />
         <CreateOptions />
         <UserOptions />
