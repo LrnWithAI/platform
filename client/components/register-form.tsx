@@ -1,15 +1,17 @@
+"use client";
+
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { register } from "@/app/register/actions"
+import { redirect } from "next/navigation";
 
 export function RegisterForm({
   className,
@@ -26,6 +28,26 @@ export function RegisterForm({
             <div className="grid gap-6">
               <div className="grid gap-6">
                 <div className="grid gap-2">
+                  <Label htmlFor="first-name">First Name</Label>
+                  <Input
+                    name="first-name"
+                    id="first-name"
+                    type="text"
+                    placeholder="John"
+                    required
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="last-name">Last Name</Label>
+                  <Input
+                    name="last-name"
+                    id="last-name"
+                    type="text"
+                    placeholder="Doe"
+                    required
+                  />
+                </div>
+                <div className="grid gap-2">
                   <Label htmlFor="email">Email</Label>
                   <Input
                     name="email"
@@ -36,18 +58,28 @@ export function RegisterForm({
                   />
                 </div>
                 <div className="grid gap-2">
-                  <div className="flex items-center">
-                    <Label htmlFor="password">Password</Label>
-                    <a
-                      href="#"
-                      className="ml-auto text-sm underline-offset-4 hover:underline"
-                    >
-                      Forgot your password?
-                    </a>
-                  </div>
-                  <Input name="password" id="password" type="password" required />
+                  <Label htmlFor="password">Password</Label>
+                  <Input
+                    name="password"
+                    id="password"
+                    type="password"
+                    required
+                  />
                 </div>
-                <Button type="submit" formAction={register} className="w-full bg-purple">
+                <div className="grid gap-2">
+                  <Label htmlFor="confirm-password">Confirm Password</Label>
+                  <Input
+                    name="confirm-password"
+                    id="confirm-password"
+                    type="password"
+                    required
+                  />
+                </div>
+                <Button
+                  type="submit"
+                  formAction={register}
+                  className="w-full bg-purple"
+                >
                   Register
                 </Button>
               </div>
@@ -64,13 +96,18 @@ export function RegisterForm({
                       fill="currentColor"
                     />
                   </svg>
-                  Login with Google
+                  Google
                 </Button>
               </div>
               <div className="text-center text-sm">
-                Don&apos;t have an account?{" "}
-                <a href="#" className="underline underline-offset-4">
-                  Register
+                Have an account?{" "}
+                <a
+                  onClick={() => {
+                    redirect("/login");
+                  }}
+                  className="underline underline-offset-4 hover:cursor-pointer"
+                >
+                  Login
                 </a>
               </div>
             </div>

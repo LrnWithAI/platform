@@ -5,8 +5,6 @@ import { type User } from "@supabase/supabase-js";
 
 import Avatar from "./avatar";
 
-// ...
-
 export default function AccountForm({ user }: { user: User | null }) {
   const supabase = createClient();
   const [loading, setLoading] = useState(true);
@@ -88,7 +86,6 @@ export default function AccountForm({ user }: { user: User | null }) {
           updateProfile({ fullname, username, website, avatar_url: url });
         }}
       />
-      {/* ... */}
 
       <div>
         <label htmlFor="email">Email</label>
