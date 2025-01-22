@@ -8,6 +8,7 @@ import { AppSidebar } from "@/components/app-sidebar";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { createClient } from "@/utils/supabase/server";
+import { ToastContainer } from 'react-toastify';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -59,6 +60,18 @@ export default async function RootLayout({
               </main>
             </SidebarProvider>
           )}
+          <ToastContainer
+            position="bottom-right"
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick={false}
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="light"
+          />
         </ThemeProvider>
       </body>
     </html>
