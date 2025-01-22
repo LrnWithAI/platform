@@ -78,7 +78,7 @@ export function RegisterForm({
                 <Button
                   type="submit"
                   formAction={register}
-                  className="w-full bg-purple"
+                  className="w-full bg-purple text-white"
                 >
                   Register
                 </Button>

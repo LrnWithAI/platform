@@ -38,7 +38,7 @@ export function ForgotPasswordForm({
               <Button
                 type="submit"
                 //formAction={forgotPassword}
-                className="w-full bg-purple"
+                className="w-full bg-purple text-white"
               >
                 Send Reset Link
               </Button>
