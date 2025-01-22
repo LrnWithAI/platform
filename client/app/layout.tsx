@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
 import { SidebarProvider } from "@/components/ui/sidebar";
-import NavHeader from "@/components/nav-header";
+import { NavHeaderLoggedIn, NavHeaderLoggedOut } from "@/components/nav-header";
 import { AppSidebar } from "@/components/app-sidebar";
 
 import "./globals.css";
@@ -24,9 +24,13 @@ export const metadata: Metadata = {
   description: "Make learning fun & easier with AI",
 };
 
-export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   return (
     <html lang="en">
@@ -39,22 +43,22 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
           enableSystem
           disableTransitionOnChange
         >
-          {user ?
+          {user ? (
             <SidebarProvider>
               <AppSidebar />
               <main className="w-full">
-                <NavHeader />
+                <NavHeaderLoggedIn />
                 {children}
               </main>
             </SidebarProvider>
-            :
+          ) : (
             <SidebarProvider>
               <main className="w-full">
-                <NavHeader />
+                <NavHeaderLoggedOut />
                 {children}
               </main>
             </SidebarProvider>
-          }
+          )}
         </ThemeProvider>
       </body>
     </html>

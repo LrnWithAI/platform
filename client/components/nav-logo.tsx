@@ -16,8 +16,8 @@ const NavLogo = () => {
       <SidebarMenuItem>
         <SidebarMenuButton
           variant="outline"
-          className={`flex flex-row space-x-2 mb-3 mt-1 ${
-            state == "collapsed" ? "mb-3" : ""
+          className={`flex flex-row space-x-2 mb-[15px] mt-2 ${
+            state == "collapsed" ? "mb-[15px]" : ""
           }`}
         >
           <BrainCircuit className="w-8 h-8" />

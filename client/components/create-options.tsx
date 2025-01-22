@@ -12,7 +12,7 @@ import { Button } from "./ui/button";
 import { FilePlus, Plus, SquarePlus, Users } from "lucide-react";
 import { Separator } from "./ui/separator";
 
-export function CreateOptions() {
+export function CreateOptionsLoggedIn() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -20,6 +20,32 @@ export function CreateOptions() {
           variant="outline"
           className="flex items-center gap-2 bg-purple hover:bg-violet-500 text-white hover:text-white"
         >
+          <Plus /> Create
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="p-1">
+        <div className="flex flex-col gap-1">
+          <DropdownMenuItem className="cursor-pointer">
+            <FilePlus /> Test
+          </DropdownMenuItem>
+          <DropdownMenuItem className="cursor-pointer">
+            <SquarePlus /> FlashCards
+          </DropdownMenuItem>
+          <Separator />
+          <DropdownMenuItem className="cursor-pointer">
+            <Users /> Class
+          </DropdownMenuItem>
+        </div>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+export function CreateOptionsLoggedOut() {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline">
           <Plus /> Create
         </Button>
       </DropdownMenuTrigger>
