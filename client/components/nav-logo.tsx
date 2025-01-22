@@ -25,7 +25,7 @@ const NavLogo = () => {
             LrnWithAI
           </a>
         </SidebarMenuButton>
-        <Separator className="-mb-1" />
+        <Separator className="-mb-2" />
       </SidebarMenuItem>
     </SidebarMenu>
   );
