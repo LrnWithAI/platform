@@ -7,6 +7,7 @@ import { AppSidebar } from "@/components/app-sidebar";
 
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import { createClient } from "@/utils/supabase/server";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,9 +24,10 @@ export const metadata: Metadata = {
   description: "Make learning fun & easier with AI",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser()
+
   return (
     <html lang="en">
       <body
@@ -37,13 +39,22 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <SidebarProvider>
-            <AppSidebar />
-            <main className="w-full">
-              <NavHeader />
-              {children}
-            </main>
-          </SidebarProvider>
+          {user ?
+            <SidebarProvider>
+              <AppSidebar />
+              <main className="w-full">
+                <NavHeader />
+                {children}
+              </main>
+            </SidebarProvider>
+            :
+            <SidebarProvider>
+              <main className="w-full">
+                <NavHeader />
+                {children}
+              </main>
+            </SidebarProvider>
+          }
         </ThemeProvider>
       </body>
     </html>
