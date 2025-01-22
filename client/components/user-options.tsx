@@ -11,11 +11,15 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Headset, LogOut, Settings, User } from "lucide-react"
 import { Separator } from "./ui/separator"
+import { Button } from "./ui/button"
+import { redirect } from "next/navigation"
+import Link from "next/link"
 
 export function UserOptions() {
 
   return (
-    <DropdownMenu>
+    <DropdownMenu
+    >
       <DropdownMenuTrigger asChild>
         <Avatar className="cursor-pointer hover:opacity-75">
           <AvatarImage
@@ -25,7 +29,8 @@ export function UserOptions() {
           <AvatarFallback>MBi</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="p-1">
+      <DropdownMenuContent align="end" className="p-1"
+      >
         <div className="px-2 py-2">
           <div className="flex flex-col">
             <span className="text-sm font-semibold">Miroslav Hanisko</span>
@@ -34,8 +39,10 @@ export function UserOptions() {
         </div>
         <Separator className="mb-1" />
         <div className="flex flex-col gap-1">
-          <DropdownMenuItem className="cursor-pointer">
-            <User /> Profile
+          <DropdownMenuItem asChild className="cursor-pointer">
+            <Link className="w-full flex gap-2 items-center" href="/account">
+              <User /> Profile
+            </Link>
           </DropdownMenuItem>
           <DropdownMenuItem className="cursor-pointer">
             <Settings /> Settings
@@ -44,8 +51,12 @@ export function UserOptions() {
             <Headset /> Support
           </DropdownMenuItem>
           <Separator />
-          <DropdownMenuItem className="cursor-pointer">
-            <LogOut /> Logout
+          <DropdownMenuItem asChild className="cursor-pointer">
+            <form action="/auth/signout" method="post" >
+              <button type="submit" className="flex items-center gap-2 py-1">
+                <LogOut /> Logout
+              </button>
+            </form>
           </DropdownMenuItem>
         </div>
       </DropdownMenuContent>

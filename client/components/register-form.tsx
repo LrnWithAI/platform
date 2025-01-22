@@ -33,7 +33,12 @@ export function RegisterForm({ className, ...props }: React.ComponentPropsWithou
       formData.append("email", data.email);
       formData.append("password", data.password);
 
-      await register(formData);
+      const res = await register(formData);
+
+      if (res instanceof Error) {
+        toast.error(String(res));
+      }
+
     } catch (error) {
       toast.error(String(error));
     }

@@ -3,7 +3,6 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
-import { toast } from "react-toastify";
 
 export async function register(formData: FormData) {
   const supabase = await createClient();
@@ -13,21 +12,15 @@ export async function register(formData: FormData) {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
 
-  // Call Supabase to register the user
-  const { error } = await supabase.auth.signUp({
+  // Step 1: Register user in auth.users
+  const { data: authData, error: authError } = await supabase.auth.signUp({
     email,
-    password,
-    options: {
-      data: {
-        firstName,
-        lastName,
-      },
-    },
+    password
   });
 
-  if (error) {
-    toast.error(String(error));
-    return;
+  if (authError) {
+    console.error("Error registering user:", authError);
+    return authError;
   }
 
   revalidatePath("/");
