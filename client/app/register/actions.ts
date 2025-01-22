@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
+import { toast } from "react-toastify";
 
 export async function register(formData: FormData) {
   const supabase = await createClient();
@@ -25,11 +26,10 @@ export async function register(formData: FormData) {
   });
 
   if (error) {
-    console.error("Supabase registration error:", error.message);
-    redirect("/error");
+    toast.error(String(error));
+    return;
   }
 
-  // Revalidate paths and redirect on success
   revalidatePath("/");
   redirect("/account");
 }
