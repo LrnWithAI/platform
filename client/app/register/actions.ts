@@ -1,7 +1,6 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 
 export async function register(formData: FormData) {
@@ -12,7 +11,6 @@ export async function register(formData: FormData) {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
 
-  // Step 1: Register user in auth.users
   const { data: authData, error: authError } = await supabase.auth.signUp({
     email,
     password
@@ -20,9 +18,9 @@ export async function register(formData: FormData) {
 
   if (authError) {
     console.error("Error registering user:", authError);
-    return authError;
+    return { success: false, message: authError.message };
   }
 
   revalidatePath("/");
-  redirect("/account");
+  return { success: true, message: "Registration successful!" };
 }

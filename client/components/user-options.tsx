@@ -11,8 +11,6 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Headset, LogOut, Settings, User } from "lucide-react"
 import { Separator } from "./ui/separator"
-import { Button } from "./ui/button"
-import { redirect } from "next/navigation"
 import Link from "next/link"
 
 export function UserOptions() {

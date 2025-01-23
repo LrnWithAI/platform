@@ -8,13 +8,14 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const token_hash = searchParams.get("token_hash");
   const type = searchParams.get("type") as EmailOtpType | null;
-  const next = "/account";
+  const next = searchParams.get("next") || "/account"; // Use 'next' from the URL if available
 
   // Create redirect link without the secret token
   const redirectTo = request.nextUrl.clone();
   redirectTo.pathname = next;
   redirectTo.searchParams.delete("token_hash");
   redirectTo.searchParams.delete("type");
+  redirectTo.searchParams.delete("next"); // Remove 'next' to clean the URL
 
   if (token_hash && type) {
     const supabase = await createClient();
