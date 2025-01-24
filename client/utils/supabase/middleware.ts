@@ -31,13 +31,8 @@ export async function updateSession(request: NextRequest) {
 
   if (
     !user &&
-    (
-      request.nextUrl.pathname.startsWith('/account') ||
-      request.nextUrl.pathname.startsWith('/settings') ||
-      request.nextUrl.pathname.startsWith('/support') ||
-      request.nextUrl.pathname.startsWith('/home') ||
-      request.nextUrl.pathname.startsWith('/library') ||
-      request.nextUrl.pathname.startsWith('/classes')
+    ['/account', '/settings', '/support', '/home', '/library', '/classes'].some((path) =>
+      request.nextUrl.pathname.startsWith(path)
     )
   ) {
     // no user, potentially respond by redirecting the user to the login page
@@ -48,10 +43,8 @@ export async function updateSession(request: NextRequest) {
 
   if (
     user &&
-    (
-      request.nextUrl.pathname.startsWith('/login') ||
-      request.nextUrl.pathname.startsWith('/register') ||
-      request.nextUrl.pathname.startsWith('/forgot')
+    ['/login', '/register', '/forgot'].some((path) =>
+      request.nextUrl.pathname.startsWith(path)
     )
   ) {
     // no user, potentially respond by redirecting the user to the login page

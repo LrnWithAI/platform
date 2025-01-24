@@ -1,0 +1,16 @@
+export type User = {
+  id: string;
+  first_name: string;
+  last_name: string;
+  full_name: string;
+  username: string;
+  updated_at: string;
+  avatar_url: string;
+  website: string;
+} | null;
+
+export type UserState = {
+  user: User;
+  setUser: (user: User) => void;
+  clearUser: () => void;
+};

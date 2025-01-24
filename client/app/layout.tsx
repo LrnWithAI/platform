@@ -9,6 +9,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { createClient } from "@/utils/supabase/server";
 import { ToastContainer } from 'react-toastify';
+import ClientProvider from "./ClientProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,13 +26,9 @@ export const metadata: Metadata = {
   description: "Make learning fun & easier with AI",
 };
 
-export default async function RootLayout({
-  children,
-}: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
 
   return (
     <html lang="en">
@@ -45,13 +42,15 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           {user ? (
-            <SidebarProvider>
-              <AppSidebar />
-              <main className="w-full">
-                <NavHeaderLoggedIn />
-                {children}
-              </main>
-            </SidebarProvider>
+            <ClientProvider user={user}>
+              <SidebarProvider>
+                <AppSidebar />
+                <main className="w-full">
+                  <NavHeaderLoggedIn />
+                  {children}
+                </main>
+              </SidebarProvider>
+            </ClientProvider>
           ) : (
             <SidebarProvider>
               <main className="w-full">
