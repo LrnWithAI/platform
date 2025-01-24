@@ -10,9 +10,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { updatePassword } from "@/app/update-password/actions";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import { updatePassword } from "@/actions/authActions";
 
 type UpdatePasswordFormValues = z.infer<typeof updatePasswordSchema>;
 

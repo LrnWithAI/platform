@@ -10,9 +10,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { login } from "@/app/login/actions";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import { login } from "@/actions/authActions";
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
