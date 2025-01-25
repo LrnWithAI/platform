@@ -15,6 +15,7 @@ import { Cards } from "@/components/cards";
 import { Class } from "@/types/class";
 import { getClasses } from "@/actions/classActions";
 import { toast } from "react-toastify";
+import { useLoadingStore } from "@/stores/loadingStore";
 
 const orderOptions = [
   { label: "Newest", value: "newest" },
@@ -32,10 +33,11 @@ const filterOptions = [
 export default function Classes() {
   const router = useRouter();
   const [classes, setClasses] = useState<Class[]>([]);
-  const [loading, setLoading] = useState(true);
+  const setLoading = useLoadingStore((state) => state.setLoading);
 
   useEffect(() => {
     async function fetchClasses() {
+      setLoading(true);
       try {
         const response = await getClasses();
         if (response) {
