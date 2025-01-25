@@ -2,6 +2,10 @@
 import { useCallback, useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { type User } from "@supabase/supabase-js";
+import { toast } from "react-toastify";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 import Avatar from "./avatar";
 
@@ -9,6 +13,8 @@ export default function AccountForm({ user }: { user: User | null }) {
   const supabase = createClient();
   const [loading, setLoading] = useState(true);
   const [fullname, setFullname] = useState<string | null>(null);
+  const [firstName, setFirstName] = useState<string | null>(null);
+  const [lastName, setLastName] = useState<string | null>(null);
   const [username, setUsername] = useState<string | null>(null);
   const [website, setWebsite] = useState<string | null>(null);
   const [avatar_url, setAvatarUrl] = useState<string | null>(null);
@@ -30,6 +36,8 @@ export default function AccountForm({ user }: { user: User | null }) {
 
       if (data) {
         setFullname(data.full_name);
+        setFirstName(data.full_name.split(" ")[0]);
+        setLastName(data.full_name.split(" ")[1]);
         setUsername(data.username);
         setWebsite(data.website);
         setAvatarUrl(data.avatar_url);
@@ -47,11 +55,16 @@ export default function AccountForm({ user }: { user: User | null }) {
 
   async function updateProfile({
     username,
+    fullname,
+    firstName,
+    lastName,
     website,
     avatar_url,
   }: {
     username: string | null;
     fullname: string | null;
+    firstName: string | null;
+    lastName: string | null;
     website: string | null;
     avatar_url: string | null;
   }) {
@@ -61,129 +74,115 @@ export default function AccountForm({ user }: { user: User | null }) {
       const { error } = await supabase.from("profiles").upsert({
         id: user?.id as string,
         full_name: fullname,
+        first_name: firstName,
+        last_name: lastName,
         username,
         website,
         avatar_url,
         updated_at: new Date().toISOString(),
       });
       if (error) throw error;
-      alert("Profile updated!");
+      toast.success("Profile updated successfully!");
     } catch (error) {
-      alert("Error updating the data!");
+      toast.success("Error updating the data!");
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="form-widget max-w-lg mx-auto p-8 bg-white rounded-lg shadow-md space-y-8">
-      {/* Avatar Section */}
-      <div className="flex flex-col items-center space-y-4">
-        <Avatar
-          uid={user?.id ?? null}
-          url={avatar_url}
-          size={150}
-          onUpload={(url) => {
-            setAvatarUrl(url);
-            updateProfile({ fullname, username, website, avatar_url: url });
-          }}
-        />
-        <button
-          onClick={() => document.querySelector('input[type="file"]').click()}
-          className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-        >
-          Upload Avatar
-        </button>
+    <div className="mx-auto mt-8 md:mt-14 p-6 max-w-xl bg-white dark:bg-muted border space-y-4 rounded-lg">
+      <div>
+        <Label className="text-md">Avatar</Label>
+        <div className="flex flex-row mt-2">
+          <Avatar
+            uid={user?.id ?? null}
+            url={avatar_url}
+            size={100}
+            onUpload={(url) => {
+              setAvatarUrl(url);
+              updateProfile({
+                fullname,
+                username,
+                firstName,
+                lastName,
+                website,
+                avatar_url,
+              });
+            }}
+          />
+        </div>
       </div>
 
       {/* Form Section */}
       <div className="space-y-6">
-        <div>
-          <label
-            htmlFor="email"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Email
-          </label>
-          <input
-            id="email"
-            type="text"
-            value={user?.email}
-            disabled
-            className="mt-2 block w-full rounded-md border border-gray-300 bg-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm cursor-not-allowed"
-          />
+        <div className="space-y-2">
+          <Label htmlFor="email">Email</Label>
+          <Input id="email" type="email" value={user?.email} disabled />
         </div>
 
-        <div>
-          <label
-            htmlFor="fullName"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Full Name
-          </label>
-          <input
-            id="fullName"
-            type="text"
-            value={fullname || ""}
-            onChange={(e) => setFullname(e.target.value)}
-            className="mt-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-          />
+        <div className="flex flex-row gap-4">
+          <div className="flex flex-col space-y-2 w-1/2">
+            <Label htmlFor="firstName">First Name</Label>
+            <Input
+              id="firstName"
+              type="text"
+              value={firstName || ""}
+              onChange={(e) => setFirstName(e.target.value)}
+            />
+          </div>
+          <div className="flex flex-col space-y-2 w-1/2">
+            <Label htmlFor="firstName">Last Name</Label>
+            <Input
+              id="lastName"
+              type="text"
+              value={lastName || ""}
+              onChange={(e) => setLastName(e.target.value)}
+            />
+          </div>
         </div>
 
-        <div>
-          <label
-            htmlFor="username"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Username
-          </label>
-          <input
+        <div className="space-y-2">
+          <Label htmlFor="username">Username</Label>
+          <Input
             id="username"
             type="text"
             value={username || ""}
             onChange={(e) => setUsername(e.target.value)}
-            className="mt-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           />
         </div>
 
-        <div>
-          <label
-            htmlFor="website"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Website
-          </label>
-          <input
+        <div className="space-y-2">
+          <Label htmlFor="website">Website</Label>
+          <Input
             id="website"
             type="url"
             value={website || ""}
             onChange={(e) => setWebsite(e.target.value)}
-            className="mt-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           />
         </div>
       </div>
 
       {/* Buttons Section */}
-      <div className="flex items-center justify-between space-x-4">
-        <button
-          className={`px-6 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${loading ? "opacity-50 cursor-not-allowed" : ""
-            }`}
+      <div className="flex justify-end pt-4">
+        <Button
+          className={`bg-purple hover:bg-violet-500 text-white hover:text-white ${
+            loading ? "opacity-50 cursor-not-allowed" : ""
+          }`}
           onClick={() =>
-            updateProfile({ fullname, username, website, avatar_url })
+            updateProfile({
+              username,
+              fullname: `${firstName} ${lastName}`,
+              firstName,
+              lastName,
+              website,
+              avatar_url,
+            })
           }
           disabled={loading}
         >
           {loading ? "Loading ..." : "Update"}
-        </button>
-
-        <form action="/auth/signout" method="post">
-          <button
-            className="px-6 py-2 bg-red-600 text-white text-sm font-medium rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-            type="submit"
-          >
-            Sign out
-          </button>
-        </form>
+        </Button>
       </div>
     </div>
   );

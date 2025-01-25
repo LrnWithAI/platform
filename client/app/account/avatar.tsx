@@ -1,7 +1,9 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { createClient } from "@/utils/supabase/client";
 import Image from "next/image";
+
+import { Button } from "@/components/ui/button";
 
 export default function Avatar({
   uid,
@@ -17,6 +19,14 @@ export default function Avatar({
   const supabase = createClient();
   const [avatarUrl, setAvatarUrl] = useState<string | null>(url);
   const [uploading, setUploading] = useState(false);
+
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const handleUploadButtonClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
 
   useEffect(() => {
     async function downloadImage(path: string) {
@@ -69,15 +79,14 @@ export default function Avatar({
   };
 
   return (
-    <div>
+    <div className="flex gap-5 items-center">
       {avatarUrl ? (
         <Image
           width={size}
           height={size}
           src={avatarUrl}
           alt="Avatar"
-          className="avatar image"
-          style={{ height: size, width: size }}
+          className="rounded-full aspect-square object-cover border"
         />
       ) : (
         <div
@@ -85,11 +94,15 @@ export default function Avatar({
           style={{ height: size, width: size }}
         />
       )}
-      <div style={{ width: size }}>
-        <label className="button primary block" htmlFor="single">
-          {uploading ? "Uploading ..." : "Upload"}
-        </label>
+      <div className="flex flex-col md:flex-row gap-4">
+        <Button onClick={handleUploadButtonClick} variant="outline">
+          {avatarUrl ? "Change avatar" : "Upload"}
+        </Button>
+
+        {avatarUrl && <Button variant="destructive">Delete avatar</Button>}
+
         <input
+          ref={fileInputRef}
           style={{
             visibility: "hidden",
             position: "absolute",
