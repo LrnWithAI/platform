@@ -11,11 +11,52 @@ import { Label } from './ui/label';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
 
-export function ClassesCards() {
+export function ClassesCards({ orderOption, filterOption }: { orderOption: string, filterOption: Record<string, string> }) {
   const setLoading = useLoadingStore((state) => state.setLoading);
   const setClasses = useClassStore((state) => state.setClasses);
-  const cards = useClassStore((state) => state.classes)
+  const classes = useClassStore((state) => state.classes)
   const [editData, setEditData] = useState({ id: 0, title: "", description1: "" });
+
+  // Apply Filtering
+  // Apply Filtering
+  const filteredClasses = classes.filter((card) => {
+    for (const key in filterOption) {
+      const filterValue = filterOption[key]?.toString().toLowerCase();
+      const cardValue = card[key];
+
+      // Handle the 'members' field differently
+      if (key === "members" && Array.isArray(cardValue)) {
+        console.log(cardValue.length.toString())
+        // Compare the length of the 'members' array
+        if (filterValue && !cardValue.length.toString().includes(filterValue)) {
+          return false;
+        }
+      } else if (cardValue && cardValue.toString().toLowerCase && !cardValue.toString().toLowerCase().includes(filterValue)) {
+        return false;
+      }
+    }
+    return true;
+  });
+
+
+
+  // Apply Sorting
+  const sortedClasses = filteredClasses.sort((a, b) => {
+    if (orderOption === "newest") {
+      return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
+    }
+    if (orderOption === "older") {
+      return new Date(a.created_at || 0).getTime() - new Date(b.created_at || 0).getTime();
+    }
+    if (orderOption === "a-z") {
+      return a.title.localeCompare(b.title);
+    }
+    if (orderOption === "z-a") {
+      return b.title.localeCompare(a.title);
+    }
+    return 0;
+  });
+
 
   const handleDelete = async (id: number) => {
     try {
@@ -74,7 +115,7 @@ export function ClassesCards() {
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      {cards.map((card) => (
+      {sortedClasses.map((card) => (
         <div
           key={card.id}
           className="relative p-5 border rounded-lg shadow bg-white hover:cursor-pointer hover:scale-105 duration-300"
@@ -156,7 +197,7 @@ export function ClassesCards() {
             />
             <div className="ml-4 flex flex-col justify-center">
               <p className="text-sm text-gray-700 font-bold">{card.description1}</p>
-              <p className="text-sm text-gray-500 mt-2">{card.description2 ?? "1 Member"}</p>
+              <p className="text-sm text-gray-500 mt-2">{card.members.length + " Members"}</p>
             </div>
           </div>
         </div>

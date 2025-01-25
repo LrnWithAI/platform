@@ -1,7 +1,6 @@
 "use server";
 
 import { createClient } from "@/utils/supabase/server";
-import { Class } from "@/types/class";
 
 /* GET Classes */
 export async function getClasses() {

@@ -24,9 +24,9 @@ const orderOptions = [
 ]
 
 const filterOptions = [
-  { label: "Subject", value: "", type: "input" },
-  { label: "Class Time", value: "", type: "input" },
-  { label: "Members", value: "", type: "input" },
+  { label: "Name", value: "", name: "title" },
+  { label: "Class Time", value: "", name: "description1" },
+  { label: "Members", value: "", name: "members" },
 ]
 
 export default function Classes() {
@@ -59,7 +59,14 @@ export default function Classes() {
   const [orderOption, setOrderOption] = useState("")
 
   const [openFilterOption, setOpenFilterOption] = useState(false)
-  const [filterOption, setFilterOption] = useState("")
+  const [filterOption, setFilterOption] = useState({})
+
+  const updateFilterOption = (key: string, value: string) => {
+    setFilterOption((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
 
   const [newClassData, setNewClassData] = useState({
     title: "",
@@ -203,9 +210,9 @@ export default function Classes() {
                 variant="outline"
                 role="combobox"
                 aria-expanded={openFilterOption}
-                className="w-[90px] justify-between"
+                className="w-[105px] justify-between"
               >
-                {filterOption ? filterOption : "Filter"}
+                {Object.keys(filterOption).length > 0 ? "Filtered" : "Filter"}
                 <Filter className="opacity-50" />
               </Button>
             </PopoverTrigger>
@@ -214,19 +221,18 @@ export default function Classes() {
                 <CommandList>
                   <CommandGroup>
                     {filterOptions.map((filter) => (
-                      filter.type === "input" && filterOption === filter.value && (
-                        <div key={filter.label} className="p-1">
-                          <Label htmlFor={filter.value}>{filter.label}</Label>
-                          <Input
-                            id={filter.value}
-                            className="border mt-1"
-                            onChange={(e) => setFilterOption(e.target.value)}
-                          />
-                        </div>
-                      )
+                      <div key={filter.label} className="p-1">
+                        <Label htmlFor={filter.value}>{filter.label}</Label>
+                        <Input
+                          id={filter.value}
+                          value={filterOption[filter.name] || ""}
+                          className="border mt-1"
+                          onChange={(e) => updateFilterOption(filter.name, e.target.value)}
+                        />
+                      </div>
                     ))}
 
-                    <div className="w-full flex justify-between p-1">
+                    {/* <div className="w-full flex justify-between p-1">
                       <Button
                         variant="default"
                         onClick={() => setOpenFilterOption(false)}
@@ -239,7 +245,7 @@ export default function Classes() {
                       >
                         Confirm
                       </Button>
-                    </div>
+                    </div> */}
                   </CommandGroup>
                 </CommandList>
               </Command>
@@ -248,7 +254,7 @@ export default function Classes() {
         </div>
       </div>
 
-      <ClassesCards />
+      <ClassesCards orderOption={orderOption} filterOption={filterOption} />
     </div >
   )
 }

@@ -4,7 +4,6 @@ export type Class = {
   title: string;
   image_url: string;
   description1: string;
-  description2: string;
   members: string[];
 }
 
