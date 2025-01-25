@@ -10,12 +10,12 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-
 import { Cards } from "@/components/cards";
-import { Class } from "@/types/class";
-import { getClasses } from "@/actions/classActions";
 import { toast } from "react-toastify";
+
+import { getClasses } from "@/actions/classActions";
 import { useLoadingStore } from "@/stores/loadingStore";
+import { useClassStore } from "@/stores/classStore";
 
 const orderOptions = [
   { label: "Newest", value: "newest" },
@@ -32,14 +32,15 @@ const filterOptions = [
 
 export default function Classes() {
   const router = useRouter();
-  const [classes, setClasses] = useState<Class[]>([]);
   const setLoading = useLoadingStore((state) => state.setLoading);
+  const setClasses = useClassStore((state) => state.setClasses);
 
   useEffect(() => {
     async function fetchClasses() {
-      setLoading(true);
       try {
+        setLoading(true);
         const response = await getClasses();
+
         if (response) {
           setClasses(response.data);
           toast.success("Classes loaded successfully!");
@@ -55,7 +56,6 @@ export default function Classes() {
 
     fetchClasses();
   }, []);
-
 
   const [openOrderOption, setOpenOrderOption] = useState(false)
   const [orderOption, setOrderOption] = useState("")
@@ -150,7 +150,7 @@ export default function Classes() {
                   <CommandGroup>
                     {orderOptions.map((option) => (
                       <CommandItem
-                        key={option.value}
+                        key={option.label}
                         value={option.value}
                         onSelect={(currentValue) => {
                           setOrderOption(currentValue === orderOption ? "" : currentValue)
@@ -190,7 +190,7 @@ export default function Classes() {
                   <CommandGroup>
                     {filterOptions.map((filter) => (
                       filter.type === "input" && filterOption === filter.value && (
-                        <div key={filter.value} className="p-1">
+                        <div key={filter.label} className="p-1">
                           <Label htmlFor={filter.value}>{filter.label}</Label>
                           <Input
                             id={filter.value}
@@ -224,7 +224,7 @@ export default function Classes() {
       </div>
 
       <Cards
-        cards={classes}
+        cardsType="class"
         navigateTo="/classes/class-example"
       />
     </div >

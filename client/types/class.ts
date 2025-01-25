@@ -9,6 +9,11 @@ export type Class = {
 }
 
 export type CardsProps = {
-  cards: Class[];
+  cardsType: string;
   navigateTo: string;
+}
+
+export type ClassStore = {
+  classes: Class[];
+  setClasses: (classes: Class[]) => void;
 }
