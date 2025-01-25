@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { CirclePlus, ChevronDown, Filter, Check } from "lucide-react";
 import { cn } from "@/lib/utils"
 import { Input } from "@/components/ui/input";
@@ -10,10 +9,10 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Cards } from "@/components/cards";
+import { ClassesCards } from "@/components/class-cards";
 import { toast } from "react-toastify";
 
-import { getClasses } from "@/actions/classActions";
+import { createClass, getClasses } from "@/actions/classActions";
 import { useLoadingStore } from "@/stores/loadingStore";
 import { useClassStore } from "@/stores/classStore";
 
@@ -31,7 +30,6 @@ const filterOptions = [
 ]
 
 export default function Classes() {
-  const router = useRouter();
   const setLoading = useLoadingStore((state) => state.setLoading);
   const setClasses = useClassStore((state) => state.setClasses);
 
@@ -63,6 +61,39 @@ export default function Classes() {
   const [openFilterOption, setOpenFilterOption] = useState(false)
   const [filterOption, setFilterOption] = useState("")
 
+  const [newClassData, setNewClassData] = useState({
+    title: "",
+    description1: ""
+  });
+
+  const handleInputChange = (field: string, value: string) => {
+    setNewClassData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleCreateClass = async () => {
+    try {
+      setLoading(true);
+      const response = await createClass(newClassData);
+
+      if (response.success) {
+        toast.success("Class created successfully!");
+
+        // Fetch updated classes
+        const updatedClasses = await getClasses();
+        if (updatedClasses) {
+          setClasses(updatedClasses.data);
+          toast.success("Updated classes loaded successfully!");
+        }
+      } else {
+        toast.error(response.message || "Failed to create class.");
+      }
+    } catch (error) {
+      toast.error("An error occurred while creating the class.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="flex flex-1 flex-col gap-4 p-8">
       <h1 className="text-2xl font-bold">Your Classes</h1>
@@ -84,44 +115,38 @@ export default function Classes() {
                 </DialogTitle>
                 <DialogDescription className="border rounded-xl text-left p-3 flex flex-col gap-5">
                   <div>
-                    <Label htmlFor="name">Name</Label>
+                    <Label htmlFor="title">Name</Label>
                     <Input
-                      id="name"
+                      id="title"
                       className="border"
+                      value={newClassData.title}
+                      onChange={(e) => handleInputChange("title", e.target.value)}
                     />
                   </div>
                   <div>
-                    <Label htmlFor="name">Subject</Label>
+                    <Label htmlFor="description1">Class Time</Label>
                     <Input
-                      id="name"
+                      id="description1"
                       className="border"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="name">Class Time</Label>
-                    <Input
-                      id="name"
-                      className="border"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="name">Year</Label>
-                    <Input
-                      id="name"
-                      className="border"
+                      value={newClassData.description1}
+                      onChange={(e) => handleInputChange("description1", e.target.value)}
                     />
                   </div>
                 </DialogDescription>
               </DialogHeader>
               <DialogFooter className="flex gap-2 w-full">
                 <DialogClose asChild className="w-full">
-                  <Button type="button" variant="secondary" >
+                  <Button type="button" variant="secondary">
                     Cancel
                   </Button>
                 </DialogClose>
                 <DialogClose asChild className="w-full">
-                  <Button type="button" variant="default" onClick={() => router.push('/classes/new-class-example')}>
-                    Ok
+                  <Button
+                    type="button"
+                    variant="default"
+                    onClick={() => handleCreateClass()}
+                  >
+                    Create
                   </Button>
                 </DialogClose>
               </DialogFooter>
@@ -223,10 +248,7 @@ export default function Classes() {
         </div>
       </div>
 
-      <Cards
-        cardsType="class"
-        navigateTo="/classes/class-example"
-      />
+      <ClassesCards />
     </div >
   )
 }

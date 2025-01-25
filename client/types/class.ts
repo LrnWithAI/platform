@@ -8,11 +8,6 @@ export type Class = {
   members: string[];
 }
 
-export type CardsProps = {
-  cardsType: string;
-  navigateTo: string;
-}
-
 export type ClassStore = {
   classes: Class[];
   setClasses: (classes: Class[]) => void;

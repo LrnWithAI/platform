@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/utils/supabase/server";
+import { Class } from "@/types/class";
 
 /* GET Classes */
 export async function getClasses() {
@@ -20,7 +21,6 @@ export async function getClasses() {
 export async function deleteClass(id: number) {
   const supabase = await createClient();
 
-  console.log(id);
   const { error } = await supabase.from("class").delete().eq("id", id);
 
   if (error) {
@@ -32,7 +32,7 @@ export async function deleteClass(id: number) {
 }
 
 /* EDIT Class */
-export async function editClass(id: string, data: any) {
+export async function editClass(id: number, data: any) {
   const supabase = await createClient();
 
   const { error } = await supabase.from("class").update(data).eq("id", id);
@@ -44,3 +44,17 @@ export async function editClass(id: string, data: any) {
     return { success: true, message: "Class successfully edited" };
   }
 }
+
+/* CREATE Class */
+export async function createClass(data: any) {
+  console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAA")
+  const supabase = await createClient();
+
+  const { data: result, error } = await supabase.from("class").insert([data]);
+
+  if (error) {
+    console.error("Error creating class:", error.message);
+    return { success: false, message: error.message };
+  }
+  return { success: true, data: result };
+};
