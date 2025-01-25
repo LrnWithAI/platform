@@ -46,7 +46,6 @@ export async function editClass(id: number, data: any) {
 
 /* CREATE Class */
 export async function createClass(data: any) {
-  console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAA")
   const supabase = await createClient();
 
   const { data: result, error } = await supabase.from("class").insert([data]);

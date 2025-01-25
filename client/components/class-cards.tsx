@@ -26,7 +26,7 @@ export function ClassesCards({ orderOption, filterOption }: { orderOption: strin
 
       // Handle the 'members' field differently
       if (key === "members" && Array.isArray(cardValue)) {
-        console.log(cardValue.length.toString())
+
         // Compare the length of the 'members' array
         if (filterValue && !cardValue.length.toString().includes(filterValue)) {
           return false;
