@@ -4,7 +4,13 @@ import { createClient } from "@/utils/supabase/server";
 export default async function Account() {
   const supabase = await createClient();
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  return <AccountForm user={user} />;
+  return (
+    <div className="m-4 ">
+      <AccountForm user={user} />
+    </div>
+  );
 }
