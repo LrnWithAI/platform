@@ -11,6 +11,7 @@ import { useLoadingStore } from '@/stores/loadingStore';
 import { deleteClass } from '@/actions/classActions';
 import { toast } from 'react-toastify';
 import ClassMembers from '@/components/class-members';
+import ClassDialog from '@/components/class-dialog';
 
 const classSettings = [
   { label: "Delete", value: "delete", icon: Trash2 },
@@ -30,6 +31,15 @@ const Class = () => {
   const [openClassSettings, setClassSettings] = useState(false)
   const setLoading = useLoadingStore((state) => state.setLoading);
 
+  const [openDialogs, setOpenDialogs] = useState<{ [key: number]: boolean }>({});
+
+  const toggleDialog = (id: number) => {
+    setOpenDialogs((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
+
   useEffect(() => {
     if (!classData) {
       getClassById(Number(id));
@@ -41,7 +51,6 @@ const Class = () => {
 
     switch (action) {
       case "delete":
-        // Logic to delete class
         if (classData) {
           const response = await deleteClass(classData.id);
 
@@ -54,8 +63,9 @@ const Class = () => {
           break;
         }
       case "edit":
-        // Logic to edit class
-        console.log("Edit class", classData?.id);
+        if (classData) {
+          toggleDialog(classData.id);
+        }
         break;
       case "report":
         // Logic to report class
@@ -151,6 +161,15 @@ const Class = () => {
         </TabsContent>
         {/* <TabsContent value="files"><ClassFiles /> </TabsContent>*/}
       </Tabs>
+
+      {classData && openDialogs[classData.id] && (
+        <ClassDialog
+          type="edit"
+          isOpen={openDialogs[classData.id]}
+          onClose={() => toggleDialog(classData.id)}
+          initialData={classData}
+        />
+      )}
     </div>
   )
 }

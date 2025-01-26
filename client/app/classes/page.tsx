@@ -1,21 +1,20 @@
 "use client"
 
 import { useEffect, useState } from "react";
-import { CirclePlus, ChevronDown, Filter, Check } from "lucide-react";
+import { ChevronDown, Filter, Check, CirclePlus } from "lucide-react";
 import { cn } from "@/lib/utils"
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
+import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { ClassesCards } from "@/components/class-cards";
 import { toast } from "react-toastify";
 
-import { createClass, getClasses } from "@/actions/classActions";
+import { getClasses } from "@/actions/classActions";
 import { useLoadingStore } from "@/stores/loadingStore";
 import { useClassStore } from "@/stores/classStore";
-import { useUserStore } from "@/stores/userStore";
+import ClassDialog from "@/components/class-dialog";
 
 const orderOptions = [
   { label: "Newest", value: "newest" },
@@ -33,7 +32,6 @@ const filterOptions = [
 export default function Classes() {
   const setLoading = useLoadingStore((state) => state.setLoading);
   const setClasses = useClassStore((state) => state.setClasses);
-  const user = useUserStore((state) => state.user);
 
   useEffect(() => {
     async function fetchClasses() {
@@ -63,52 +61,13 @@ export default function Classes() {
   const [openFilterOption, setOpenFilterOption] = useState(false)
   const [filterOption, setFilterOption] = useState({})
 
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+
   const updateFilterOption = (key: string, value: string) => {
     setFilterOption((prev) => ({
       ...prev,
       [key]: value,
     }));
-  };
-
-  const [newClassData, setNewClassData] = useState({
-    title: "",
-    name: "",
-    class_time: "",
-    year: "",
-    image_url: "",
-  });
-
-  const handleInputChange = (field: string, value: string) => {
-    setNewClassData((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const handleCreateClass = async () => {
-    try {
-      setLoading(true);
-      if (!user) {
-        toast.error("User information is missing.");
-        return;
-      }
-      const updatedClassData = { ...newClassData, created_by: { id: user.id, name: user.full_name, role: user.role, email: user.email }, members: [{ id: user.id, name: user.full_name, role: user.role, email: user.email }] };
-      const response = await createClass(updatedClassData);
-
-      if (response.success) {
-        toast.success("Class created successfully!");
-
-        // Fetch updated classes
-        const updatedClasses = await getClasses();
-        if (updatedClasses) {
-          setClasses(updatedClasses.data);
-          toast.success("Updated classes loaded successfully!");
-        }
-      } else {
-        toast.error(response.message || "Failed to create class.");
-      }
-    } catch (error) {
-      toast.error("An error occurred while creating the class.");
-    } finally {
-      setLoading(false);
-    }
   };
 
   return (
@@ -118,84 +77,8 @@ export default function Classes() {
       <div className="flex justify-between">
         <div className="flex gap-1 items-center">
           <p>Create</p>
-          <Dialog>
-            <DialogTrigger>
-              <CirclePlus size={20} />
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>
-                  <div className="text-center">
-                    <strong className="font-bold text-2xl">Create Your Class</strong>
-                    <p className="font-thin my-3">Details of your class</p>
-                  </div>
-                </DialogTitle>
-                <DialogDescription className="border rounded-xl text-left p-3 flex flex-col gap-5">
-                  <div>
-                    <Label htmlFor="title">Title</Label>
-                    <Input
-                      id="title"
-                      className="border"
-                      value={newClassData.title}
-                      onChange={(e) => handleInputChange("title", e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="name">Name</Label>
-                    <Input
-                      id="name"
-                      className="border"
-                      value={newClassData.name}
-                      onChange={(e) => handleInputChange("name", e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="class_time">Class Time</Label>
-                    <Input
-                      id="class_time"
-                      className="border"
-                      value={newClassData.class_time}
-                      onChange={(e) => handleInputChange("class_time", e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="year">Year</Label>
-                    <Input
-                      id="year"
-                      className="border"
-                      value={newClassData.year}
-                      onChange={(e) => handleInputChange("year", e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="image_url">Image</Label>
-                    <Input
-                      id="image_url"
-                      className="border"
-                      type="file"
-                      onChange={(e) => handleInputChange("image_url", e.target.value)}
-                    />
-                  </div>
-                </DialogDescription>
-              </DialogHeader>
-              <DialogFooter className="flex gap-2 w-full">
-                <DialogClose asChild className="w-full">
-                  <Button type="button" variant="secondary">
-                    Cancel
-                  </Button>
-                </DialogClose>
-                <DialogClose asChild className="w-full">
-                  <Button
-                    type="button"
-                    variant="default"
-                    onClick={() => handleCreateClass()}
-                  >
-                    Create
-                  </Button>
-                </DialogClose>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+          <CirclePlus size={20} className="hover:cursor-pointer" onClick={() => setIsDialogOpen(true)} />
+          <ClassDialog type="create" isOpen={isDialogOpen} onClose={() => setIsDialogOpen(false)} />
         </div>
 
         <div className="flex gap-2 items-center">
