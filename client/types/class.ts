@@ -26,3 +26,17 @@ export type ClassStore = {
   class: Class;
   getClassById: (id: number) => void;
 }
+
+export type ClassDialogProps = {
+  type: "create" | "edit";
+  onClose: () => void;
+  isOpen: boolean;
+  initialData?: {
+    id?: number;
+    title?: string;
+    name?: string;
+    class_time?: string;
+    year?: string;
+    image_url?: string;
+  };
+}
