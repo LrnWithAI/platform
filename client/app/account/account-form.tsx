@@ -1,4 +1,10 @@
 "use client";
+
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { accountSchema } from "@/schema/account";
+import { useForm } from "react-hook-form";
+
 import { useCallback, useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { type User } from "@supabase/supabase-js";
@@ -6,18 +12,35 @@ import { toast } from "react-toastify";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-
 import Avatar from "./avatar";
+
+type AccountFormValues = z.infer<typeof accountSchema>;
 
 export default function AccountForm({ user }: { user: User | null }) {
   const supabase = createClient();
+  const [fetchedUser, setFetchedUser] = useState<AccountFormValues>();
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [fullname, setFullname] = useState<string | null>(null);
-  const [firstName, setFirstName] = useState<string | null>(null);
-  const [lastName, setLastName] = useState<string | null>(null);
-  const [username, setUsername] = useState<string | null>(null);
-  const [website, setWebsite] = useState<string | null>(null);
-  const [avatar_url, setAvatarUrl] = useState<string | null>(null);
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm<AccountFormValues>({
+    resolver: zodResolver(accountSchema),
+    defaultValues: {
+      firstName: user?.user_metadata.firstName ?? "",
+      lastName: user?.user_metadata.lastName ?? "",
+      username: fetchedUser?.username ?? "",
+      website: fetchedUser?.website ?? "",
+    },
+  });
+
+  const onSubmit = async (data: AccountFormValues) => {
+    console.log("submitted data", data);
+    await updateProfile(data);
+  };
 
   const getProfile = useCallback(async () => {
     try {
@@ -25,7 +48,7 @@ export default function AccountForm({ user }: { user: User | null }) {
 
       const { data, error, status } = await supabase
         .from("profiles")
-        .select(`full_name, username, website, avatar_url`)
+        .select(`*`)
         .eq("id", user?.id)
         .single();
 
@@ -35,12 +58,12 @@ export default function AccountForm({ user }: { user: User | null }) {
       }
 
       if (data) {
-        setFullname(data.full_name);
-        setFirstName(data.full_name.split(" ")[0]);
-        setLastName(data.full_name.split(" ")[1]);
-        setUsername(data.username);
-        setWebsite(data.website);
+        setFetchedUser({
+          ...data,
+        });
         setAvatarUrl(data.avatar_url);
+        setValue("username", data.username);
+        setValue("website", data.website);
       }
     } catch (error) {
       alert("Error loading user data!");
@@ -53,32 +76,18 @@ export default function AccountForm({ user }: { user: User | null }) {
     getProfile();
   }, [user, getProfile]);
 
-  async function updateProfile({
-    username,
-    fullname,
-    firstName,
-    lastName,
-    website,
-    avatar_url,
-  }: {
-    username: string | null;
-    fullname: string | null;
-    firstName: string | null;
-    lastName: string | null;
-    website: string | null;
-    avatar_url: string | null;
-  }) {
+  async function updateProfile(data: AccountFormValues) {
     try {
       setLoading(true);
 
       const { error } = await supabase.from("profiles").upsert({
         id: user?.id as string,
-        full_name: fullname,
-        first_name: firstName,
-        last_name: lastName,
-        username,
-        website,
-        avatar_url,
+        full_name: `${data.firstName} ${data.lastName}`,
+        first_name: data.firstName,
+        last_name: data.lastName,
+        username: data.username,
+        website: data.website,
+        avatar_url: avatarUrl,
         updated_at: new Date().toISOString(),
       });
       if (error) throw error;
@@ -91,24 +100,19 @@ export default function AccountForm({ user }: { user: User | null }) {
   }
 
   return (
-    <div className="mx-auto mt-8 md:mt-14 p-6 max-w-xl bg-white dark:bg-muted border space-y-4 rounded-lg">
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="mx-auto mt-8 md:mt-14 p-6 max-w-xl bg-white dark:bg-muted border space-y-4 rounded-lg"
+    >
       <div>
         <Label className="text-md">Avatar</Label>
         <div className="flex flex-row mt-2">
           <Avatar
             uid={user?.id ?? null}
-            url={avatar_url}
+            url={avatarUrl}
             size={100}
             onUpload={(url) => {
               setAvatarUrl(url);
-              updateProfile({
-                fullname,
-                username,
-                firstName,
-                lastName,
-                website,
-                avatar_url,
-              });
             }}
           />
         </div>
@@ -124,42 +128,34 @@ export default function AccountForm({ user }: { user: User | null }) {
         <div className="flex flex-row gap-4">
           <div className="flex flex-col space-y-2 w-1/2">
             <Label htmlFor="firstName">First Name</Label>
-            <Input
-              id="firstName"
-              type="text"
-              value={firstName || ""}
-              onChange={(e) => setFirstName(e.target.value)}
-            />
+            <Input id="firstName" type="text" {...register("firstName")} />
+            {errors.firstName && (
+              <p className="text-sm text-red-500">{errors.firstName.message}</p>
+            )}
           </div>
           <div className="flex flex-col space-y-2 w-1/2">
             <Label htmlFor="firstName">Last Name</Label>
-            <Input
-              id="lastName"
-              type="text"
-              value={lastName || ""}
-              onChange={(e) => setLastName(e.target.value)}
-            />
+            <Input id="lastName" type="text" {...register("lastName")} />
+            {errors.lastName && (
+              <p className="text-sm text-red-500">{errors.lastName.message}</p>
+            )}
           </div>
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="username">Username</Label>
-          <Input
-            id="username"
-            type="text"
-            value={username || ""}
-            onChange={(e) => setUsername(e.target.value)}
-          />
+          <Input id="username" type="text" {...register("username")} />
+          {errors.username && (
+            <p className="text-sm text-red-500">{errors.username.message}</p>
+          )}
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="website">Website</Label>
-          <Input
-            id="website"
-            type="url"
-            value={website || ""}
-            onChange={(e) => setWebsite(e.target.value)}
-          />
+          <Input id="website" type="url" {...register("website")} />
+          {errors.website && (
+            <p className="text-sm text-red-500">{errors.website.message}</p>
+          )}
         </div>
       </div>
 
@@ -169,21 +165,12 @@ export default function AccountForm({ user }: { user: User | null }) {
           className={`bg-purple hover:bg-violet-500 text-white hover:text-white ${
             loading ? "opacity-50 cursor-not-allowed" : ""
           }`}
-          onClick={() =>
-            updateProfile({
-              username,
-              fullname: `${firstName} ${lastName}`,
-              firstName,
-              lastName,
-              website,
-              avatar_url,
-            })
-          }
           disabled={loading}
+          type="submit"
         >
           {loading ? "Loading ..." : "Update"}
         </Button>
       </div>
-    </div>
+    </form>
   );
 }
