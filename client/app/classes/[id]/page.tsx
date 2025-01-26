@@ -76,6 +76,14 @@ const Class = () => {
     setLoading(false);
   };
 
+  const invitationUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/classes/${classData?.id}`;
+
+  const handleCopyToClipboard = () => {
+    navigator.clipboard.writeText(invitationUrl).then(() => {
+      toast.success('Class URL copied to clipboard!');
+    });
+  };
+
   return (
     <div className="flex flex-1 flex-col gap-4 p-8">
       <div className="bg-stone-200 rounded-lg flex justify-between p-4">
@@ -84,9 +92,9 @@ const Class = () => {
           <strong>{classData?.name}</strong>
           <p>{classData?.class_time}</p>
           <div className="flex gap-2">
-            <p>{classData?.invitation_url}</p>
+            <p>{invitationUrl}</p>
             <Share2 size={20} className="hover:cursor-pointer hover:scale-125 duration-300" />
-            <Copy size={20} className="hover:cursor-pointer hover:scale-125 duration-300" />
+            <Copy size={20} className="hover:cursor-pointer hover:scale-125 duration-300" onClick={handleCopyToClipboard} />
           </div>
         </div>
 

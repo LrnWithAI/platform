@@ -3,7 +3,6 @@ export type Class = {
   title: string;
   name: string;
   class_time: string;
-  invitation_url: string;
   members: [
     {
       id: number;
