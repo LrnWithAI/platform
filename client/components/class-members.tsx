@@ -1,8 +1,13 @@
 'use client'
 
 import React from 'react';
-import { Trash2, Mail } from 'lucide-react';
+import { Trash2, Mail, CirclePlus } from 'lucide-react';
 import { useParams } from 'next/navigation';
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Button } from './ui/button';
+import { Label } from './ui/label';
+import { Input } from './ui/input';
+
 import { useClassStore } from '@/stores/classStore';
 import { useLoadingStore } from '@/stores/loadingStore';
 import { editClass, getClasses } from '@/actions/classActions';
@@ -56,6 +61,47 @@ const ClassMembers = () => {
 
   return (
     <div className="space-y-6">
+      <Dialog>
+        <DialogTrigger>
+          <Button className="bg-violet-500 hover:bg-violet-600 text-white">
+            <CirclePlus size={20} /> Add Student
+          </Button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              <div className="text-center">
+                <strong className="font-bold text-2xl">Add student to your class</strong>
+              </div>
+            </DialogTitle>
+            <DialogDescription className="border rounded-xl text-left p-3 flex flex-col gap-5">
+              <div>
+                <Label htmlFor="id">ID of student</Label>
+                <Input
+                  id="id"
+                  className="border"
+                />
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex gap-2 w-full">
+            <DialogClose asChild className="w-full">
+              <Button type="button" variant="secondary">
+                Cancel
+              </Button>
+            </DialogClose>
+            <DialogClose asChild className="w-full">
+              <Button
+                type="button"
+                variant="default"
+              >
+                Add
+              </Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {teacher && (
         <div className="bg-gradient-to-r from-indigo-500 via-violet-500 to-pink-500 text-white p-4 rounded-lg shadow-lg">
           <h2 className="text-2xl font-bold mb-1">Teacher</h2>

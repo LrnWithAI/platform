@@ -93,7 +93,7 @@ const Class = () => {
           <p>{classData?.class_time}</p>
           <div className="flex gap-2">
             <p>{invitationUrl}</p>
-            <Share2 size={20} className="hover:cursor-pointer hover:scale-125 duration-300" />
+            {/* <Share2 size={20} className="hover:cursor-pointer hover:scale-125 duration-300" /> */}
             <Copy size={20} className="hover:cursor-pointer hover:scale-125 duration-300" onClick={handleCopyToClipboard} />
           </div>
         </div>
