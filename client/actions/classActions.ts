@@ -56,3 +56,17 @@ export async function createClass(data: any) {
   }
   return { success: true, data: result };
 };
+
+/* GET Class by ID */
+export async function getClassById(id: number) {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase.from("class").select(`*`).eq("id", id).single();
+
+  if (error) {
+    console.error("Error fetching class by ID:", error.message);
+    return { success: false, message: error.message, data: {} };
+  } else {
+    return { success: true, message: "Class successfully fetched", data: data };
+  }
+}

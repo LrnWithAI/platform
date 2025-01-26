@@ -1,13 +1,28 @@
 export type Class = {
   id: number;
-  created_at: string;
   title: string;
+  name: string;
+  class_time: string;
+  members: [
+    {
+      id: number;
+      name: string;
+      role: string;
+      email: string;
+    }
+  ];
+  year: string;
   image_url: string;
-  description1: string;
-  members: string[];
+  created_at: string;
+  created_by: {
+    id: number;
+    name: string;
+  };
 }
 
 export type ClassStore = {
   classes: Class[];
   setClasses: (classes: Class[]) => void;
+  class: Class;
+  getClassById: (id: number) => void;
 }

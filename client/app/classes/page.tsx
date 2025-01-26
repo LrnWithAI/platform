@@ -15,6 +15,7 @@ import { toast } from "react-toastify";
 import { createClass, getClasses } from "@/actions/classActions";
 import { useLoadingStore } from "@/stores/loadingStore";
 import { useClassStore } from "@/stores/classStore";
+import { useUserStore } from "@/stores/userStore";
 
 const orderOptions = [
   { label: "Newest", value: "newest" },
@@ -25,13 +26,14 @@ const orderOptions = [
 
 const filterOptions = [
   { label: "Name", value: "", name: "title" },
-  { label: "Class Time", value: "", name: "description1" },
+  { label: "Class Time", value: "", name: "class_time" },
   { label: "Members", value: "", name: "members" },
 ]
 
 export default function Classes() {
   const setLoading = useLoadingStore((state) => state.setLoading);
   const setClasses = useClassStore((state) => state.setClasses);
+  const user = useUserStore((state) => state.user);
 
   useEffect(() => {
     async function fetchClasses() {
@@ -70,7 +72,10 @@ export default function Classes() {
 
   const [newClassData, setNewClassData] = useState({
     title: "",
-    description1: ""
+    name: "",
+    class_time: "",
+    year: "",
+    image_url: "",
   });
 
   const handleInputChange = (field: string, value: string) => {
@@ -80,7 +85,12 @@ export default function Classes() {
   const handleCreateClass = async () => {
     try {
       setLoading(true);
-      const response = await createClass(newClassData);
+      if (!user) {
+        toast.error("User information is missing.");
+        return;
+      }
+      const updatedClassData = { ...newClassData, created_by: { id: user.id, name: user.full_name, role: user.role, email: user.email }, members: [{ id: user.id, name: user.full_name, role: user.role, email: user.email }] };
+      const response = await createClass(updatedClassData);
 
       if (response.success) {
         toast.success("Class created successfully!");
@@ -122,7 +132,7 @@ export default function Classes() {
                 </DialogTitle>
                 <DialogDescription className="border rounded-xl text-left p-3 flex flex-col gap-5">
                   <div>
-                    <Label htmlFor="title">Name</Label>
+                    <Label htmlFor="title">Title</Label>
                     <Input
                       id="title"
                       className="border"
@@ -131,12 +141,39 @@ export default function Classes() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="description1">Class Time</Label>
+                    <Label htmlFor="name">Name</Label>
                     <Input
-                      id="description1"
+                      id="name"
                       className="border"
-                      value={newClassData.description1}
-                      onChange={(e) => handleInputChange("description1", e.target.value)}
+                      value={newClassData.name}
+                      onChange={(e) => handleInputChange("name", e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="class_time">Class Time</Label>
+                    <Input
+                      id="class_time"
+                      className="border"
+                      value={newClassData.class_time}
+                      onChange={(e) => handleInputChange("class_time", e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="year">Year</Label>
+                    <Input
+                      id="year"
+                      className="border"
+                      value={newClassData.year}
+                      onChange={(e) => handleInputChange("year", e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="image_url">Image</Label>
+                    <Input
+                      id="image_url"
+                      className="border"
+                      type="file"
+                      onChange={(e) => handleInputChange("image_url", e.target.value)}
                     />
                   </div>
                 </DialogDescription>
@@ -176,7 +213,6 @@ export default function Classes() {
             </PopoverTrigger>
             <PopoverContent className="w-[150px] p-0">
               <Command>
-                <CommandInput placeholder="Search" />
                 <CommandList>
                   <CommandEmpty>Not found</CommandEmpty>
                   <CommandGroup>
@@ -188,6 +224,7 @@ export default function Classes() {
                           setOrderOption(currentValue === orderOption ? "" : currentValue)
                           setOpenOrderOption(false)
                         }}
+                        className="hover:cursor-pointer"
                       >
                         <Check
                           className={cn(
