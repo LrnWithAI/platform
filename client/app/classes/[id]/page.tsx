@@ -1,0 +1,127 @@
+'use client'
+
+import React, { useEffect, useState } from 'react'
+import { useParams } from 'next/navigation';
+import { useClassStore } from '@/stores/classStore';
+import { CircleAlert, Copy, EllipsisVertical, FilePenLine, Share2, SquareMinus, Trash2 } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
+import { cn } from '@/lib/utils';
+
+const classSettings = [
+  { label: "Delete", value: "delete", icon: Trash2 },
+  { label: "Edit", value: "edit", icon: FilePenLine },
+  { label: "Report", value: "report", icon: CircleAlert },
+  { label: "Remove all members", value: "remove_members", icon: SquareMinus },
+  { label: "Remove all content", value: "remove_content", icon: SquareMinus },
+]
+
+const Class = () => {
+  const params = useParams<{ id: string }>();
+  const id = params.id;
+
+  const classData = useClassStore((state) => state.classes.find((c) => c.id === Number(id)));
+  const getClassById = useClassStore((state) => state.getClassById);
+  const [openClassSettings, setClassSettings] = useState(false)
+
+  useEffect(() => {
+    if (!classData) {
+      getClassById(Number(id));
+    }
+  }, [id, classData, getClassById]);
+
+  const handleClassSettings = (action: string) => {
+    switch (action) {
+      case "delete":
+        // Logic to delete class
+        console.log("Delete class", classData?.id);
+        break;
+      case "edit":
+        // Logic to edit class
+        console.log("Edit class", classData?.id);
+        break;
+      case "report":
+        // Logic to report class
+        console.log("Report class", classData?.id);
+        break;
+      case "remove_members":
+        // Logic to remove all members
+        console.log("Remove all members from class", classData?.id);
+        break;
+      case "remove_content":
+        // Logic to remove all content
+        console.log("Remove all content from class", classData?.id);
+        break;
+      default:
+        console.log("Unknown action");
+    }
+  };
+
+  return (
+    <div className="flex flex-1 flex-col gap-4 p-8">
+      <div className="bg-stone-200 rounded-lg flex justify-between p-4">
+        <div>
+          <h1 className="text-2xl">{classData?.title}</h1>
+          <strong>{classData?.name}</strong>
+          <p>{classData?.class_time}</p>
+          <div className="flex gap-2">
+            <p>{classData?.invitation_url}</p>
+            <Share2 size={20} className="hover:cursor-pointer hover:scale-125 duration-300" />
+            <Copy size={20} className="hover:cursor-pointer hover:scale-125 duration-300" />
+          </div>
+        </div>
+
+        <div className="flex flex-col text-right">
+          <Popover open={openClassSettings} onOpenChange={setClassSettings}>
+            <PopoverTrigger asChild>
+              <EllipsisVertical className="me-0 ms-auto cursor-pointer hover:scale-125 duration-300" />
+            </PopoverTrigger>
+            <PopoverContent className="w-[150px] p-0">
+              <Command>
+                <CommandList>
+                  <CommandEmpty>Not found</CommandEmpty>
+                  <CommandGroup>
+                    {classSettings.map((option) => (
+                      <CommandItem
+                        key={option.label}
+                        value={option.value}
+                        onSelect={() => {
+                          handleClassSettings(option.value);
+                          setClassSettings(false);
+                        }}
+                        className="hover:cursor-pointer"
+                      >
+                        <option.icon className="mr-2 h-4 w-4" />
+                        {option.label}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
+
+          <strong>{classData?.created_by.name}</strong>
+          <p>{classData?.year}</p>
+          <p>{classData?.members?.length ?? 0} {(classData?.members?.length ?? 0) > 1 ? "Members" : "Member"}</p>
+        </div>
+      </div>
+
+      <Tabs defaultValue="account" className="w-full h-screen bg-stone-200 rounded-lg p-3">
+        <TabsList>
+          <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+          <TabsTrigger value="members">Members</TabsTrigger>
+          <TabsTrigger value="files">Files</TabsTrigger>
+
+        </TabsList>
+        <TabsContent value="dashboard">Dashboard</TabsContent>
+        <TabsContent value="members">Members</TabsContent>
+        <TabsContent value="files">Files</TabsContent>
+      </Tabs>
+
+    </div>
+  )
+}
+
+export default Class

@@ -25,7 +25,7 @@ const orderOptions = [
 
 const filterOptions = [
   { label: "Name", value: "", name: "title" },
-  { label: "Class Time", value: "", name: "description1" },
+  { label: "Class Time", value: "", name: "class_time" },
   { label: "Members", value: "", name: "members" },
 ]
 
@@ -70,7 +70,7 @@ export default function Classes() {
 
   const [newClassData, setNewClassData] = useState({
     title: "",
-    description1: ""
+    class_time: ""
   });
 
   const handleInputChange = (field: string, value: string) => {
@@ -131,12 +131,12 @@ export default function Classes() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="description1">Class Time</Label>
+                    <Label htmlFor="class_time">Class Time</Label>
                     <Input
-                      id="description1"
+                      id="class_time"
                       className="border"
-                      value={newClassData.description1}
-                      onChange={(e) => handleInputChange("description1", e.target.value)}
+                      value={newClassData.class_time}
+                      onChange={(e) => handleInputChange("class_time", e.target.value)}
                     />
                   </div>
                 </DialogDescription>
@@ -176,7 +176,6 @@ export default function Classes() {
             </PopoverTrigger>
             <PopoverContent className="w-[150px] p-0">
               <Command>
-                <CommandInput placeholder="Search" />
                 <CommandList>
                   <CommandEmpty>Not found</CommandEmpty>
                   <CommandGroup>
@@ -188,6 +187,7 @@ export default function Classes() {
                           setOrderOption(currentValue === orderOption ? "" : currentValue)
                           setOpenOrderOption(false)
                         }}
+                        className="hover:cursor-pointer"
                       >
                         <Check
                           className={cn(

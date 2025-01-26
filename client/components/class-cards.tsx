@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Pencil, Trash2 } from 'lucide-react';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from 'react-toastify';
 import { deleteClass, editClass, getClasses } from '@/actions/classActions';
@@ -15,10 +16,9 @@ export function ClassesCards({ orderOption, filterOption }: { orderOption: strin
   const setLoading = useLoadingStore((state) => state.setLoading);
   const setClasses = useClassStore((state) => state.setClasses);
   const classes = useClassStore((state) => state.classes)
-  const [editData, setEditData] = useState({ id: 0, title: "", description1: "" });
+  const [editData, setEditData] = useState({ id: 0, title: "", class_time: "" });
 
-  // Apply Filtering
-  // Apply Filtering
+  // Filtering
   const filteredClasses = classes.filter((card) => {
     for (const key in filterOption) {
       const filterValue = filterOption[key]?.toString().toLowerCase();
@@ -38,9 +38,7 @@ export function ClassesCards({ orderOption, filterOption }: { orderOption: strin
     return true;
   });
 
-
-
-  // Apply Sorting
+  // Sorting
   const sortedClasses = filteredClasses.sort((a, b) => {
     if (orderOption === "newest") {
       return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
@@ -56,7 +54,6 @@ export function ClassesCards({ orderOption, filterOption }: { orderOption: strin
     }
     return 0;
   });
-
 
   const handleDelete = async (id: number) => {
     try {
@@ -88,7 +85,7 @@ export function ClassesCards({ orderOption, filterOption }: { orderOption: strin
       setLoading(true);
       const response = await editClass(id, {
         title: editData.title,
-        description1: editData.description1,
+        class_time: editData.class_time,
       });
       if (response.success) {
         toast.success("Class updated successfully!");
@@ -120,13 +117,14 @@ export function ClassesCards({ orderOption, filterOption }: { orderOption: strin
           key={card.id}
           className="relative p-5 border rounded-lg shadow bg-white hover:cursor-pointer hover:scale-105 duration-300"
         >
+
           {/* Action Buttons */}
           <div className="absolute top-2 right-2 flex gap-1">
             <Dialog>
               <DialogTrigger>
                 <Button
                   className="bg-purple-500 rounded-sm hover:bg-purple-600 h-7 w-7"
-                  onClick={() => setEditData({ id: card.id, title: card.title, description1: card.description1 })}
+                  onClick={() => setEditData({ id: card.id, title: card.title, class_time: card.class_time })}
                 >
                   <Pencil size={16} />
                 </Button>
@@ -150,12 +148,12 @@ export function ClassesCards({ orderOption, filterOption }: { orderOption: strin
                       />
                     </div>
                     <div>
-                      <Label htmlFor="description1">Class Time</Label>
+                      <Label htmlFor="class_time">Class Time</Label>
                       <Input
-                        id="description1"
+                        id="class_time"
                         className="border"
-                        value={editData.description1}
-                        onChange={(e) => handleInputChange("description1", e.target.value)}
+                        value={editData.class_time}
+                        onChange={(e) => handleInputChange("class_time", e.target.value)}
                       />
                     </div>
                   </DialogDescription>
@@ -186,20 +184,22 @@ export function ClassesCards({ orderOption, filterOption }: { orderOption: strin
             </Button>
           </div>
 
-          {/* Card Content */}
-          <h2 className="text-lg font-bold mb-2">{card.title}</h2>
-          <div className="flex">
-            <Image
-              src={card.image_url || "/class_cover.jpg"}
-              alt={`Class ${card.id}`}
-              width={60}
-              height={20}
-            />
-            <div className="ml-4 flex flex-col justify-center">
-              <p className="text-sm text-gray-700 font-bold">{card.description1}</p>
-              <p className="text-sm text-gray-500 mt-2">{card.members.length + " Members"}</p>
+          <Link href={`/classes/${card.id}`}>
+            {/* Card Content */}
+            <h2 className="text-lg font-bold mb-2">{card.title}</h2>
+            <div className="flex">
+              <Image
+                src={card.image_url || "/class_cover.jpg"}
+                alt={`Class ${card.id}`}
+                width={60}
+                height={20}
+              />
+              <div className="ml-4 flex flex-col justify-center">
+                <p className="text-sm text-gray-700 font-bold">{card.class_time}</p>
+                <p className="text-sm text-gray-500 mt-2">{card.members.length + " Members"}</p>
+              </div>
             </div>
-          </div>
+          </Link>
         </div>
       ))}
     </div>
