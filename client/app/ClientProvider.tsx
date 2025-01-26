@@ -1,23 +1,28 @@
 "use client";
 
-import { useEffect } from 'react';
-import { cn } from '@/lib/utils';
+import { useEffect } from "react";
+import { cn } from "@/lib/utils";
 import { createClient } from "@/utils/supabase/client";
-import { LoaderCircle } from 'lucide-react';
+import { LoaderCircle } from "lucide-react";
 
 import { type User } from "@supabase/supabase-js";
-import { useUserStore } from '@/stores/userStore';
-import { useLoadingStore } from '@/stores/loadingStore';
-import { toast } from 'react-toastify';
+import { useUserStore } from "@/stores/userStore";
+import { useLoadingStore } from "@/stores/loadingStore";
+import { toast } from "react-toastify";
 
-export default function ClientProvider({ user, children }: { user: User, children: React.ReactNode }) {
+export default function ClientProvider({
+  user,
+  children,
+}: {
+  user: User;
+  children: React.ReactNode;
+}) {
   const supabase = createClient();
   const setUser = useUserStore((state) => state.setUser);
   const loading = useLoadingStore((state) => state.loading);
 
   const getProfile = async () => {
     try {
-
       const { data, error, status } = await supabase
         .from("profiles")
         .select(`*`)
