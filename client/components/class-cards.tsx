@@ -189,7 +189,6 @@ export function ClassesCards({ orderOption, filterOption }: { orderOption: strin
                         id="image_url"
                         className="border"
                         type="file"
-                        value={editData.image_url}
                         onChange={(e) => handleInputChange("image_url", e.target.value)}
                       />
                     </div>

@@ -173,7 +173,6 @@ export default function Classes() {
                       id="image_url"
                       className="border"
                       type="file"
-                      value={newClassData.image_url}
                       onChange={(e) => handleInputChange("image_url", e.target.value)}
                     />
                   </div>

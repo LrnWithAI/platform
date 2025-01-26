@@ -30,8 +30,6 @@ const Class = () => {
   const [openClassSettings, setClassSettings] = useState(false)
   const setLoading = useLoadingStore((state) => state.setLoading);
 
-  console.log(classData);
-
   useEffect(() => {
     if (!classData) {
       getClassById(Number(id));
@@ -138,7 +136,7 @@ const Class = () => {
         {/* <TabsContent value="dashboard"><ClassDashboard /></TabsContent>*/}
         <TabsContent value="members">
           {classData?.members ? (
-            <ClassMembers members={classData.members} />
+            <ClassMembers />
           ) : (
             <p>Loading members...</p>
           )}

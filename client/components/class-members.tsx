@@ -2,25 +2,56 @@
 
 import React from 'react';
 import { Trash2, Mail } from 'lucide-react';
+import { useParams } from 'next/navigation';
+import { useClassStore } from '@/stores/classStore';
+import { useLoadingStore } from '@/stores/loadingStore';
+import { editClass, getClasses } from '@/actions/classActions';
+import { toast } from 'react-toastify';
 
-type Member = {
-  id: number;
-  name: string;
-  role: string;
-  email: string;
-};
+const ClassMembers = () => {
+  const params = useParams<{ id: string }>();
+  const id = params.id;
+  const classData = useClassStore((state) => state.classes.find((c) => c.id === Number(id)));
+  const setLoading = useLoadingStore((state) => state.setLoading);
+  const setClasses = useClassStore((state) => state.setClasses);
 
-type ClassMembersProps = {
-  members: Member[];
-};
+  const teacher = classData?.members.find((member) => member.role === 'teacher');
+  const students = classData?.members.filter((member) => member.role === 'student') || [];
 
-const ClassMembers = ({ members }: ClassMembersProps) => {
-  const teacher = members.find((member) => member.role === 'teacher');
-  const students = members.filter((member) => member.role === 'student');
+  const handleDelete = async (id: number) => {
+    classData?.members.splice(
+      classData?.members.findIndex((member) => member.id === id),
+      1
+    );
 
-  const handleDelete = (id: number) => {
-    console.log(`Delete member with ID: ${id}`);
-    // Add your delete logic here
+    try {
+      setLoading(true);
+
+      if (!classData) {
+        toast.error("Class data is not available.");
+        return;
+      }
+      const response = await editClass(classData.id, {
+        members: classData.members,
+      });
+
+      if (response.success) {
+        toast.success("User removed successfully!");
+
+        // Fetch the updated list after editing
+        const updatedClasses = await getClasses();
+        if (updatedClasses) {
+          setClasses(updatedClasses.data);
+          toast.success('Updated classes loaded successfully!');
+        }
+      } else {
+        toast.error(response.message || "Failed to update class.");
+      }
+    } catch (error) {
+      toast.error("An error occurred while updating the class.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
