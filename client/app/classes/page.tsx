@@ -15,6 +15,7 @@ import { toast } from "react-toastify";
 import { createClass, getClasses } from "@/actions/classActions";
 import { useLoadingStore } from "@/stores/loadingStore";
 import { useClassStore } from "@/stores/classStore";
+import { useUserStore } from "@/stores/userStore";
 
 const orderOptions = [
   { label: "Newest", value: "newest" },
@@ -32,6 +33,7 @@ const filterOptions = [
 export default function Classes() {
   const setLoading = useLoadingStore((state) => state.setLoading);
   const setClasses = useClassStore((state) => state.setClasses);
+  const user = useUserStore((state) => state.user);
 
   useEffect(() => {
     async function fetchClasses() {
@@ -70,7 +72,10 @@ export default function Classes() {
 
   const [newClassData, setNewClassData] = useState({
     title: "",
-    class_time: ""
+    name: "",
+    class_time: "",
+    year: "",
+    image_url: "",
   });
 
   const handleInputChange = (field: string, value: string) => {
@@ -80,7 +85,12 @@ export default function Classes() {
   const handleCreateClass = async () => {
     try {
       setLoading(true);
-      const response = await createClass(newClassData);
+      if (!user) {
+        toast.error("User information is missing.");
+        return;
+      }
+      const updatedClassData = { ...newClassData, created_by: { id: user.id, name: user.full_name, role: user.role, email: user.email }, members: [{ id: user.id, name: user.full_name, role: user.role, email: user.email }] };
+      const response = await createClass(updatedClassData);
 
       if (response.success) {
         toast.success("Class created successfully!");
@@ -122,12 +132,21 @@ export default function Classes() {
                 </DialogTitle>
                 <DialogDescription className="border rounded-xl text-left p-3 flex flex-col gap-5">
                   <div>
-                    <Label htmlFor="title">Name</Label>
+                    <Label htmlFor="title">Title</Label>
                     <Input
                       id="title"
                       className="border"
                       value={newClassData.title}
                       onChange={(e) => handleInputChange("title", e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="name">Name</Label>
+                    <Input
+                      id="name"
+                      className="border"
+                      value={newClassData.name}
+                      onChange={(e) => handleInputChange("name", e.target.value)}
                     />
                   </div>
                   <div>
@@ -137,6 +156,25 @@ export default function Classes() {
                       className="border"
                       value={newClassData.class_time}
                       onChange={(e) => handleInputChange("class_time", e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="year">Year</Label>
+                    <Input
+                      id="year"
+                      className="border"
+                      value={newClassData.year}
+                      onChange={(e) => handleInputChange("year", e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="image_url">Image</Label>
+                    <Input
+                      id="image_url"
+                      className="border"
+                      type="file"
+                      value={newClassData.image_url}
+                      onChange={(e) => handleInputChange("image_url", e.target.value)}
                     />
                   </div>
                 </DialogDescription>

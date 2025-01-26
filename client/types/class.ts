@@ -1,10 +1,17 @@
 export type Class = {
   id: number;
-  name: string;
   title: string;
+  name: string;
   class_time: string;
   invitation_url: string;
-  members: string[];
+  members: [
+    {
+      id: number;
+      name: string;
+      role: string;
+      email: string;
+    }
+  ];
   year: string;
   image_url: string;
   created_at: string;

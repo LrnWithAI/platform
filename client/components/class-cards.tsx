@@ -16,7 +16,13 @@ export function ClassesCards({ orderOption, filterOption }: { orderOption: strin
   const setLoading = useLoadingStore((state) => state.setLoading);
   const setClasses = useClassStore((state) => state.setClasses);
   const classes = useClassStore((state) => state.classes)
-  const [editData, setEditData] = useState({ id: 0, title: "", class_time: "" });
+  const [editData, setEditData] = useState({
+    title: "",
+    name: "",
+    class_time: "",
+    year: "",
+    image_url: "",
+  });
 
   // Filtering
   const filteredClasses = classes.filter((card) => {
@@ -85,7 +91,10 @@ export function ClassesCards({ orderOption, filterOption }: { orderOption: strin
       setLoading(true);
       const response = await editClass(id, {
         title: editData.title,
+        name: editData.name,
         class_time: editData.class_time,
+        year: editData.year,
+        image_url: editData.image_url,
       });
       if (response.success) {
         toast.success("Class updated successfully!");
@@ -123,8 +132,8 @@ export function ClassesCards({ orderOption, filterOption }: { orderOption: strin
             <Dialog>
               <DialogTrigger>
                 <Button
-                  className="bg-purple-500 rounded-sm hover:bg-purple-600 h-7 w-7"
-                  onClick={() => setEditData({ id: card.id, title: card.title, class_time: card.class_time })}
+                  className="bg-violet-500 rounded-sm hover:bg-violet-600 h-7 w-7"
+                  onClick={() => setEditData({ id: card.id, title: card.title, name: card.name, class_time: card.class_time, year: card.year, image_url: card.image_url })}
                 >
                   <Pencil size={16} />
                 </Button>
@@ -139,12 +148,21 @@ export function ClassesCards({ orderOption, filterOption }: { orderOption: strin
                   </DialogTitle>
                   <DialogDescription className="border rounded-xl text-left p-3 flex flex-col gap-5">
                     <div>
-                      <Label htmlFor="title">Name</Label>
+                      <Label htmlFor="title">Title</Label>
                       <Input
                         id="title"
                         className="border"
                         value={editData.title}
                         onChange={(e) => handleInputChange("title", e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="name">Name</Label>
+                      <Input
+                        id="name"
+                        className="border"
+                        value={editData.name}
+                        onChange={(e) => handleInputChange("name", e.target.value)}
                       />
                     </div>
                     <div>
@@ -154,6 +172,25 @@ export function ClassesCards({ orderOption, filterOption }: { orderOption: strin
                         className="border"
                         value={editData.class_time}
                         onChange={(e) => handleInputChange("class_time", e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="year">Year</Label>
+                      <Input
+                        id="year"
+                        className="border"
+                        value={editData.year}
+                        onChange={(e) => handleInputChange("year", e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="image_url">Image</Label>
+                      <Input
+                        id="image_url"
+                        className="border"
+                        type="file"
+                        value={editData.image_url}
+                        onChange={(e) => handleInputChange("image_url", e.target.value)}
                       />
                     </div>
                   </DialogDescription>

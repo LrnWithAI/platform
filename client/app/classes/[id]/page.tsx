@@ -1,13 +1,16 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation';
-import { useClassStore } from '@/stores/classStore';
+import { useParams, useRouter } from 'next/navigation';
 import { CircleAlert, Copy, EllipsisVertical, FilePenLine, Share2, SquareMinus, Trash2 } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
-import { cn } from '@/lib/utils';
+import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command"
+import { useClassStore } from '@/stores/classStore';
+import { useLoadingStore } from '@/stores/loadingStore';
+import { deleteClass } from '@/actions/classActions';
+import { toast } from 'react-toastify';
+import ClassMembers from '@/components/class-members';
 
 const classSettings = [
   { label: "Delete", value: "delete", icon: Trash2 },
@@ -18,12 +21,16 @@ const classSettings = [
 ]
 
 const Class = () => {
+  const router = useRouter();
   const params = useParams<{ id: string }>();
   const id = params.id;
 
   const classData = useClassStore((state) => state.classes.find((c) => c.id === Number(id)));
   const getClassById = useClassStore((state) => state.getClassById);
   const [openClassSettings, setClassSettings] = useState(false)
+  const setLoading = useLoadingStore((state) => state.setLoading);
+
+  console.log(classData);
 
   useEffect(() => {
     if (!classData) {
@@ -31,12 +38,23 @@ const Class = () => {
     }
   }, [id, classData, getClassById]);
 
-  const handleClassSettings = (action: string) => {
+  const handleClassSettings = async (action: string) => {
+    setLoading(true);
+
     switch (action) {
       case "delete":
         // Logic to delete class
-        console.log("Delete class", classData?.id);
-        break;
+        if (classData) {
+          const response = await deleteClass(classData.id);
+
+          if (response.success) {
+            toast.success('Class deleted successfully!');
+            router.push("/classes");
+          } else {
+            toast.error(response.message || 'Failed to delete card.');
+          }
+          break;
+        }
       case "edit":
         // Logic to edit class
         console.log("Edit class", classData?.id);
@@ -56,6 +74,8 @@ const Class = () => {
       default:
         console.log("Unknown action");
     }
+
+    setLoading(false);
   };
 
   return (
@@ -75,7 +95,7 @@ const Class = () => {
         <div className="flex flex-col text-right">
           <Popover open={openClassSettings} onOpenChange={setClassSettings}>
             <PopoverTrigger asChild>
-              <EllipsisVertical className="me-0 ms-auto cursor-pointer hover:scale-125 duration-300" />
+              <EllipsisVertical className="me-0 ms-auto cursor-pointer duration-300" />
             </PopoverTrigger>
             <PopoverContent className="w-[150px] p-0">
               <Command>
@@ -108,18 +128,23 @@ const Class = () => {
         </div>
       </div>
 
-      <Tabs defaultValue="account" className="w-full h-screen bg-stone-200 rounded-lg p-3">
-        <TabsList>
+      <Tabs defaultValue="account" className="w-full h-screen bg-stone-200 rounded-lg p-4">
+        <TabsList className='mb-3'>
           <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
           <TabsTrigger value="members">Members</TabsTrigger>
           <TabsTrigger value="files">Files</TabsTrigger>
-
         </TabsList>
-        <TabsContent value="dashboard">Dashboard</TabsContent>
-        <TabsContent value="members">Members</TabsContent>
-        <TabsContent value="files">Files</TabsContent>
-      </Tabs>
 
+        {/* <TabsContent value="dashboard"><ClassDashboard /></TabsContent>*/}
+        <TabsContent value="members">
+          {classData?.members ? (
+            <ClassMembers members={classData.members} />
+          ) : (
+            <p>Loading members...</p>
+          )}
+        </TabsContent>
+        {/* <TabsContent value="files"><ClassFiles /> </TabsContent>*/}
+      </Tabs>
     </div>
   )
 }
