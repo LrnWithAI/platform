@@ -12,6 +12,7 @@ import { deleteClass } from '@/actions/classActions';
 import { toast } from 'react-toastify';
 import ClassMembers from '@/components/class-members';
 import ClassDialog from '@/components/class-dialog';
+import ReportDialog from '@/components/report_dialog';
 
 const classSettings = [
   { label: "Delete", value: "delete", icon: Trash2 },
@@ -32,6 +33,7 @@ const Class = () => {
   const setLoading = useLoadingStore((state) => state.setLoading);
 
   const [openDialogs, setOpenDialogs] = useState<{ [key: number]: boolean }>({});
+  const [openReportDialog, setOpenReportDialog] = useState(false);
 
   const toggleDialog = (id: number) => {
     setOpenDialogs((prev) => ({
@@ -68,8 +70,7 @@ const Class = () => {
         }
         break;
       case "report":
-        // Logic to report class
-        console.log("Report class", classData?.id);
+        setOpenReportDialog(true);
         break;
       case "remove_members":
         // Logic to remove all members
@@ -170,6 +171,8 @@ const Class = () => {
           initialData={classData}
         />
       )}
+
+      <ReportDialog isOpen={openReportDialog} onClose={() => setOpenReportDialog(false)} />
     </div>
   )
 }
