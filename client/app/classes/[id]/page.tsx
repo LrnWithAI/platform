@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command"
 import { useClassStore } from '@/stores/classStore';
 import { useLoadingStore } from '@/stores/loadingStore';
-import { deleteClass } from '@/actions/classActions';
+import { deleteClass, editClass } from '@/actions/classActions';
 import { toast } from 'react-toastify';
 import ClassMembers from '@/components/class-members';
 import ClassDialog from '@/components/class-dialog';
@@ -19,6 +19,7 @@ const classSettings = [
   { label: "Edit", value: "edit", icon: FilePenLine },
   { label: "Report", value: "report", icon: CircleAlert },
   { label: "Remove all members", value: "remove_members", icon: SquareMinus },
+  { label: "Remove all students", value: "remove_students", icon: SquareMinus },
   { label: "Remove all content", value: "remove_content", icon: SquareMinus },
 ]
 
@@ -62,6 +63,7 @@ const Class = () => {
           } else {
             toast.error(response.message || 'Failed to delete card.');
           }
+
           break;
         }
       case "edit":
@@ -71,14 +73,44 @@ const Class = () => {
         break;
       case "report":
         setOpenReportDialog(true);
+
         break;
       case "remove_members":
-        // Logic to remove all members
-        console.log("Remove all members from class", classData?.id);
+        const payload = { ...classData, members: [], };
+        const response = await editClass(Number(classData?.id), payload);
+
+        if (response.success) {
+          toast.success('All members removed successfully!');
+          getClassById(Number(classData?.id));
+        } else {
+          toast.error(response.message || 'Failed to remove members.');
+        }
+
+        break;
+      case "remove_students":
+        const teacher = classData?.members?.filter((member) => member.role === "teacher") || [];
+        const payloadwithoutStudents = { ...classData, members: teacher };
+        const responseWithoutStudents = await editClass(Number(classData?.id), payloadwithoutStudents);
+
+        if (responseWithoutStudents.success) {
+          toast.success('All students removed successfully!');
+          getClassById(Number(classData?.id));
+        } else {
+          toast.error(responseWithoutStudents.message || 'Failed to remove students.');
+        }
+
         break;
       case "remove_content":
-        // Logic to remove all content
-        console.log("Remove all content from class", classData?.id);
+        const payloadWithoutContent = { ...classData, content: [], };
+        const responseWithoutContent = await editClass(Number(classData?.id), payloadWithoutContent);
+
+        if (responseWithoutContent.success) {
+          toast.success('All content removed successfully!');
+          getClassById(Number(classData?.id));
+        } else {
+          toast.error(responseWithoutContent.message || 'Failed to remove content.');
+        }
+
         break;
       default:
         console.log("Unknown action");
