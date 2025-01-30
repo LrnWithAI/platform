@@ -41,6 +41,7 @@ const ClassDialog: React.FC<ClassDialogProps> = ({ type, onClose, isOpen, initia
 
   const onSubmit = async (data: ClassFormData) => {
     try {
+      onClose();
       setLoading(true);
 
       if (!user) {
@@ -81,7 +82,6 @@ const ClassDialog: React.FC<ClassDialogProps> = ({ type, onClose, isOpen, initia
       toast.error(`An error occurred while ${type === "create" ? "creating" : "updating"} the class.`);
       return false;
     } finally {
-      onClose();
       setValue("title", "");
       setValue("name", "");
       setValue("class_time", "");
