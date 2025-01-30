@@ -1,81 +1,79 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { createClient } from "@/utils/supabase/server";
+import { revalidatePath } from "next/cache";
 
 /* Register */
 export async function register(formData: FormData) {
   const supabase = await createClient();
 
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
+  try {
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
 
-  const { data: authData, error: authError } = await supabase.auth.signUp({
-    email,
-    password
-  });
+    const { error } = await supabase.auth.signUp({ email, password });
 
-  if (authError) {
-    console.error("Error registering user:", authError);
-    return { success: false, message: authError.message };
+    if (error) throw new Error(error.message);
+
+    return { success: true, message: "Registration successful!" };
+  } catch (error) {
+    console.error("Error registering user:", error);
+    return { success: false, message: (error as Error).message };
   }
-
-  revalidatePath("/");
-  return { success: true, message: "Registration successful!" };
 }
 
 /* Login */
 export async function login(formData: FormData) {
   const supabase = await createClient();
 
-  const data = {
-    email: formData.get("email") as string,
-    password: formData.get("password") as string,
-  };
+  try {
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
 
-  const { data: authData, error: authError } = await supabase.auth.signInWithPassword(data);
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
 
-  if (authError) {
-    console.error("Error logging in user:", authError);
-    return { success: false, message: authError.message };
+    if (error) throw new Error(error.message);
+
+    revalidatePath("/", "layout");
+    return { success: true, message: "Login successful!" };
+  } catch (error) {
+    console.error("Error logging in:", error);
+    return { success: false, message: (error as Error).message };
   }
-
-  revalidatePath("/", "layout");
-  return { success: true, message: "Login successful!" };
 }
 
 /* Forgot Password */
 export async function forgotPassword(formData: FormData) {
   const supabase = await createClient();
 
-  const email = formData.get("email") as string;
+  try {
+    const email = formData.get("email") as string;
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: process.env.NEXT_PUBLIC_UPDATE_PASSWORD_URL || "http://localhost:3000/update-password",
+    });
 
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: 'http://localhost:3000/update-password',
-  });
+    if (error) throw new Error(error.message);
 
-  if (error) {
+    return { success: true, message: "Password reset email sent!" };
+  } catch (error) {
     console.error("Error sending password reset email:", error);
-    return { success: false, message: error.message };
+    return { success: false, message: (error as Error).message };
   }
-
-  revalidatePath("/", "layout");
-  return { success: true, message: "Password reset email sent!" };
 }
 
 /* Update Password */
 export async function updatePassword(formData: FormData) {
   const supabase = await createClient();
 
-  const newPassword = formData.get("password") as string;
+  try {
+    const newPassword = formData.get("password") as string;
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
 
-  const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (error) throw new Error(error.message);
 
-  if (error) {
+    return { success: true, message: "Password updated successfully!" };
+  } catch (error) {
     console.error("Error updating password:", error);
-    return { success: false, message: error.message };
+    return { success: false, message: (error as Error).message };
   }
-
-  revalidatePath("/", "layout");
-  return { success: true, message: "Password updated successfully!" };
 }

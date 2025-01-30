@@ -98,7 +98,6 @@ export function ClassesCards({ orderOption, filterOption }: { orderOption: strin
             <Button className="bg-violet-500 rounded-sm hover:bg-violet-600 h-7 w-7" onClick={() => toggleDialog(card.id)}>
               <Pencil size={16} />
             </Button>
-            <ClassDialog type="edit" isOpen={openDialogs[card.id] || false} onClose={() => toggleDialog(card.id)} initialData={card} />
             <Button
               onClick={(e) => {
                 e.stopPropagation();
@@ -110,8 +109,10 @@ export function ClassesCards({ orderOption, filterOption }: { orderOption: strin
             </Button>
           </div>
 
+          <ClassDialog type="edit" isOpen={openDialogs[card.id] || false} onClose={() => toggleDialog(card.id)} initialData={card} />
+
+          {/* Card Content */}
           <Link href={`/classes/${card.id}`}>
-            {/* Card Content */}
             <h2 className="text-lg font-bold mb-2">{card.title}</h2>
             <div className="flex">
               <Image

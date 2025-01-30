@@ -70,7 +70,7 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
             <div className="text-center text-sm mt-4">
               Remembered your password?{" "}
               <a
-                onClick={() => { router.push("/register") }}
+                onClick={() => { router.push("/login") }}
                 className="underline underline-offset-4 hover:cursor-pointer"
               >
                 Login

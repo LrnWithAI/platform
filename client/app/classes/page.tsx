@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { ChevronDown, Filter, Check, CirclePlus } from "lucide-react";
+import { toast } from "react-toastify";
 import { cn } from "@/lib/utils"
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,7 +10,6 @@ import { Button } from "@/components/ui/button";
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { ClassesCards } from "@/components/class-cards";
-import { toast } from "react-toastify";
 
 import { getClasses } from "@/actions/classActions";
 import { useLoadingStore } from "@/stores/loadingStore";
@@ -33,6 +33,21 @@ export default function Classes() {
   const setLoading = useLoadingStore((state) => state.setLoading);
   const setClasses = useClassStore((state) => state.setClasses);
 
+  const [openOrderOption, setOpenOrderOption] = useState(false)
+  const [orderOption, setOrderOption] = useState("")
+
+  const [openFilterOption, setOpenFilterOption] = useState(false)
+  const [filterOption, setFilterOption] = useState({})
+
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+
+  const updateFilterOption = (key: string, value: string) => {
+    setFilterOption((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
+
   useEffect(() => {
     async function fetchClasses() {
       try {
@@ -54,21 +69,6 @@ export default function Classes() {
 
     fetchClasses();
   }, []);
-
-  const [openOrderOption, setOpenOrderOption] = useState(false)
-  const [orderOption, setOrderOption] = useState("")
-
-  const [openFilterOption, setOpenFilterOption] = useState(false)
-  const [filterOption, setFilterOption] = useState({})
-
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-
-  const updateFilterOption = (key: string, value: string) => {
-    setFilterOption((prev) => ({
-      ...prev,
-      [key]: value,
-    }));
-  };
 
   return (
     <div className="flex flex-1 flex-col gap-4 p-8">
