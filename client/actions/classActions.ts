@@ -34,7 +34,7 @@ export async function getClassById(id: number) {
   }
 }
 
-/* CREATE Class */
+/* POST Class */
 export async function createClass(data: any) {
   const supabase = await createClient();
 
@@ -50,7 +50,7 @@ export async function createClass(data: any) {
   }
 }
 
-/* EDIT Class */
+/* PUT Class */
 export async function editClass(id: number, data: any) {
   const supabase = await createClient();
 
