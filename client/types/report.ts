@@ -9,9 +9,11 @@ export type Report = {
     role: string;
     email: string;
   };
+  type: string;
 }
 
 export type ReportDialogProps = {
   isOpen: boolean;
   onClose: () => void;
+  type: string;
 }

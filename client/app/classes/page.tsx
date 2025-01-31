@@ -37,7 +37,7 @@ export default function Classes() {
   const [orderOption, setOrderOption] = useState("")
 
   const [openFilterOption, setOpenFilterOption] = useState(false)
-  const [filterOption, setFilterOption] = useState({})
+  const [filterOption, setFilterOption] = useState<{ [key: string]: string }>({})
 
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 

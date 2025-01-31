@@ -12,13 +12,32 @@ export type Class = {
   };
   members: [
     {
-      id: number;
+      id: string;
       name: string;
       role: string;
       email: string;
     }
   ];
-  content: []
+  content: [
+    {
+      id: number;
+      title: string;
+      content: string;
+      created_at: string;
+      created_by: {
+        id: number;
+        name: string
+      }
+      files: [
+        {
+          id: string;
+          name: string;
+          size: number;
+          url: string;
+        }
+      ]
+    }
+  ]
 }
 
 export type ClassStore = {
