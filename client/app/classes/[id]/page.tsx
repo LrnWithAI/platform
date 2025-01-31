@@ -10,6 +10,7 @@ import { useClassStore } from '@/stores/classStore';
 import { useLoadingStore } from '@/stores/loadingStore';
 import { deleteClass, editClass } from '@/actions/classActions';
 import { toast } from 'react-toastify';
+import ClassDashboard from '@/components/class-dashboard';
 import ClassMembers from '@/components/class-members';
 import ClassDialog from '@/components/class-dialog';
 import ReportDialog from '@/components/report_dialog';
@@ -144,7 +145,7 @@ const Class = () => {
         <div className="flex flex-col text-right">
           <Popover open={openClassSettings} onOpenChange={setClassSettings}>
             <PopoverTrigger asChild>
-              <EllipsisVertical className="me-0 ms-auto cursor-pointer duration-300" />
+              <EllipsisVertical className="me-0 ms-auto cursor-pointer" />
             </PopoverTrigger>
             <PopoverContent className="w-[150px] p-0">
               <Command>
@@ -184,7 +185,14 @@ const Class = () => {
           <TabsTrigger value="files">Files</TabsTrigger>
         </TabsList>
 
-        {/* <TabsContent value="dashboard"><ClassDashboard /></TabsContent>*/}
+        <TabsContent value="dashboard">
+          {classData?.content ? (
+            <ClassDashboard />
+          ) : (
+            <p>Loading dashboard...</p>
+          )}
+        </TabsContent>
+
         <TabsContent value="members">
           {classData?.members ? (
             <ClassMembers />
@@ -192,9 +200,11 @@ const Class = () => {
             <p>Loading members...</p>
           )}
         </TabsContent>
+
         {/* <TabsContent value="files"><ClassFiles /> </TabsContent>*/}
       </Tabs>
 
+      {/* Create / Update Class dialog */}
       {classData && openDialogs[classData.id] && (
         <ClassDialog
           type="edit"
@@ -204,7 +214,12 @@ const Class = () => {
         />
       )}
 
-      <ReportDialog isOpen={openReportDialog} onClose={() => setOpenReportDialog(false)} />
+      {/* Report dialog */}
+      <ReportDialog
+        isOpen={openReportDialog}
+        onClose={() => setOpenReportDialog(false)}
+        type="class"
+      />
     </div>
   )
 }

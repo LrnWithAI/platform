@@ -23,7 +23,7 @@ const ClassMembers = () => {
   const teacher = classData?.members.find((member) => member.role === 'teacher');
   const students = classData?.members.filter((member) => member.role === 'student') || [];
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
     classData?.members.splice(
       classData?.members.findIndex((member) => member.id === id),
       1
