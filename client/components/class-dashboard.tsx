@@ -116,7 +116,7 @@ const ClassDashboard = () => {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              <div className="text-center">
+              <div className="text-center font-bold text-2xl">
                 {isEditing ? 'Edit Post' : 'Add Post'}
               </div>
             </DialogTitle>
