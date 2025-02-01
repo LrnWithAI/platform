@@ -13,7 +13,7 @@ import { ReportSchema } from '@/schema/report';
 import { Label } from './ui/label';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
-import { createReport } from '@/actions/reportAcrions';
+import { createReport } from '@/actions/reportActions';
 
 type ReportFormData = z.infer<typeof ReportSchema>;
 

@@ -99,6 +99,7 @@ const ClassDashboard = () => {
     if (!classData) return;
     setOpenPostDialog(false);
 
+    setLoading(true);
     if (isEditing) postData.updated_at = new Date();
 
     const updatedContent = isEditing
@@ -108,13 +109,19 @@ const ClassDashboard = () => {
     await handleUpdateClass(updatedContent);
     setPostData({ id: null, title: '', content: '', files: [], updated_at: new Date() });
     setIsEditing(false);
+    setLoading(false);
   };
 
   const handleDeletePost = async (postId: number) => {
     if (!classData) return;
+
+    setLoading(true);
+
     const updatedContent = classData.content.filter((post) => post.id !== postId);
     await handleUpdateClass(updatedContent);
+
     toast.success('Post deleted successfully!');
+    setLoading(false);
   };
 
   const handleFileUpload = async (files: FileList | null) => {
@@ -127,6 +134,8 @@ const ClassDashboard = () => {
       toast.error('User ID is missing.');
       return;
     }
+
+    setLoading(true);
 
     const newFiles = await uploadFilesToStorage(files, user.id, classData.id, postData.id ?? 0);
 
@@ -147,6 +156,8 @@ const ClassDashboard = () => {
 
       }
     }
+
+    setLoading(false);
   };
 
   return (
@@ -192,7 +203,7 @@ const ClassDashboard = () => {
       <div className="bg-white p-6 rounded-lg shadow-lg">
         {classData && classData.content?.length > 0 ? (
           classData.content.map((post) => (
-            <div className="mt-5 first:mt-0 border-b pb-3 last:border-none">
+            <div className="mt-5 first:mt-0 border-b-4  pb-3 last:border-none">
               <div className='flex items-center gap-4'>
                 <Avatar className="cursor-pointer hover:opacity-75">
                   <AvatarImage
