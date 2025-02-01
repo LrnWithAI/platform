@@ -178,7 +178,7 @@ const Class = () => {
         </div>
       </div>
 
-      <Tabs defaultValue="account" className="w-full h-screen bg-stone-200 rounded-lg p-4">
+      <Tabs defaultValue="dashboard" className="w-full min-h-screen bg-stone-200 rounded-lg p-4">
         <TabsList className='mb-3'>
           <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
           <TabsTrigger value="members">Members</TabsTrigger>

@@ -24,6 +24,7 @@ export type Class = {
       title: string;
       content: string;
       created_at: string;
+      updated_at: string;
       created_by: {
         id: number;
         name: string
@@ -33,6 +34,7 @@ export type Class = {
           id: string;
           name: string;
           size: number;
+          type: string;
           url: string;
         }
       ]
