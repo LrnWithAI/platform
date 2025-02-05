@@ -98,13 +98,7 @@ export function ClassesCards({ orderOption, filterOption }: { orderOption: strin
             <Button className="bg-violet-500 rounded-sm hover:bg-violet-600 h-7 w-7" onClick={() => toggleDialog(card.id)}>
               <Pencil size={16} />
             </Button>
-            <Button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleDelete(card.id);
-              }}
-              className="bg-red-500 rounded-sm text-sm hover:bg-red-600 h-7 w-7"
-            >
+            <Button className="bg-red-500 rounded-sm text-sm hover:bg-red-600 h-7 w-7" onClick={(e) => { e.stopPropagation(); handleDelete(card.id); }}>
               <Trash2 size={16} />
             </Button>
           </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -90,6 +90,16 @@ const ClassDialog: React.FC<ClassDialogProps> = ({ type, onClose, isOpen, initia
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (initialData) {
+      setValue("title", initialData.title || "");
+      setValue("name", initialData.name || "");
+      setValue("class_time", initialData.class_time || "");
+      setValue("year", initialData.year || "");
+      setValue("image_url", initialData.image_url || "");
+    }
+  }, [initialData, setValue]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
