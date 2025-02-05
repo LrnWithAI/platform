@@ -41,7 +41,10 @@ export function CreateOptionsLoggedIn() {
             <Separator />
             <DropdownMenuItem
               className="cursor-pointer"
-              onClick={toggleClassDialog}
+              onSelect={(e) => {
+                e.preventDefault();
+                setIsClassDialogOpen(true);
+              }}
             >
               <Users /> Class
             </DropdownMenuItem>
