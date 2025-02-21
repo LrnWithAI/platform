@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { ClassesCards } from "@/components/class-cards";
 import { toast } from "react-toastify";
 
@@ -57,6 +58,7 @@ export default function Library() {
 
   useEffect(() => {
     fetchTests();
+    console.log("tests", tests);
   }, [user]);
 
   const [openOrderOption, setOpenOrderOption] = useState(false);
@@ -83,6 +85,45 @@ export default function Library() {
           <p>Tests</p>
           <CreateTestDialog />
         </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {tests.map((test) => (
+          <div
+            key={test.id}
+            className="relative p-5 border rounded-lg shadow bg-white hover:cursor-pointer hover:scale-105 duration-300"
+          >
+            <Link href={`/test/${test.id}`}>
+              <h2 className="text-lg font-bold mb-2">{test.title}</h2>
+              <div className="flex">
+                <Image
+                  src={"/class_cover.jpg"}
+                  alt={`${test.title} cover image`}
+                  className="w-14 h-14 object-cover rounded-md"
+                  width={60}
+                  height={20}
+                />
+                <div className="ml-4 flex flex-col justify-center">
+                  <p className="text-sm text-gray-700 font-bold">
+                    Created at{" "}
+                    {test.created_at
+                      ? new Date(
+                          Date.parse(test.created_at)
+                        ).toLocaleDateString("sk-SK", {
+                          day: "numeric",
+                          month: "numeric",
+                          year: "numeric",
+                        })
+                      : "Invalid date"}
+                  </p>
+                  <p className="text-sm text-gray-500 mt-2">
+                    {test.questions?.length} questions
+                  </p>
+                </div>
+              </div>
+            </Link>
+          </div>
+        ))}
       </div>
 
       <ClassesCards orderOption={orderOption} filterOption={filterOption} />
