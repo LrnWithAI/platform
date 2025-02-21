@@ -8,7 +8,7 @@ import { AppSidebar } from "@/components/app-sidebar";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { createClient } from "@/utils/supabase/server";
-import { ToastContainer } from 'react-toastify';
+import { ToastContainer } from "react-toastify";
 import ClientProvider from "./ClientProvider";
 
 const geistSans = Geist({
@@ -26,9 +26,13 @@ export const metadata: Metadata = {
   description: "Make learning fun & easier with AI",
 };
 
-export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   return (
     <html lang="en">
