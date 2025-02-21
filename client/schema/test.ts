@@ -8,6 +8,7 @@ export const testSchema = z.object({
   questions: z
     .array(
       z.object({
+        id: z.number().int().optional(),
         question: z.string().min(1, "Question text is required."),
         answers: z
           .array(z.string().min(1, "Answer cannot be empty."))

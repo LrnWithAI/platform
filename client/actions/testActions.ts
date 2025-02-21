@@ -40,13 +40,16 @@ export async function getTestById(id: number) {
 }
 
 /* GET Tests by user id */
-export async function getTestsByUserId(userId: number) {
+export async function getTestsByUserId(userId: string) {
   const supabase = await createClient();
+  console.log("userId:", userId);
 
   const { data, error } = await supabase
     .from("tests")
     .select(`*`)
     .eq("created_by", userId);
+
+  console.log("Supabase response:", { data, error });
 
   if (error) {
     console.error("Error fetching tests by user id:", error.message);

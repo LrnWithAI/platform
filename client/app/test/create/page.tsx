@@ -5,7 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { testSchema } from "@/schema/test";
 import { useForm, useFieldArray } from "react-hook-form";
 
-import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -41,13 +40,16 @@ export default function CreateTest() {
     register,
     handleSubmit,
     setValue,
+    getValues,
     control,
     formState: { errors },
   } = useForm<CreateTestFormValues>({
     resolver: zodResolver(testSchema),
     defaultValues: {
       visibility: "everyone",
-      questions: [{ question: "", answers: ["", "", "", ""], correct: 0 }],
+      questions: [
+        { id: 1, question: "", answers: ["", "", "", ""], correct: 0 },
+      ],
     },
   });
 
@@ -58,6 +60,30 @@ export default function CreateTest() {
 
   const setCorrectAnswer = (questionIndex: number, answerIndex: number) => {
     setValue(`questions.${questionIndex}.correct`, answerIndex);
+  };
+
+  const addQuestion = () => {
+    const existingQuestions = getValues("questions") || [];
+
+    // Ensure we only use valid numbers for max calculation
+    const ids = existingQuestions
+      .map((q) => q.id)
+      .filter((id): id is number => id !== undefined);
+
+    const nextId = ids.length > 0 ? Math.max(...ids) + 1 : 1;
+
+    append({ id: nextId, question: "", answers: ["", "", "", ""], correct: 0 });
+  };
+
+  const removeQuestion = (index: number) => {
+    remove(index);
+
+    setTimeout(() => {
+      const updatedFields = getValues("questions"); // Get the updated array
+      updatedFields.forEach((_, i: number) => {
+        setValue(`questions.${i}.id`, i + 1); // Reassign IDs sequentially
+      });
+    }, 0);
   };
 
   console.log("Form errors ", errors);
@@ -160,11 +186,6 @@ export default function CreateTest() {
                   placeholder="Enter a question, like What is AI?"
                   {...register(`questions.${questionIndex}.question`)}
                 />
-                {errors.questions?.[questionIndex]?.question && (
-                  <p className="text-sm text-red-500">
-                    {errors.questions[questionIndex].question.message}
-                  </p>
-                )}
               </div>
 
               <div className="mb-2 space-y-2">
@@ -190,9 +211,9 @@ export default function CreateTest() {
                         <Button
                           variant={isCorrect ? "default" : "outline"}
                           size="icon"
-                          onClick={() => {
-                            setCorrectAnswer(questionIndex, answerIndex);
-                          }}
+                          onClick={() =>
+                            setCorrectAnswer(questionIndex, answerIndex)
+                          }
                           type="button"
                         >
                           <Check />
@@ -205,9 +226,9 @@ export default function CreateTest() {
               <Button
                 type="button"
                 className="bg-red-500"
-                onClick={() => remove(questionIndex)}
+                onClick={() => removeQuestion(questionIndex)}
               >
-                Remove Question
+                Remove question
               </Button>
             </div>
           ))}
@@ -215,13 +236,7 @@ export default function CreateTest() {
 
         {/* Add New Question */}
         <div className="flex justify-center">
-          <Button
-            type="button"
-            className="bg-blue-500"
-            onClick={() =>
-              append({ question: "", answers: ["", "", "", ""], correct: 0 })
-            }
-          >
+          <Button type="button" className="bg-blue-500" onClick={addQuestion}>
             Add Question
           </Button>
         </div>

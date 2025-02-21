@@ -5,9 +5,10 @@ import Link from "next/link";
 import { ClassesCards } from "@/components/class-cards";
 import { toast } from "react-toastify";
 
-import { createClass, getClasses } from "@/actions/classActions";
+import { getTestsByUserId, getTests } from "@/actions/testActions";
+import { Test } from "@/types/test";
 import { useLoadingStore } from "@/stores/loadingStore";
-import { useClassStore } from "@/stores/classStore";
+import { useUserStore } from "@/stores/userStore";
 import {
   CreateTestDialog,
   CreateFlashcardsDialog,
@@ -28,29 +29,35 @@ const filterOptions = [
 
 export default function Library() {
   const setLoading = useLoadingStore((state) => state.setLoading);
-  const setClasses = useClassStore((state) => state.setClasses);
+  const user = useUserStore((state) => state.user);
+  const [tests, setTests] = useState([] as Test[]);
+
+  async function fetchTests() {
+    try {
+      setLoading(true);
+
+      if (!user) return;
+      const response = await getTestsByUserId(user?.id);
+
+      if (response.success) {
+        setTests(response.data);
+        toast.success("Tests fetched successfully!");
+      } else {
+        toast.error(response.message || "Failed to fetch tests.");
+      }
+
+      return response.data ?? [];
+    } catch (error) {
+      toast.error("An error occurred while fetching tests.");
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  }
 
   useEffect(() => {
-    async function fetchClasses() {
-      try {
-        setLoading(true);
-        const response = await getClasses();
-
-        if (response) {
-          setClasses(response.data);
-          toast.success("Classes loaded successfully!");
-        } else {
-          toast.error("Failed to fetch classes.");
-        }
-      } catch (error) {
-        toast.error("An error occurred while fetching classes.");
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchClasses();
-  }, []);
+    fetchTests();
+  }, [user]);
 
   const [openOrderOption, setOpenOrderOption] = useState(false);
   const [orderOption, setOrderOption] = useState("");
@@ -65,38 +72,7 @@ export default function Library() {
     }));
   };
 
-  const [newClassData, setNewClassData] = useState({
-    title: "",
-    description1: "",
-  });
-
-  const handleInputChange = (field: string, value: string) => {
-    setNewClassData((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const handleCreateClass = async () => {
-    try {
-      setLoading(true);
-      const response = await createClass(newClassData);
-
-      if (response.success) {
-        toast.success("Class created successfully!");
-
-        // Fetch updated classes
-        const updatedClasses = await getClasses();
-        if (updatedClasses) {
-          setClasses(updatedClasses.data);
-          toast.success("Updated classes loaded successfully!");
-        }
-      } else {
-        toast.error(response.message || "Failed to create class.");
-      }
-    } catch (error) {
-      toast.error("An error occurred while creating the class.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  // TODO: Render cards for tests and flashcards separately without additional modal stuff there after clicking
 
   return (
     <div className="flex flex-1 flex-col gap-4 p-8">
