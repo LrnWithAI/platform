@@ -21,8 +21,6 @@ export default function ClientProvider({
   const setUser = useUserStore((state) => state.setUser);
   const loading = useLoadingStore((state) => state.loading);
 
-  console.log("data", user);
-
   const getProfile = async () => {
     try {
       const { data, error, status } = await supabase

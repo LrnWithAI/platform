@@ -116,7 +116,7 @@ const ClassDialog: React.FC<ClassDialogProps> = ({ type, onClose, isOpen, initia
           <DialogDescription className="border rounded-xl text-left p-3 flex flex-col gap-5">
             {["title", "name", "class_time", "year", "image_url"].map((field) => (
               <div key={field}>
-                <Label htmlFor={field}>{field.replace("_", " ").toUpperCase()}</Label>
+                <Label htmlFor={field}> {field.replace("_", " ").toUpperCase()} </Label>
                 <Input
                   id={field}
                   className="border"

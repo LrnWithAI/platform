@@ -24,7 +24,7 @@ export async function downloadImage(path: string) {
 }
 
 /* POST Files into Supabase Storage class_files bucket */
-export async function uploadFilesToStorage(files: FileList | null, userId: string, classId: number, postId: number) {
+export async function uploadFilesToStorage(files: File[] | null, userId: string, classId: number, postId: number) {
   if (!files || files.length === 0) return [];
 
   const supabase = createClient();
@@ -56,7 +56,7 @@ export async function uploadFilesToStorage(files: FileList | null, userId: strin
 }
 
 /* UPDATE `files` array in `class.content` in class table */
-export async function updateClassFiles(classId: number, postId: number, newFiles: any[]) {
+export async function updateClassFiles(classId: number, postId: number, files: any[]) {
   const supabase = createClient();
 
   const { data: classData, error: fetchError } = await supabase
@@ -70,9 +70,12 @@ export async function updateClassFiles(classId: number, postId: number, newFiles
     return;
   }
 
-  // Nájdeme príspevok a pridáme do neho nové súbory
+  // Odstránime duplikáty
+  files = files.filter((file, index, self) => self.findIndex((f) => f.id === file.id) === index);
+
+  // Nájdeme príspevok a pridáme do neho už existujúce aj nové súbory
   const updatedContent = classData.content.map((post: any) =>
-    post.id === postId ? { ...post, files: [...(post.files || []), ...newFiles] } : post
+    post.id === postId ? { ...post, files: files } : post
   );
 
   // Aktualizujeme `class` tabuľku s novým obsahom

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { CircleAlert, CirclePlus, Trash2, EditIcon, EllipsisVertical, Files } from 'lucide-react';
+import { CircleAlert, CirclePlus, Trash2, EditIcon, EllipsisVertical, Download } from 'lucide-react';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command"
@@ -30,7 +30,7 @@ const ClassDashboard = () => {
 
   const isTeacher = classData?.members.some((member) => member.role === 'teacher' && member.id === user?.id);
 
-  const [postData, setPostData] = useState({ id: null, title: '', content: '', files: [], updated_at: new Date() });
+  const [postData, setPostData] = useState<{ id: number | null, title: string, content: string, files: File[], created_at: Date, updated_at: Date }>({ id: null, title: '', content: '', files: [], created_at: new Date(), updated_at: new Date() });
   const [isEditing, setIsEditing] = useState(false);
   const [openPostDialog, setOpenPostDialog] = useState(false);
   const [openReportDialog, setOpenReportDialog] = useState(false);
@@ -98,16 +98,59 @@ const ClassDashboard = () => {
   const handleSavePost = async () => {
     if (!classData) return;
     setOpenPostDialog(false);
-
     setLoading(true);
-    if (isEditing) postData.updated_at = new Date();
+
+    const generatedId = isEditing ? postData.id : new Date().getTime();
+
+    // Oddelenie existujúcich a nových súborov
+    const existingFiles = postData.files.filter(file => file.url);  // Existujúce súbory (majú URL)
+    const newFiles = postData.files.filter(file => !file.url);      // Nové súbory (inštancie File)
+
+    const newPost = {
+      ...postData,
+      id: generatedId,
+      created_at: isEditing ? postData.created_at : new Date(),
+      updated_at: new Date(),
+      created_by: user,
+      files: existingFiles,  // Na začiatku len existujúce súbory
+    };
 
     const updatedContent = isEditing
-      ? classData.content.map((post) => post.id === postData.id ? postData : post)
-      : [...classData.content, { ...postData, id: new Date(), created_at: new Date(), updated_at: new Date(), created_by: user, files: [] }];
+      ? classData.content.map((post) => (post.id === postData.id ? { ...post, files: existingFiles } : post)) // Upravíme iba existujúce súbory
+      : [...classData.content, newPost];  // Pri novom príspevku pridáme existujúce súbory
 
     await handleUpdateClass(updatedContent);
-    setPostData({ id: null, title: '', content: '', files: [], updated_at: new Date() });
+
+    if (newFiles.length > 0) {
+      if (!user) {
+        toast.error('User is not logged in.');
+        return;
+      }
+
+      const uploadedFiles = await uploadFilesToStorage(newFiles, user.id, classData.id, generatedId as number);
+
+      if (uploadedFiles.length > 0) {
+        if (classData.id !== null && generatedId !== null) {
+          const res = await updateClassFiles(classData.id, generatedId, [...existingFiles, ...uploadedFiles]); // pošleme existujúce prílohy ale aj nové, ktoré sa práve nahrali aby ich updatlo do triedy 
+
+          if (res?.success) {
+            if (res.data) {
+              setClasses(res.data);
+            } else {
+              toast.error("Failed to update class content");
+            }
+            toast.success("Files uploaded and saved successfully!");
+          } else {
+            toast.error("Failed to update class content");
+          }
+        } else {
+          toast.error("Class ID or Post ID is null, cannot update files.");
+        }
+      }
+    }
+
+    // Reset postData
+    setPostData({ id: null, title: '', content: '', files: [], created_at: new Date(), updated_at: new Date() });
     setIsEditing(false);
     setLoading(false);
   };
@@ -124,47 +167,13 @@ const ClassDashboard = () => {
     setLoading(false);
   };
 
-  const handleFileUpload = async (files: FileList | null) => {
-    if (!classData?.id) {
-      toast.error('Class ID is missing.');
-      return;
-    }
-
-    if (!user?.id) {
-      toast.error('User ID is missing.');
-      return;
-    }
-
-    setLoading(true);
-
-    const newFiles = await uploadFilesToStorage(files, user.id, classData.id, postData.id ?? 0);
-
-    if (newFiles.length > 0) {
-      if (postData.id !== null) {
-        const res = await updateClassFiles(classData.id, postData.id, newFiles);
-
-        if (res?.success) {
-          if (res.data) {
-            setClasses(res.data);
-          } else {
-            toast.error("Failed to update class content");
-          }
-          toast.success("Files uploaded and saved successfully!");
-        } else {
-          toast.error("Failed to update class content");
-        }
-
-      }
-    }
-
-    setLoading(false);
-  };
+  console.log("data", postData.files);
 
   return (
     <div className="space-y-6">
       {isTeacher && (
         <Button className="bg-violet-500 hover:bg-violet-600 text-white" onClick={() => {
-          setPostData({ id: null, title: '', content: '', files: [], updated_at: new Date() });
+          setPostData({ id: null, title: '', content: '', files: [], created_at: new Date(), updated_at: new Date() });
           setIsEditing(false);
           setOpenPostDialog(true);
         }}>
@@ -183,10 +192,61 @@ const ClassDashboard = () => {
             <DialogDescription className="border rounded-xl text-left p-3 flex flex-col gap-5">
               <Label htmlFor="title">Title</Label>
               <Input id="title" value={postData.title} onChange={(e) => setPostData({ ...postData, title: e.target.value })} />
-              <Label htmlFor="content" >Content</Label>
+              <Label htmlFor="content">Content</Label>
               <textarea id="content" value={postData.content} onChange={(e) => setPostData({ ...postData, content: e.target.value })} className="border w-full h-32 p-2" />
               <Label htmlFor="file">Files</Label>
-              <Input id="file" type="file" multiple onChange={(e) => handleFileUpload(e.target.files)} />
+              <Input
+                id="file"
+                type="file"
+                multiple
+                onChange={(e) => setPostData({ ...postData, files: [...postData.files, ...Array.from(e.target.files || [])] })}
+              />
+
+              {/* Zoznam existujúcich súborov */}
+              {postData.files.length > 0 && (
+                <div>
+                  <h3 className='mb-1'>Existing Files</h3>
+                  <ul className="mt-2 space-y-2">
+                    {postData.files.filter(file => file.url).map((file, index) => (
+                      <li key={index} className="flex items-center justify-between border p-2 rounded-lg">
+                        <span className="truncate">{file.name}</span>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => {
+                            setPostData({
+                              ...postData,
+                              files: postData.files.filter((_, i) => i !== index),
+                            });
+                          }}
+                        >
+                          <Trash2 size={16} />
+                        </Button>
+                      </li>
+                    ))}
+                  </ul>
+                  <h3 className='mb-1'>New Files</h3>
+                  <ul className="mt-2 space-y-2">
+                    {postData.files.filter(file => !file.url).map((file, index) => (
+                      <li key={index} className="flex items-center justify-between border p-2 rounded-lg">
+                        <span className="truncate">{file.name}</span>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => {
+                            setPostData({
+                              ...postData,
+                              files: postData.files.filter((_, i) => i !== index),
+                            });
+                          }}
+                        >
+                          <Trash2 size={16} />
+                        </Button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex gap-2 w-full">
@@ -200,10 +260,10 @@ const ClassDashboard = () => {
         </DialogContent>
       </Dialog>
 
-      <div className="bg-white p-6 rounded-lg shadow-lg">
+      <div>
         {classData && classData.content?.length > 0 ? (
           classData.content.map((post) => (
-            <div className="mt-5 first:mt-0 border-b-4  pb-3 last:border-none">
+            <div className="mt-5 first:mt-0 bg-white rounded-lg shadow-lg p-6 pe-16 relative">
               <div className='flex items-center gap-4'>
                 <Avatar className="cursor-pointer hover:opacity-75">
                   <AvatarImage
@@ -220,13 +280,13 @@ const ClassDashboard = () => {
 
               <div key={post.id} className="flex items-center justify-between border-b pb-3 last:border-none">
                 <div>
-                  <p className="max-w-4xl py-5">{post.content}</p>
+                  <p className="py-5">{post.content}</p>
                   <p className="text-gray-500">Created at: {formatDate(post.created_at)}</p>
                   <p className="text-gray-500"> Last updated at: {formatDate(post.updated_at)}</p>
                 </div>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <EllipsisVertical className="cursor-pointer" />
+                    <EllipsisVertical className="cursor-pointer absolute right-5 top-9" />
                   </PopoverTrigger>
                   <PopoverContent className="w-[150px] p-0">
                     <Command>
@@ -253,9 +313,10 @@ const ClassDashboard = () => {
 
               {post.files?.map((file) => (
                 <div key={file.id} className="flex items-center gap-2 mt-2">
-                  <a href={file.url} target="_blank" rel="noopener noreferrer" className="text-blue-500">
-                    {file.name}
-                  </a>
+                  <div className="flex items-center gap-2 cursor-pointer hover:opacity-75" onClick={() => { }}>
+                    <Download className="h-4 w-4" />
+                    <p>{file.name}</p>
+                  </div>
                   <span className="text-sm text-gray-500">({(file.size / 1024).toFixed(2)} KB)</span>
                 </div>
               ))}
