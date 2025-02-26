@@ -17,7 +17,7 @@ import { toast } from 'react-toastify';
 import { useUserStore } from '@/stores/userStore';
 import ReportDialog from './report_dialog';
 import { formatDate } from '@/utils/supabase/utils';
-import { downloadImage, updateClassFiles, uploadFilesToStorage } from '@/actions/storageActions';
+import { downloadImage, updateClassContent, uploadFilesToClassContent } from '@/actions/storageActions';
 
 const ClassDashboard = () => {
   const params = useParams();
@@ -127,11 +127,11 @@ const ClassDashboard = () => {
         return;
       }
 
-      const uploadedFiles = await uploadFilesToStorage(newFiles, user.id, classData.id, generatedId as number);
+      const uploadedFiles = await uploadFilesToClassContent(newFiles, user.id, classData.id, generatedId as number);
 
       if (uploadedFiles.length > 0) {
         if (classData.id !== null && generatedId !== null) {
-          const res = await updateClassFiles(classData.id, generatedId, [...existingFiles, ...uploadedFiles]); // pošleme existujúce prílohy ale aj nové, ktoré sa práve nahrali aby ich updatlo do triedy 
+          const res = await updateClassContent(classData.id, generatedId, [...existingFiles, ...uploadedFiles]); // pošleme existujúce prílohy ale aj nové, ktoré sa práve nahrali aby ich updatlo do triedy 
 
           if (res?.success) {
             if (res.data) {
@@ -167,8 +167,6 @@ const ClassDashboard = () => {
     setLoading(false);
   };
 
-  console.log("data", postData.files);
-
   return (
     <div className="space-y-6">
       {isTeacher && (
@@ -182,7 +180,7 @@ const ClassDashboard = () => {
       )}
 
       <Dialog open={openPostDialog} onOpenChange={setOpenPostDialog}>
-        <DialogContent>
+        <DialogContent className="max-h-[90%] overflow-y-scroll">
           <DialogHeader>
             <DialogTitle>
               <div className="text-center font-bold text-2xl">
@@ -205,7 +203,7 @@ const ClassDashboard = () => {
               {/* Zoznam existujúcich súborov */}
               {postData.files.length > 0 && (
                 <div>
-                  <h3 className='mb-1'>Existing Files</h3>
+                  <h3 className='mb-1 mt-2'>Existing Files</h3>
                   <ul className="mt-2 space-y-2">
                     {postData.files.filter(file => file.url).map((file, index) => (
                       <li key={index} className="flex items-center justify-between border p-2 rounded-lg">
@@ -225,7 +223,7 @@ const ClassDashboard = () => {
                       </li>
                     ))}
                   </ul>
-                  <h3 className='mb-1'>New Files</h3>
+                  <h3 className='mb-1 mt-2'>New Files</h3>
                   <ul className="mt-2 space-y-2">
                     {postData.files.filter(file => !file.url).map((file, index) => (
                       <li key={index} className="flex items-center justify-between border p-2 rounded-lg">

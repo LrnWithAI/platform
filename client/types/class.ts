@@ -4,7 +4,10 @@ export type Class = {
   name: string;
   class_time: string;
   year: string;
-  image_url: string;
+  image: {
+    name: string;
+    url: string;
+  };
   created_at: string;
   created_by: {
     id: number;
@@ -59,6 +62,9 @@ export type ClassDialogProps = {
     name?: string;
     class_time?: string;
     year?: string;
-    image_url?: string;
+    image?: {
+      name: string;
+      url: string;
+    };
   };
 }

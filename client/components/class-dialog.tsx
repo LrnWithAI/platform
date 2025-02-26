@@ -15,6 +15,7 @@ import { useClassStore } from '@/stores/classStore';
 import { Button } from './ui/button';
 import { ClassDialogProps } from '@/types/class';
 import { ClassSchema } from '@/schema/class';
+import { deleteFileFromClass, uploadFileToClass } from '@/actions/storageActions';
 
 type ClassFormData = z.infer<typeof ClassSchema>;
 
@@ -27,6 +28,7 @@ const ClassDialog: React.FC<ClassDialogProps> = ({ type, onClose, isOpen, initia
     register,
     handleSubmit,
     setValue,
+    reset,
     formState: { errors },
   } = useForm<ClassFormData>({
     resolver: zodResolver(ClassSchema),
@@ -35,11 +37,11 @@ const ClassDialog: React.FC<ClassDialogProps> = ({ type, onClose, isOpen, initia
       name: initialData?.name || "",
       class_time: initialData?.class_time || "",
       year: initialData?.year || "",
-      image_url: initialData?.image_url || "",
+      image: undefined,
     },
   });
 
-  const onSubmit = async (data: ClassFormData) => {
+  const onSubmit = async (data: any) => {
     try {
       onClose();
       setLoading(true);
@@ -49,57 +51,97 @@ const ClassDialog: React.FC<ClassDialogProps> = ({ type, onClose, isOpen, initia
         return;
       }
 
-      const payload = {
-        ...data,
-        created_by: {
-          id: user.id,
-          name: user.full_name,
-          role: user.role,
-          email: user.email,
-        },
-        ...(type === "create" && {
+      let classId = initialData?.id;
+      let imageName = initialData?.image?.name || "Default class cover";
+      let imageUrl = initialData?.image?.url || "/class_cover.jpg";
+
+      // Ak sa trieda vytvára, najprv ju vytvoríme a získame ID
+      if (type === "create") {
+        const createResponse = await createClass({
+          ...data,
+          image: {
+            name: "Default class cover",
+            url: "/class_cover.jpg",
+          },
+          created_by: {
+            id: user.id,
+            name: user.full_name,
+            role: user.role,
+            email: user.email,
+          },
           members: [{ id: user.id, name: user.full_name, role: user.role, email: user.email }],
-        }),
-      };
+        });
 
-      const response = type === "create" ? await createClass(payload) : await editClass(Number(initialData?.id), payload);
-
-      if (response.success) {
-        toast.success(`Class ${type === "create" ? "created" : "updated"} successfully!`);
-
-        const updatedClasses = await getClasses();
-        if (updatedClasses) {
-          setClasses(updatedClasses.data);
-          toast.success("Updated classes loaded successfully!");
+        if (!createResponse.success) {
+          toast.error("Failed to create class.");
+          return;
         }
 
-        return true;
-      } else {
-        toast.error(response.message || `Failed to ${type === "create" ? "create" : "update"} class.`);
-        return false;
+        classId = createResponse.data?.[0].id;
+        if (!classId) {
+          toast.error("Failed to retrieve class ID.");
+          return;
+        }
+      }
+
+      // Ďalej nahráme obrázok triedy, ak bol nahraný nový buď pri vytváraní alebo editovaní triedy
+      if (data.image instanceof File) {
+
+        // Pri editovaní triedy ak existuje obrázok nahraný na supabase, tak ho najprv vymažeme a potom nahráme nový (nebudú duplikáty a stále bude len jeden obrázok)ň
+        // Defaultne ma image url hodnotu "/class_cover.jpg", takže ak je obrázok defaultný, tak ho nebudeme mazať pretože nie je na supabase stači len nahratie novy a updatnúť class
+        if (imageUrl && imageUrl.includes("https://")) {
+          if (imageName) {
+            if (classId) {
+              await deleteFileFromClass(imageName, user.id, classId);
+            } else {
+              toast.error("Class ID is missing.");
+            }
+          }
+        }
+
+        const uploadedUrl = await uploadFileToClass(data.image, user.id, classId);
+        if (uploadedUrl) {
+          imageName = data.image.name;
+          imageUrl = uploadedUrl;
+        }
+      }
+
+      // Teraz zaktualizujeme triedu s novými údajmi súboru ak sa nahral nový obrázok
+      const updateResponse = await editClass(classId, { ...data, image: { name: imageName, url: imageUrl } });
+
+      if (!updateResponse.success) {
+        toast.error("Failed to update class.");
+        return;
+      }
+
+      toast.success(`Class ${type === "create" ? "created" : "updated"} successfully!`);
+
+      // Aktualizujeme zoznam tried
+      const updatedClasses = await getClasses();
+      if (updatedClasses) {
+        setClasses(updatedClasses.data);
       }
     } catch (error) {
       toast.error(`An error occurred while ${type === "create" ? "creating" : "updating"} the class.`);
-      return false;
     } finally {
       setValue("title", "");
       setValue("name", "");
       setValue("class_time", "");
       setValue("year", "");
-      setValue("image_url", "");
+      setValue("image", undefined);
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (initialData) {
-      setValue("title", initialData.title || "");
-      setValue("name", initialData.name || "");
-      setValue("class_time", initialData.class_time || "");
-      setValue("year", initialData.year || "");
-      setValue("image_url", initialData.image_url || "");
-    }
-  }, [initialData, setValue]);
+    reset({
+      title: initialData?.title || "",
+      name: initialData?.name || "",
+      class_time: initialData?.class_time || "",
+      year: initialData?.year || "",
+      image: undefined,
+    });
+  }, [initialData, reset]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -114,14 +156,14 @@ const ClassDialog: React.FC<ClassDialogProps> = ({ type, onClose, isOpen, initia
             </div>
           </DialogTitle>
           <DialogDescription className="border rounded-xl text-left p-3 flex flex-col gap-5">
-            {["title", "name", "class_time", "year", "image_url"].map((field) => (
+            {["title", "name", "class_time", "year"].map((field) => (
               <div key={field}>
-                <Label htmlFor={field}> {field.replace("_", " ").toUpperCase()} </Label>
+                <Label htmlFor={field}>{field.replace("_", " ").toUpperCase()}</Label>
                 <Input
                   id={field}
                   className="border"
                   {...register(field as keyof ClassFormData)}
-                  type={field === "image_url" ? "file" : "text"}
+                  type="text"
                 />
                 {errors[field as keyof ClassFormData] && (
                   <p className="text-red-500 text-sm mt-1">
@@ -130,6 +172,25 @@ const ClassDialog: React.FC<ClassDialogProps> = ({ type, onClose, isOpen, initia
                 )}
               </div>
             ))}
+
+            {/* Pole pre nahratie obrázka */}
+            <div>
+              <Label htmlFor="image">CLASS COVER PHOTO</Label>
+              <Input
+                id="image"
+                className="border"
+                type="file"
+                accept="image/*" // Povolenie len obrázkových súborov
+                onChange={(e) => {
+                  const file = e.target.files?.[0] || undefined;
+                  console.log(file);
+                  setValue("image", file, { shouldValidate: true }); // Nastavenie hodnoty manuálne
+                }}
+              />
+              {errors.image && (
+                <p className="text-red-500 text-sm mt-1">{errors.image?.message}</p>
+              )}
+            </div>
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="flex gap-2 w-full">

@@ -110,10 +110,11 @@ export function ClassesCards({ orderOption, filterOption }: { orderOption: strin
             <h2 className="text-lg font-bold mb-2">{card.title}</h2>
             <div className="flex">
               <Image
-                src={card.image_url || "/class_cover.jpg"}
+                src={card.image.url || "/class_cover.jpg"}
                 alt={`Class ${card.id}`}
                 width={60}
                 height={20}
+                unoptimized
               />
               <div className="ml-4 flex flex-col justify-center">
                 <p className="text-sm text-gray-700 font-bold">{card.class_time}</p>
@@ -121,8 +122,9 @@ export function ClassesCards({ orderOption, filterOption }: { orderOption: strin
               </div>
             </div>
           </Link>
-        </div>
-      ))}
-    </div>
+        </div >
+      ))
+      }
+    </div >
   );
 }
