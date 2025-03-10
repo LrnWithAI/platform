@@ -96,7 +96,6 @@ const ClassDashboard = () => {
   };
 
   const handleSavePost = async () => {
-    console.log(postData);
     if (!classData) return;
     setOpenPostDialog(false);
     setLoading(true);
@@ -107,11 +106,6 @@ const ClassDashboard = () => {
     const existingFiles = postData.files.filter(file => file.url);  // Existujúce súbory (majú URL)
     const newFiles = postData.files.filter(file => !file.url);      // Nové súbory (inštancie File)
 
-    console.log("Existing files:");
-    console.log(existingFiles);
-    console.log("New files:");
-    console.log(newFiles);
-
     const preparedPostData = {
       ...postData,
       id: generatedId,
@@ -120,17 +114,10 @@ const ClassDashboard = () => {
       created_by: user,
       files: existingFiles,  // Na začiatku len existujúce súbory
     };
-    console.log("Prepared post data:");
-    console.log(preparedPostData);
-    console.log("Is editing:");
-    console.log(isEditing);
 
     const updatedContent = isEditing
       ? classData.content.map((post) => (post.id === postData.id ? { ...post, files: existingFiles, updated_at: new Date() } : post)) // Upravíme iba existujúce súbory
       : [...classData.content, preparedPostData];
-
-    console.log("Updated content:");
-    console.log(updatedContent);
 
     await handleUpdateClass(updatedContent);
 
@@ -142,10 +129,7 @@ const ClassDashboard = () => {
       }
 
       try {
-        const uploadedFiles = await uploadFilesToClassContent(newFiles, user.id, classData.id, generatedId as number);
-
-        console.log("Uploaded files:");
-        console.log(uploadedFiles);
+        const uploadedFiles = await uploadFilesToClassContent(newFiles, user.id, classData.id, generatedId as number);;
 
         if (uploadedFiles.length > 0) {
           const res = await updateClassContent(classData.id, generatedId, [...existingFiles, ...uploadedFiles]); // pošleme existujúce prílohy ale aj nové, ktoré sa práve nahrali aby ich updatlo do triedy 
@@ -181,9 +165,9 @@ const ClassDashboard = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
       {isTeacher && (
-        <Button className="bg-violet-500 hover:bg-violet-600 text-white" onClick={() => {
+        <Button className="bg-violet-500 hover:bg-violet-600 text-white absolute right-0 top-[-75px]" onClick={() => {
           setPostData({ id: null, title: '', content: '', files: [], created_at: new Date(), updated_at: new Date() });
           setIsEditing(false);
           setOpenPostDialog(true);

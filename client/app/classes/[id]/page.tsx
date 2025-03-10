@@ -216,9 +216,9 @@ const Class = () => {
 
       {/* Report dialog */}
       <ReportDialog
+        type="class"
         isOpen={openReportDialog}
         onClose={() => setOpenReportDialog(false)}
-        type="class"
       />
     </div>
   )

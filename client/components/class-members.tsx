@@ -60,10 +60,10 @@ const ClassMembers = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
       <Dialog>
         <DialogTrigger>
-          <Button className="bg-violet-500 hover:bg-violet-600 text-white">
+          <Button className="bg-violet-500 hover:bg-violet-600 text-white absolute right-0 top-[-59px]">
             <CirclePlus size={20} /> Add Student
           </Button>
         </DialogTrigger>
@@ -76,9 +76,9 @@ const ClassMembers = () => {
             </DialogTitle>
             <DialogDescription className="border rounded-xl text-left p-3 flex flex-col gap-5">
               <div>
-                <Label htmlFor="id">ID of student</Label>
+                <Label htmlFor="id">Mail of student</Label>
                 <Input
-                  id="id"
+                  id="mail"
                   className="border"
                 />
               </div>
