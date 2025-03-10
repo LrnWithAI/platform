@@ -213,13 +213,13 @@ const ClassDashboard = () => {
                 onChange={(e) => setPostData({ ...postData, files: [...postData.files, ...Array.from(e.target.files || [])] })}
               />
 
-              {/* Zoznam existujúcich súborov */}
+              {/* Zoznam existujúcich a nových súborov */}
               {postData.files.length > 0 && (
                 <div>
-                  <h3 className='mb-1 mt-2'>Existing Files</h3>
+                  <h3 className="mb-1 mt-2">Existing Files</h3>
                   <ul className="mt-2 space-y-2">
-                    {postData.files.filter(file => file.url).map((file, index) => (
-                      <li key={index} className="flex items-center justify-between border p-2 rounded-lg">
+                    {postData.files.filter(file => file.url).map((file) => (
+                      <li key={file.name} className="flex items-center justify-between border p-2 rounded-lg">
                         <span className="truncate">{file.name}</span>
                         <Button
                           variant="destructive"
@@ -227,7 +227,7 @@ const ClassDashboard = () => {
                           onClick={() => {
                             setPostData({
                               ...postData,
-                              files: postData.files.filter((_, i) => i !== index),
+                              files: postData.files.filter(f => f !== file), // Porovnáva sa objekt, nie index
                             });
                           }}
                         >
@@ -236,10 +236,11 @@ const ClassDashboard = () => {
                       </li>
                     ))}
                   </ul>
-                  <h3 className='mb-1 mt-2'>New Files</h3>
+
+                  <h3 className="mb-1 mt-2">New Files</h3>
                   <ul className="mt-2 space-y-2">
-                    {postData.files.filter(file => !file.url).map((file, index) => (
-                      <li key={index} className="flex items-center justify-between border p-2 rounded-lg">
+                    {postData.files.filter(file => !file.url).map((file) => (
+                      <li key={file.name} className="flex items-center justify-between border p-2 rounded-lg">
                         <span className="truncate">{file.name}</span>
                         <Button
                           variant="destructive"
@@ -247,7 +248,7 @@ const ClassDashboard = () => {
                           onClick={() => {
                             setPostData({
                               ...postData,
-                              files: postData.files.filter((_, i) => i !== index),
+                              files: postData.files.filter(f => f !== file), // Odstráni sa presne daný objekt
                             });
                           }}
                         >
