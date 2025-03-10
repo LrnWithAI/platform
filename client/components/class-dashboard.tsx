@@ -96,17 +96,23 @@ const ClassDashboard = () => {
   };
 
   const handleSavePost = async () => {
+    console.log(postData);
     if (!classData) return;
     setOpenPostDialog(false);
     setLoading(true);
 
-    const generatedId = isEditing ? postData.id : new Date().getTime();
+    const generatedId = isEditing ? postData.id : Date.now();
 
     // Oddelenie existujúcich a nových súborov
     const existingFiles = postData.files.filter(file => file.url);  // Existujúce súbory (majú URL)
     const newFiles = postData.files.filter(file => !file.url);      // Nové súbory (inštancie File)
 
-    const newPost = {
+    console.log("Existing files:");
+    console.log(existingFiles);
+    console.log("New files:");
+    console.log(newFiles);
+
+    const preparedPostData = {
       ...postData,
       id: generatedId,
       created_at: isEditing ? postData.created_at : new Date(),
@@ -114,43 +120,50 @@ const ClassDashboard = () => {
       created_by: user,
       files: existingFiles,  // Na začiatku len existujúce súbory
     };
+    console.log("Prepared post data:");
+    console.log(preparedPostData);
+    console.log("Is editing:");
+    console.log(isEditing);
 
     const updatedContent = isEditing
-      ? classData.content.map((post) => (post.id === postData.id ? { ...post, files: existingFiles } : post)) // Upravíme iba existujúce súbory
-      : [...classData.content, newPost];  // Pri novom príspevku pridáme existujúce súbory
+      ? classData.content.map((post) => (post.id === postData.id ? { ...post, files: existingFiles, updated_at: new Date() } : post)) // Upravíme iba existujúce súbory
+      : [...classData.content, preparedPostData];
+
+    console.log("Updated content:");
+    console.log(updatedContent);
 
     await handleUpdateClass(updatedContent);
 
     if (newFiles.length > 0) {
       if (!user) {
-        toast.error('User is not logged in.');
+        toast.error("User is not logged in.");
+        setLoading(false);
         return;
       }
 
-      const uploadedFiles = await uploadFilesToClassContent(newFiles, user.id, classData.id, generatedId as number);
+      try {
+        const uploadedFiles = await uploadFilesToClassContent(newFiles, user.id, classData.id, generatedId as number);
 
-      if (uploadedFiles.length > 0) {
-        if (classData.id !== null && generatedId !== null) {
+        console.log("Uploaded files:");
+        console.log(uploadedFiles);
+
+        if (uploadedFiles.length > 0) {
           const res = await updateClassContent(classData.id, generatedId, [...existingFiles, ...uploadedFiles]); // pošleme existujúce prílohy ale aj nové, ktoré sa práve nahrali aby ich updatlo do triedy 
 
           if (res?.success) {
-            if (res.data) {
-              setClasses(res.data);
-            } else {
-              toast.error("Failed to update class content");
-            }
+            res.data ? setClasses(res.data) : toast.error("Failed to update class content");
             toast.success("Files uploaded and saved successfully!");
           } else {
             toast.error("Failed to update class content");
           }
-        } else {
-          toast.error("Class ID or Post ID is null, cannot update files.");
         }
+      } catch (error) {
+        toast.error("An error occurred while uploading files.");
       }
     }
 
-    // Reset postData
-    setPostData({ id: null, title: '', content: '', files: [], created_at: new Date(), updated_at: new Date() });
+    // Resetovanie stavu
+    setPostData({ id: null, title: "", content: "", files: [], created_at: new Date(), updated_at: new Date() });
     setIsEditing(false);
     setLoading(false);
   };
