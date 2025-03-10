@@ -134,14 +134,18 @@ const ClassDialog: React.FC<ClassDialogProps> = ({ type, onClose, isOpen, initia
   };
 
   useEffect(() => {
-    reset({
-      title: initialData?.title || "",
-      name: initialData?.name || "",
-      class_time: initialData?.class_time || "",
-      year: initialData?.year || "",
-      image: undefined,
-    });
-  }, [initialData, reset]);
+    // Reset hodnôt len keď sa dialóg otvorí
+    if (isOpen) {
+      reset({
+        title: initialData?.title || "",
+        name: initialData?.name || "",
+        class_time: initialData?.class_time || "",
+        year: initialData?.year || "",
+        image: undefined,
+      });
+    }
+  }, [isOpen, initialData, reset]);
+
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
