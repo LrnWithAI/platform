@@ -14,6 +14,7 @@ import ClassDashboard from '@/components/class-dashboard';
 import ClassMembers from '@/components/class-members';
 import ClassDialog from '@/components/class-dialog';
 import ReportDialog from '@/components/report_dialog';
+import ClassFiles from '@/components/class-files';
 
 const classSettings = [
   { label: "Delete", value: "delete", icon: Trash2 },
@@ -201,7 +202,9 @@ const Class = () => {
           )}
         </TabsContent>
 
-        {/* <TabsContent value="files"><ClassFiles /> </TabsContent>*/}
+        <TabsContent value="files">
+          <ClassFiles />
+        </TabsContent>
       </Tabs>
 
       {/* Create / Update Class dialog */}

@@ -106,6 +106,7 @@ const ClassDashboard = () => {
     const existingFiles = postData.files.filter(file => file.url);  // Existujúce súbory (majú URL)
     const newFiles = postData.files.filter(file => !file.url);      // Nové súbory (inštancie File)
 
+
     const preparedPostData = {
       ...postData,
       id: generatedId,
@@ -116,7 +117,7 @@ const ClassDashboard = () => {
     };
 
     const updatedContent = isEditing
-      ? classData.content.map((post) => (post.id === postData.id ? { ...post, files: existingFiles, updated_at: new Date() } : post)) // Upravíme iba existujúce súbory
+      ? classData.content.map((post) => (post.id === postData.id ? { ...post, title: preparedPostData.title, content: preparedPostData.content, updated_at: new Date(), files: preparedPostData.files } : post))
       : [...classData.content, preparedPostData];
 
     await handleUpdateClass(updatedContent);
