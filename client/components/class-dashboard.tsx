@@ -17,7 +17,7 @@ import { toast } from 'react-toastify';
 import { useUserStore } from '@/stores/userStore';
 import ReportDialog from './report_dialog';
 import { formatDate } from '@/utils/supabase/utils';
-import { downloadImage, updateClassContent, uploadFilesToClassContent } from '@/actions/storageActions';
+import { downloadImage, updateClassContent, uploadFilesToClassContent, deleteFileFromClassContent } from '@/actions/storageActions';
 
 const ClassDashboard = () => {
   const params = useParams();
@@ -106,7 +106,6 @@ const ClassDashboard = () => {
     const existingFiles = postData.files.filter(file => file.url);  // Existujúce súbory (majú URL)
     const newFiles = postData.files.filter(file => !file.url);      // Nové súbory (inštancie File)
 
-
     const preparedPostData = {
       ...postData,
       id: generatedId,
@@ -122,6 +121,18 @@ const ClassDashboard = () => {
 
     await handleUpdateClass(updatedContent);
 
+    //ak sa vymazali súbory z príspevku tak ich treba vymazať aj z databazy po jednom cez map
+    if (isEditing) {
+      const deletedFiles = classData.content.find(post => post.id === postData.id)?.files.filter(file => !postData.files.some(f => f.name === file.name));
+
+      let res;
+      for (const file of deletedFiles) {
+        res = await deleteFileFromClassContent(user.id, classData.id, generatedId, file.name);
+      }
+      if (res?.success) toast.success("Files deleted successfully!");
+    }
+
+    // Ak boli nahrané nové súbory, tak ich nahrajeme do bucketu a pridáme do triedy
     if (newFiles.length > 0) {
       if (!user) {
         toast.error("User is not logged in.");
@@ -155,9 +166,17 @@ const ClassDashboard = () => {
 
   const handleDeletePost = async (postId: number) => {
     if (!classData) return;
-
     setLoading(true);
 
+    // Vymaže všetky súbory z bucketu pre vymazaný príspevok, tým sa vymaže aj folder z bucketu lebo ostane prázdny
+    const deletedFiles = classData.content.find(post => post.id === postId)?.files;
+    let res;
+    for (const file of deletedFiles) {
+      res = await deleteFileFromClassContent(user.id, classData.id, postId, file.name);
+    }
+    if (res?.success) toast.success("Files deleted successfully from the post!");
+
+    // Aktualizuje triedu bez daného vymazaného príspevku
     const updatedContent = classData.content.filter((post) => post.id !== postId);
     await handleUpdateClass(updatedContent);
 

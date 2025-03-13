@@ -115,7 +115,7 @@ const Class = () => {
 
         break;
       default:
-        console.log("Unknown action");
+        toast.error("Unknown action");
     }
 
     setLoading(false);

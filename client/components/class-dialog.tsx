@@ -15,7 +15,7 @@ import { useClassStore } from '@/stores/classStore';
 import { Button } from './ui/button';
 import { ClassDialogProps } from '@/types/class';
 import { ClassSchema } from '@/schema/class';
-import { deleteFileFromClass, uploadFileToClass } from '@/actions/storageActions';
+import { deleteFileFromClassCoverPhoto, uploadFileToClassCoverPhoto } from '@/actions/storageActions';
 
 type ClassFormData = z.infer<typeof ClassSchema>;
 
@@ -92,14 +92,14 @@ const ClassDialog: React.FC<ClassDialogProps> = ({ type, onClose, isOpen, initia
         if (imageUrl && imageUrl.includes("https://")) {
           if (imageName) {
             if (classId) {
-              await deleteFileFromClass(imageName, user.id, classId);
+              await deleteFileFromClassCoverPhoto(imageName, user.id, classId);
             } else {
               toast.error("Class ID is missing.");
             }
           }
         }
 
-        const uploadedUrl = await uploadFileToClass(data.image, user.id, classId);
+        const uploadedUrl = await uploadFileToClassCoverPhoto(data.image, user.id, classId);
         if (uploadedUrl) {
           imageName = data.image.name;
           imageUrl = uploadedUrl;
@@ -187,7 +187,6 @@ const ClassDialog: React.FC<ClassDialogProps> = ({ type, onClose, isOpen, initia
                 accept="image/*" // Povolenie len obrázkových súborov
                 onChange={(e) => {
                   const file = e.target.files?.[0] || undefined;
-                  console.log(file);
                   setValue("image", file, { shouldValidate: true }); // Nastavenie hodnoty manuálne
                 }}
               />
