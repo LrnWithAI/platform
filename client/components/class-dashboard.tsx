@@ -184,6 +184,22 @@ const ClassDashboard = () => {
     setLoading(false);
   };
 
+  const handleDownloadFileFromPost = async (url, fileName) => {
+    const response = await fetch(url);
+    const blob = await response.blob();
+
+    const a = document.createElement('a');
+    const urlBlob = window.URL.createObjectURL(blob);
+
+    a.href = urlBlob;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    window.URL.revokeObjectURL(urlBlob);
+  };
+
   return (
     <div className="space-y-6 relative">
       {isTeacher && (
@@ -330,7 +346,12 @@ const ClassDashboard = () => {
               {post.files?.map((file) => (
                 <div key={file.id} className="flex items-center gap-2 mt-2">
                   <div className="flex items-center gap-2 cursor-pointer hover:opacity-75" onClick={() => { }}>
-                    <Download className="h-4 w-4" />
+                    <button
+                      onClick={() => handleDownloadFileFromPost(file.url, file.name)}
+                      className="text-blue-600 hover:underline text-lg font-medium"
+                    >
+                      <Download className="h-4 w-4" />
+                    </button>
                     <p>{file.name}</p>
                   </div>
                   <span className="text-sm text-gray-500">({(file.size / 1024).toFixed(2)} KB)</span>
