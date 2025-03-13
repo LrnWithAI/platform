@@ -9,6 +9,7 @@ import { useLoadingStore } from '@/stores/loadingStore';
 import { useClassStore } from '@/stores/classStore';
 import { Button } from './ui/button';
 import ClassDialog from './class-dialog';
+import { deleteFileFromClassContent } from '@/actions/storageActions';
 
 export function ClassesCards({ orderOption, filterOption }: { orderOption: string, filterOption: Record<string, string> }) {
   const setLoading = useLoadingStore((state) => state.setLoading);
@@ -63,6 +64,19 @@ export function ClassesCards({ orderOption, filterOption }: { orderOption: strin
   const handleDelete = async (id: number) => {
     try {
       setLoading(true);
+
+      // Vymazanie všetkých súborov zo všetkých príspevkov v triede z bucketu
+      const classData = classes.find((c) => c.id === id);
+
+      for (const post of classData.content) {
+        if (post.files && post.files.length > 0) {
+          for (const file of post.files) {
+            await deleteFileFromClassContent(classData?.created_by.id, classData.id, post.id, file.name);
+          }
+        }
+      }
+
+      // Vymazanie samotnej triedy
       const response = await deleteClass(id);
       if (response.success) {
         toast.success('Card deleted successfully!');

@@ -15,12 +15,12 @@ import ClassMembers from '@/components/class-members';
 import ClassDialog from '@/components/class-dialog';
 import ReportDialog from '@/components/report_dialog';
 import ClassFiles from '@/components/class-files';
+import { deleteFileFromClassContent } from '@/actions/storageActions';
 
 const classSettings = [
   { label: "Delete", value: "delete", icon: Trash2 },
   { label: "Edit", value: "edit", icon: FilePenLine },
   { label: "Report", value: "report", icon: CircleAlert },
-  { label: "Remove all members", value: "remove_members", icon: SquareMinus },
   { label: "Remove all students", value: "remove_students", icon: SquareMinus },
   { label: "Remove all content", value: "remove_content", icon: SquareMinus },
 ]
@@ -77,18 +77,6 @@ const Class = () => {
         setOpenReportDialog(true);
 
         break;
-      case "remove_members":
-        const payload = { ...classData, members: [], };
-        const response = await editClass(Number(classData?.id), payload);
-
-        if (response.success) {
-          toast.success('All members removed successfully!');
-          getClassById(Number(classData?.id));
-        } else {
-          toast.error(response.message || 'Failed to remove members.');
-        }
-
-        break;
       case "remove_students":
         const teacher = classData?.members?.filter((member) => member.role === "teacher") || [];
         const payloadwithoutStudents = { ...classData, members: teacher };
@@ -103,6 +91,15 @@ const Class = () => {
 
         break;
       case "remove_content":
+        // Vymazanie všetkých súborov zo všetkých príspevkov v triede z bucketu
+        for (const post of classData.content) {
+          if (post.files && post.files.length > 0) {
+            for (const file of post.files) {
+              await deleteFileFromClassContent(classData?.created_by.id, classData.id, post.id, file.name);
+            }
+          }
+        }
+
         const payloadWithoutContent = { ...classData, content: [], };
         const responseWithoutContent = await editClass(Number(classData?.id), payloadWithoutContent);
 
