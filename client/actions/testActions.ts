@@ -64,10 +64,14 @@ export async function getTestsByUserId(userId: string) {
 }
 
 /* DELETE Test */
-export async function deleteTest(id: number) {
+export async function deleteTest(testId: number, userId: string) {
   const supabase = await createClient();
 
-  const { error } = await supabase.from("tests").delete().eq("id", id);
+  const { error } = await supabase
+    .from("tests")
+    .delete()
+    .eq("id", testId)
+    .eq("created_by", userId);
 
   if (error) {
     console.error("Error deleting test:", error.message);

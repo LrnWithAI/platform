@@ -6,7 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify";
-import { getTestById } from "@/actions/testActions";
+import { getTestById, deleteTest } from "@/actions/testActions";
 import { Test } from "@/types/test";
 import { useUserStore } from "@/stores/userStore";
 import { useForm, Controller } from "react-hook-form";
@@ -59,8 +59,34 @@ const TestPage = () => {
     console.log("test check data", data);
   };
 
+  const onDeleteTest = async () => {
+    console.log("testId for delete", testId);
+
+    toast
+      .promise(deleteTest(testId, user?.id as string), {
+        pending: "Deleting test...",
+        success: "Test deleted successfully.",
+        error: "Failed to delete test.",
+      })
+      .then((response) => {
+        if (response.success) {
+          router.push("/library");
+        }
+      });
+  };
+
   return (
     <div className="mx-4 mb-20 mt-0 md:mt-6">
+      {user?.id === test?.created_by && (
+        <div className="max-w-4xl mx-auto">
+          <div className="flex flex-row justify-end space-x-2">
+            <Button variant="outline">Edit test</Button>
+            <Button onClick={onDeleteTest} variant="destructive">
+              Delete Test
+            </Button>
+          </div>
+        </div>
+      )}
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="flex flex-col justify-center max-w-4xl mx-auto"
@@ -90,7 +116,6 @@ const TestPage = () => {
             </p>
           </div>
         </div>
-
         {/* One question */}
         {test?.questions?.map((question, index) => (
           <div
@@ -133,7 +158,6 @@ const TestPage = () => {
             </div>
           </div>
         ))}
-
         {/* Submit Button */}
         <div className="flex justify-center">
           <Button type="submit" className="bg-purple">
