@@ -57,13 +57,23 @@ const Class = () => {
     switch (action) {
       case "delete":
         if (classData) {
-          const response = await deleteClass(classData.id);
+          let response;
+          // Vymazanie všetkých súborov zo všetkých príspevkov v triede z bucketu
+          for (const post of classData.content) {
+            if (post.files && post.files.length > 0) {
+              for (const file of post.files) {
+                response = await deleteFileFromClassContent(classData?.created_by.id, classData.id, post.id, file.name);
+              }
+            }
+          }
+
+          response = await deleteClass(classData.id);
 
           if (response.success) {
             toast.success('Class deleted successfully!');
             router.push("/classes");
           } else {
-            toast.error(response.message || 'Failed to delete card.');
+            toast.error(response.message || 'Failed to delete class.');
           }
 
           break;

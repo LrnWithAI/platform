@@ -79,7 +79,7 @@ export function ClassesCards({ orderOption, filterOption }: { orderOption: strin
       // Vymazanie samotnej triedy
       const response = await deleteClass(id);
       if (response.success) {
-        toast.success('Card deleted successfully!');
+        toast.success('Class deleted successfully!');
 
         // Fetch the updated list after deleting
         const response = await getClasses();

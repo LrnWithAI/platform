@@ -348,11 +348,11 @@ const ClassDashboard = () => {
                   <div className="flex items-center gap-2 cursor-pointer hover:opacity-75" onClick={() => { }}>
                     <button
                       onClick={() => handleDownloadFileFromPost(file.url, file.name)}
-                      className="text-blue-600 hover:underline text-lg font-medium"
+                      className="flex items-center gap-2 text-blue-600 text-lg font-medium"
                     >
                       <Download className="h-4 w-4" />
+                      <p>{file.name}</p>
                     </button>
-                    <p>{file.name}</p>
                   </div>
                   <span className="text-sm text-gray-500">({(file.size / 1024).toFixed(2)} KB)</span>
                 </div>
