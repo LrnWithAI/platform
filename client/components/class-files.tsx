@@ -11,7 +11,7 @@ const ClassFiles = () => {
   const classData = useClassStore((state) => state.classes.find((c) => c.id === Number(id)));
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 z-10">
       {/* Iterate over all posts in the class */}
       {classData?.content.map((post) => (
         <div key={post.id} className="bg-white p-6 rounded-lg shadow-lg space-y-4">

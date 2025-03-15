@@ -201,7 +201,7 @@ const ClassDashboard = () => {
   };
 
   return (
-    <div className="space-y-6 relative">
+    <div className="space-y-6 relative z-10">
       {isTeacher && (
         <Button className="bg-violet-500 hover:bg-violet-600 text-white absolute right-0 top-[-75px]" onClick={() => {
           setPostData({ id: null, title: '', content: '', files: [], created_at: new Date(), updated_at: new Date() });
@@ -325,7 +325,7 @@ const ClassDashboard = () => {
                       <CommandList>
                         <CommandEmpty>Not found</CommandEmpty>
                         <CommandGroup>
-                          {postSettings.map((option) => (
+                          {(isTeacher ? postSettings : postSettings.filter(option => option.value === 'report')).map((option) => (
                             <CommandItem
                               key={option.label}
                               value={option.value}

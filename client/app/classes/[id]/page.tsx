@@ -16,6 +16,7 @@ import ClassDialog from '@/components/class-dialog';
 import ReportDialog from '@/components/report_dialog';
 import ClassFiles from '@/components/class-files';
 import { deleteFileFromClassContent } from '@/actions/storageActions';
+import { useUserStore } from '@/stores/userStore';
 
 const classSettings = [
   { label: "Delete", value: "delete", icon: Trash2 },
@@ -34,6 +35,9 @@ const Class = () => {
   const getClassById = useClassStore((state) => state.getClassById);
   const [openClassSettings, setClassSettings] = useState(false)
   const setLoading = useLoadingStore((state) => state.setLoading);
+
+  const user = useUserStore((state) => state.user);
+  const isTeacher = classData?.members.some((member) => member.role === 'teacher' && member.id === user?.id);
 
   const [openDialogs, setOpenDialogs] = useState<{ [key: number]: boolean }>({});
   const [openReportDialog, setOpenReportDialog] = useState(false);
@@ -160,7 +164,7 @@ const Class = () => {
                 <CommandList>
                   <CommandEmpty>Not found</CommandEmpty>
                   <CommandGroup>
-                    {classSettings.map((option) => (
+                    {(isTeacher ? classSettings : classSettings.filter(option => option.value === 'report')).map((option) => (
                       <CommandItem
                         key={option.label}
                         value={option.value}

@@ -20,7 +20,7 @@ export const NavHeaderLoggedIn = () => {
   const pathname = usePathname();
 
   return (
-    <header className="flex justify-between h-16 shrink-0 items-center gap-2 border-b px-4 sticky top-0 dark:bg-sidebar bg-sidebar">
+    <header className="flex justify-between h-16 shrink-0 items-center gap-2 border-b px-4 sticky top-0 dark:bg-sidebar bg-sidebar z-20">
       <div className="flex gap-2 items-center">
         <SidebarTrigger />
         <Separator orientation="vertical" className="mr-2 h-4" />

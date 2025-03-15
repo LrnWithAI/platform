@@ -12,16 +12,21 @@ import { useClassStore } from '@/stores/classStore';
 import { useLoadingStore } from '@/stores/loadingStore';
 import { editClass, getClasses } from '@/actions/classActions';
 import { toast } from 'react-toastify';
+import { useUserStore } from '@/stores/userStore';
 
 const ClassMembers = () => {
   const params = useParams<{ id: string }>();
   const id = params.id;
+
   const classData = useClassStore((state) => state.classes.find((c) => c.id === Number(id)));
   const setLoading = useLoadingStore((state) => state.setLoading);
   const setClasses = useClassStore((state) => state.setClasses);
 
+  const user = useUserStore((state) => state.user);
   const teacher = classData?.members.find((member) => member.role === 'teacher');
+
   const students = classData?.members.filter((member) => member.role === 'student') || [];
+  const isTeacher = classData?.members.some((member) => member.role === 'teacher' && member.id === user?.id);
 
   const handleDelete = async (id: string) => {
     classData?.members.splice(
@@ -60,13 +65,15 @@ const ClassMembers = () => {
   };
 
   return (
-    <div className="space-y-6 relative">
+    <div className="space-y-6 relative z-10">
       <Dialog>
-        <DialogTrigger>
-          <Button className="bg-violet-500 hover:bg-violet-600 text-white absolute right-0 top-[-59px]">
-            <CirclePlus size={20} /> Add Student
-          </Button>
-        </DialogTrigger>
+        {isTeacher && (
+          <DialogTrigger className='absolute right-0 top-[-75px]'>
+            <Button className="bg-violet-500 hover:bg-violet-600 text-white ">
+              <CirclePlus size={20} /> Add Student
+            </Button>
+          </DialogTrigger>
+        )}
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
