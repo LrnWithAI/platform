@@ -81,3 +81,25 @@ export async function deleteClass(id: number) {
     return { success: false, message: (error as Error).message };
   }
 }
+
+/* Add student to class */
+export async function addStudentToClass(classId: number, user: object) {
+  const supabase = await createClient();
+
+  const { data: classData, error } = await supabase
+    .from("class")
+    .select("members")
+    .eq("id", classId)
+    .single();
+
+  if (error) throw new Error(error.message);
+
+  const updatedMembers = [...(classData?.members || []), user];
+
+  const { error: updateError } = await supabase
+    .from("class")
+    .update({ members: updatedMembers })
+    .eq("id", classId);
+
+  if (updateError) throw new Error(updateError.message);
+}

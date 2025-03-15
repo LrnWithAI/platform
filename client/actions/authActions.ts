@@ -2,6 +2,7 @@
 
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
+import { addStudentToClass } from "./classActions";
 
 /* Register */
 export async function register(formData: FormData) {
@@ -75,5 +76,50 @@ export async function updatePassword(formData: FormData) {
   } catch (error) {
     console.error("Error updating password:", error);
     return { success: false, message: (error as Error).message };
+  }
+}
+
+/* Send invite email to join class */
+export async function inviteToClass(email: string, classId: number) {
+  const supabase = await createClient();
+
+  // 1. Načítaj triedu podľa ID
+  const { data: classData, error: classError } = await supabase
+    .from("class")
+    .select("members")
+    .eq("id", classId)
+    .single();
+
+  if (classError) throw new Error(classError.message);
+
+  // 2. Skontroluj, či užívateľ už nie je v members
+  const isAlreadyMember = classData.members?.some((member: any) => member.email === email);
+
+  if (isAlreadyMember) {
+    return { success: false, message: "User is already in class!" };
+  }
+
+  // 3. Skontroluj, či už existuje v profiles
+  const { data: user, error: userError } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("email", email)
+    .single();
+
+  if (user) {
+    // ✅ Pridáme ho rovno do members
+    await addStudentToClass(classId, {
+      id: user.id,
+      name: user.first_name + " " + user.last_name,
+      role: user.role,
+      email: user.email,
+    });
+
+    return { success: true, message: "User added to class!" };
+  }
+
+  if (userError) {
+    console.error("User doesn't exist:", userError.message);
+    return { success: false, message: "User doesn't exist" };
   }
 }

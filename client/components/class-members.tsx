@@ -1,6 +1,11 @@
 'use client'
 
-import React from 'react';
+import React, { useState } from 'react';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { addMemberToClassSchema } from '@/schema/addMemberToClass';
+import { useForm } from 'react-hook-form';
+
 import { Trash2, Mail, CirclePlus } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -11,14 +16,17 @@ import { Input } from './ui/input';
 import { useClassStore } from '@/stores/classStore';
 import { useLoadingStore } from '@/stores/loadingStore';
 import { editClass, getClasses } from '@/actions/classActions';
+import { inviteToClass } from '@/actions/authActions';
 import { toast } from 'react-toastify';
 import { useUserStore } from '@/stores/userStore';
+
+type FormData = z.infer<typeof addMemberToClassSchema>;
 
 const ClassMembers = () => {
   const params = useParams<{ id: string }>();
   const id = params.id;
-
   const classData = useClassStore((state) => state.classes.find((c) => c.id === Number(id)));
+
   const setLoading = useLoadingStore((state) => state.setLoading);
   const setClasses = useClassStore((state) => state.setClasses);
 
@@ -27,6 +35,22 @@ const ClassMembers = () => {
 
   const students = classData?.members.filter((member) => member.role === 'student') || [];
   const isTeacher = classData?.members.some((member) => member.role === 'teacher' && member.id === user?.id);
+
+  const [open, setOpen] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<FormData>({
+    resolver: zodResolver(addMemberToClassSchema),
+  });
+
+  const onSubmit = async (data: FormData) => {
+    await handleInviteStudent(data.email);
+    reset();
+  };
 
   const handleDelete = async (id: string) => {
     classData?.members.splice(
@@ -64,12 +88,31 @@ const ClassMembers = () => {
     }
   };
 
+  const handleInviteStudent = async (email: string) => {
+    const response = await inviteToClass(email, classData?.id);
+
+    if (response?.success) {
+      toast.success(response.message);
+      // Fetch the updated list after editing
+      const updatedClasses = await getClasses();
+      if (updatedClasses) {
+        setClasses(updatedClasses.data);
+        toast.success('Updated classes loaded successfully!');
+        setOpen(false);
+      } else {
+        toast.error(response.message || "Failed to update class.");
+      }
+    } else {
+      toast.error(response?.message || "Failed to invite member.");
+    }
+  };
+
   return (
     <div className="space-y-6 relative z-10">
-      <Dialog>
+      <Dialog open={open} onOpenChange={setOpen}>
         {isTeacher && (
           <DialogTrigger className='absolute right-0 top-[-75px]'>
-            <Button className="bg-violet-500 hover:bg-violet-600 text-white ">
+            <Button className="bg-violet-500 hover:bg-violet-600 text-white" onClick={() => setOpen(true)}>
               <CirclePlus size={20} /> Add Student
             </Button>
           </DialogTrigger>
@@ -81,31 +124,36 @@ const ClassMembers = () => {
                 <strong className="font-bold text-2xl">Add student to your class</strong>
               </div>
             </DialogTitle>
-            <DialogDescription className="border rounded-xl text-left p-3 flex flex-col gap-5">
+          </DialogHeader>
+
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <DialogDescription className="border rounded-xl text-left p-3 flex flex-col gap-5 mb-4">
               <div>
-                <Label htmlFor="id">Mail of student</Label>
+                <Label htmlFor="email">Student's e-mail address</Label>
                 <Input
-                  id="mail"
+                  id="email"
+                  placeholder="example@email.com"
                   className="border"
+                  {...register("email")}
                 />
+                {errors.email && (
+                  <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+                )}
               </div>
             </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="flex gap-2 w-full">
-            <DialogClose asChild className="w-full">
-              <Button type="button" variant="secondary">
-                Cancel
-              </Button>
-            </DialogClose>
-            <DialogClose asChild className="w-full">
-              <Button
-                type="button"
-                variant="default"
-              >
+
+            <DialogFooter className="flex gap-2 w-full">
+              <DialogClose asChild className="w-full">
+                <Button type="button" variant="secondary">
+                  Cancel
+                </Button>
+              </DialogClose>
+
+              <Button type="submit" variant="default" className="w-full">
                 Add
               </Button>
-            </DialogClose>
-          </DialogFooter>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
 
