@@ -64,10 +64,14 @@ export async function getTestsByUserId(userId: string) {
 }
 
 /* DELETE Test */
-export async function deleteTest(id: number) {
+export async function deleteTest(testId: number, userId: string) {
   const supabase = await createClient();
 
-  const { error } = await supabase.from("tests").delete().eq("id", id);
+  const { error } = await supabase
+    .from("tests")
+    .delete()
+    .eq("id", testId)
+    .eq("created_by", userId);
 
   if (error) {
     console.error("Error deleting test:", error.message);
@@ -90,6 +94,29 @@ export async function createTest(test: Test) {
     return {
       success: true,
       message: "Test successfully created",
+      data: data,
+    };
+  }
+}
+
+/* UPDATE Test */
+export async function updateTest(test: Test) {
+  const supabase = await createClient();
+
+  console.log("test:", test);
+
+  const { data, error } = await supabase
+    .from("tests")
+    .update(test)
+    .eq("id", test.id);
+
+  if (error) {
+    console.error("Error updating test:", error.message);
+    return { success: false, message: error.message, data: [] };
+  } else {
+    return {
+      success: true,
+      message: "Test successfully updated",
       data: data,
     };
   }

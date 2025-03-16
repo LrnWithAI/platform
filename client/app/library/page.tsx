@@ -118,7 +118,9 @@ export default function Library() {
                         : "Invalid date"}
                     </p>
                     <p className="text-sm text-gray-500 mt-2">
-                      {test.questions?.length} questions
+                      {test.questions?.length && test.questions?.length > 1
+                        ? test.questions?.length + " questions"
+                        : test.questions?.length + " question"}
                     </p>
                   </div>
                 </div>
