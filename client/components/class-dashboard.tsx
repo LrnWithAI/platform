@@ -67,7 +67,7 @@ const ClassDashboard = () => {
 
       if (response.success) {
         toast.success(isEditing ? 'Post updated successfully!' : 'Post added successfully!');
-        const updatedClasses = await getClasses();
+        const updatedClasses = await getClasses(user.id);
         setClasses(updatedClasses.data);
       } else {
         toast.error(response.message || 'Failed to update class.');
@@ -129,7 +129,7 @@ const ClassDashboard = () => {
 
       let res;
       for (const file of deletedFiles) {
-        res = await deleteFileFromClassContent(user.id, classData.id, generatedId, file.name);
+        res = await deleteFileFromClassContent(user.id, classData.id, generatedId, file.name, user.id);
       }
       if (res?.success) toast.success("Files deleted successfully!");
     }
@@ -146,7 +146,7 @@ const ClassDashboard = () => {
         const uploadedFiles = await uploadFilesToClassContent(newFiles, user.id, classData.id, generatedId as number);;
 
         if (uploadedFiles.length > 0) {
-          const res = await updateClassContent(classData.id, generatedId, [...existingFiles, ...uploadedFiles]); // pošleme existujúce prílohy ale aj nové, ktoré sa práve nahrali aby ich updatlo do triedy 
+          const res = await updateClassContent(classData.id, generatedId, [...existingFiles, ...uploadedFiles], user.id); // pošleme existujúce prílohy ale aj nové, ktoré sa práve nahrali aby ich updatlo do triedy 
 
           if (res?.success) {
             res.data ? setClasses(res.data) : toast.error("Failed to update class content");
@@ -174,7 +174,7 @@ const ClassDashboard = () => {
     const deletedFiles = classData.content.find(post => post.id === postId)?.files;
     let res;
     for (const file of deletedFiles) {
-      res = await deleteFileFromClassContent(user.id, classData.id, postId, file.name);
+      res = await deleteFileFromClassContent(user.id, classData.id, postId, file.name, user.id);
     }
     if (res?.success) toast.success("Files deleted successfully from the post!");
 

@@ -91,7 +91,7 @@ export async function uploadFilesToClassContent(files: File[] | null, userId: st
 }
 
 /* UPDATE `files` array in `class.content` in class table */
-export async function updateClassContent(classId: number, postId: number, files: any[]) {
+export async function updateClassContent(classId: number, postId: number, files: any[], user_id: string) {
   const supabase = createClient();
 
   const { data: classData, error: fetchError } = await supabase
@@ -122,13 +122,13 @@ export async function updateClassContent(classId: number, postId: number, files:
   if (updateError) {
     return { success: false, message: (updateError as Error).message };
   } else {
-    const res = await getClasses();
+    const res = await getClasses(user_id);
     return { success: true, message: "Files uploaded and saved successfully!", data: res.data };
   }
 }
 
 /* DELETE File from class_files bucket for class post */
-export async function deleteFileFromClassContent(userId: string, classId: number, postId: number, fileName: string) {
+export async function deleteFileFromClassContent(userId: string, classId: number, postId: number, fileName: string, user_id: string) {
   const supabase = createClient();
 
   const filePath = `private/${userId}/${classId}/${postId}/${fileName}`;
@@ -137,7 +137,7 @@ export async function deleteFileFromClassContent(userId: string, classId: number
   if (error) {
     return { success: false, message: (error as Error).message };
   } else {
-    const res = await getClasses();
+    const res = await getClasses(user_id);
     return { success: true, message: `File ${fileName} deleted successfully!`, data: res.data };
   }
 }

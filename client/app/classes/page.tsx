@@ -14,6 +14,7 @@ import { ClassesCards } from "@/components/class-cards";
 import { getClasses } from "@/actions/classActions";
 import { useLoadingStore } from "@/stores/loadingStore";
 import { useClassStore } from "@/stores/classStore";
+import { useUserStore } from "@/stores/userStore";
 import ClassDialog from "@/components/class-dialog";
 
 const orderOptions = [
@@ -40,6 +41,7 @@ export default function Classes() {
   const [filterOption, setFilterOption] = useState<{ [key: string]: string }>({})
 
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const user = useUserStore((state) => state.user);
 
   const updateFilterOption = (key: string, value: string) => {
     setFilterOption((prev) => ({
@@ -49,10 +51,12 @@ export default function Classes() {
   };
 
   useEffect(() => {
+    if (!user?.id) return;
+
     async function fetchClasses() {
       try {
         setLoading(true);
-        const response = await getClasses();
+        const response = await getClasses(user.id);
 
         if (response) {
           setClasses(response.data);
@@ -68,7 +72,7 @@ export default function Classes() {
     }
 
     fetchClasses();
-  }, []);
+  }, [user]);
 
   return (
     <div className="flex flex-1 flex-col gap-4 p-8">

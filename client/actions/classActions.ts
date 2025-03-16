@@ -3,11 +3,14 @@
 import { createClient } from "@/utils/supabase/server";
 
 /* GET Classes */
-export async function getClasses() {
+export async function getClasses(user_id: string) {
   const supabase = await createClient();
 
   try {
-    const { data, error } = await supabase.from("class").select("*");
+    const { data, error } = await supabase
+      .from("class")
+      .select("*")
+      .contains("members", JSON.stringify([{ id: user_id }]));
 
     if (error) throw new Error(error.message);
 

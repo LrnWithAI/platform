@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 import { deleteClass, getClasses } from '@/actions/classActions';
 import { useLoadingStore } from '@/stores/loadingStore';
 import { useClassStore } from '@/stores/classStore';
+import { useUserStore } from '@/stores/userStore';
 import { Button } from './ui/button';
 import ClassDialog from './class-dialog';
 import { deleteFileFromClassContent } from '@/actions/storageActions';
@@ -16,6 +17,7 @@ export function ClassesCards({ orderOption, filterOption }: { orderOption: strin
   const setClasses = useClassStore((state) => state.setClasses);
   const classes = useClassStore((state) => state.classes)
   const [openDialogs, setOpenDialogs] = useState<{ [key: number]: boolean }>({});
+  const user = useUserStore((state) => state.user);
 
   const toggleDialog = (id: number) => {
     setOpenDialogs((prev) => ({
@@ -71,7 +73,7 @@ export function ClassesCards({ orderOption, filterOption }: { orderOption: strin
       for (const post of classData.content) {
         if (post.files && post.files.length > 0) {
           for (const file of post.files) {
-            await deleteFileFromClassContent(classData?.created_by.id, classData.id, post.id, file.name);
+            await deleteFileFromClassContent(classData?.created_by.id, classData.id, post.id, file.name, user.id);
           }
         }
       }
@@ -82,7 +84,7 @@ export function ClassesCards({ orderOption, filterOption }: { orderOption: strin
         toast.success('Class deleted successfully!');
 
         // Fetch the updated list after deleting
-        const response = await getClasses();
+        const response = await getClasses(user.id);
         if (response) {
           setClasses(response.data);
           toast.success('Updated classes loaded successfully!');

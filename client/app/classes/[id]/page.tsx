@@ -66,7 +66,7 @@ const Class = () => {
           for (const post of classData.content) {
             if (post.files && post.files.length > 0) {
               for (const file of post.files) {
-                response = await deleteFileFromClassContent(classData?.created_by.id, classData.id, post.id, file.name);
+                response = await deleteFileFromClassContent(classData?.created_by.id, classData.id, post.id, file.name, user.id);
               }
             }
           }
@@ -109,7 +109,7 @@ const Class = () => {
         for (const post of classData.content) {
           if (post.files && post.files.length > 0) {
             for (const file of post.files) {
-              await deleteFileFromClassContent(classData?.created_by.id, classData.id, post.id, file.name);
+              await deleteFileFromClassContent(classData?.created_by.id, classData.id, post.id, file.name, user.id);
             }
           }
         }

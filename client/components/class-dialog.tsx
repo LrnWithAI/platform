@@ -117,7 +117,7 @@ const ClassDialog: React.FC<ClassDialogProps> = ({ type, onClose, isOpen, initia
       toast.success(`Class ${type === "create" ? "created" : "updated"} successfully!`);
 
       // Aktualizujeme zoznam tried
-      const updatedClasses = await getClasses();
+      const updatedClasses = await getClasses(user.id);
       if (updatedClasses) {
         setClasses(updatedClasses.data);
       }

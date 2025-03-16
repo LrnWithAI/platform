@@ -74,7 +74,7 @@ const ClassMembers = () => {
         toast.success("User removed successfully!");
 
         // Fetch the updated list after editing
-        const updatedClasses = await getClasses();
+        const updatedClasses = await getClasses(user.id);
         if (updatedClasses) {
           setClasses(updatedClasses.data);
           toast.success('Updated classes loaded successfully!');
@@ -95,7 +95,7 @@ const ClassMembers = () => {
     if (response?.success) {
       toast.success(response.message);
       // Fetch the updated list after editing
-      const updatedClasses = await getClasses();
+      const updatedClasses = await getClasses(user.id);
       if (updatedClasses) {
         setClasses(updatedClasses.data);
         toast.success('Updated classes loaded successfully!');
