@@ -15,13 +15,6 @@ export const ClassSchema = z.object({
       /^(\d{4} \/ \d{4}|\d{4})$/,
       "Year must be a single year (e.g., '2025') or a range (e.g., '2024 / 2025')."
     ),
-  // image: z
-  //   .custom<File | undefined>((file) => {
-  //     if (!file) return true; // Ak nie je súbor, je to OK (voliteľné pole)
-  //     return file instanceof File && file.type.startsWith("image/");
-  //   }, "Only image files are allowed.")
-  //   .optional()
-
   image: z
     .custom<File | undefined>((file) => {
       if (file === undefined || file === null || file === '') {

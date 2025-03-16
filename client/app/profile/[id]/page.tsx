@@ -114,9 +114,11 @@ const Profile = () => {
           </div>
         </div>
 
-        <div className="p-4 bg-gray-100 rounded-lg">
+        <div className="p-4 bg-gray-100 rounded-lg max-h-60 overflow-y-auto">
           <h2 className="text-lg font-semibold mb-2">About Me</h2>
-          <p>{user?.about || "No information available"}</p>
+          <p className="whitespace-pre-line">
+            {user?.bio || "No information available"}
+          </p>
         </div>
       </div>
 

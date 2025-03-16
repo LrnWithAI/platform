@@ -11,7 +11,7 @@ export type User = {
   website: string;
   phone: string;
   workplace: string;
-  about: string;
+  bio: string;
 } | null;
 
 export type UserState = {

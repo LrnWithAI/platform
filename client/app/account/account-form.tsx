@@ -1,6 +1,6 @@
 "use client";
 
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { accountSchema } from "@/schema/account";
 import { useEffect, useState } from "react";
@@ -9,6 +9,7 @@ import { getUserProfile, updateUserProfile } from "@/actions/userActions";
 
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import Avatar from "./avatar";
 import { z } from "zod";
@@ -22,7 +23,7 @@ export default function AccountForm({ user }: { user: any }) {
   const loading = useLoadingStore((state) => state.loading);
 
   const {
-    control,
+    register,
     handleSubmit,
     setValue,
     formState: { errors },
@@ -35,6 +36,7 @@ export default function AccountForm({ user }: { user: any }) {
       website: "",
       phone: "",
       workplace: "",
+      bio: "",
     },
   });
 
@@ -50,6 +52,7 @@ export default function AccountForm({ user }: { user: any }) {
       setValue("website", data?.website || "");
       setValue("phone", data?.phone || "");
       setValue("workplace", data?.workplace || "");
+      setValue("bio", data?.bio || "");
       setAvatarUrl(data?.avatar_url || null);
       toast.success("User data fetched successfully.");
     } else {
@@ -70,6 +73,7 @@ export default function AccountForm({ user }: { user: any }) {
       website: data.website,
       phone: data.phone,
       workplace: data.workplace,
+      bio: data.bio,
       avatar_url: avatarUrl,
     });
 
@@ -91,7 +95,7 @@ export default function AccountForm({ user }: { user: any }) {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="mx-auto mt-8 md:mt-14 p-6 max-w-xl bg-white dark:bg-muted border space-y-4 rounded-lg"
+      className="space-y-8 p-6 shadow-md rounded-lg bg-gray-50 w-3/4 mx-auto mt-10"
     >
       <div>
         <Label className="text-md">Avatar</Label>
@@ -109,10 +113,9 @@ export default function AccountForm({ user }: { user: any }) {
         <div className="flex gap-4">
           <div className="space-y-2 w-1/2">
             <Label>First Name</Label>
-            <Controller
-              control={control}
-              name="firstName"
-              render={({ field }) => <Input {...field} />}
+            <Input
+              {...register("firstName")}
+              placeholder="First Name"
             />
             {errors.firstName && (
               <p className="text-sm text-red-500">{errors.firstName.message}</p>
@@ -120,10 +123,9 @@ export default function AccountForm({ user }: { user: any }) {
           </div>
           <div className="space-y-2 w-1/2">
             <Label>Last Name</Label>
-            <Controller
-              control={control}
-              name="lastName"
-              render={({ field }) => <Input {...field} />}
+            <Input
+              {...register("lastName")}
+              placeholder="Last Name"
             />
             {errors.lastName && (
               <p className="text-sm text-red-500">{errors.lastName.message}</p>
@@ -133,38 +135,59 @@ export default function AccountForm({ user }: { user: any }) {
 
         <div className="space-y-2">
           <Label>Username</Label>
-          <Controller
-            control={control}
-            name="username"
-            render={({ field }) => <Input {...field} />}
+          <Input
+            {...register("username")}
+            placeholder="Username"
           />
+          {errors.username && (
+            <p className="text-sm text-red-500">{errors.username.message}</p>
+          )}
         </div>
 
         <div className="space-y-2">
           <Label>Website</Label>
-          <Controller
-            control={control}
-            name="website"
-            render={({ field }) => <Input type="url" {...field} />}
+          <Input
+            type="url"
+            {...register("website")}
+            placeholder="Website"
           />
+          {errors.website && (
+            <p className="text-sm text-red-500">{errors.website.message}</p>
+          )}
         </div>
 
         <div className="space-y-2">
           <Label>Phone</Label>
-          <Controller
-            control={control}
-            name="phone"
-            render={({ field }) => <Input type="tel" {...field} />}
+          <Input
+            type="tel"
+            {...register("phone")}
+            placeholder="Phone"
           />
+          {errors.phone && (
+            <p className="text-sm text-red-500">{errors.phone.message}</p>
+          )}
         </div>
 
         <div className="space-y-2">
           <Label>Workplace</Label>
-          <Controller
-            control={control}
-            name="workplace"
-            render={({ field }) => <Input {...field} />}
+          <Input
+            {...register("workplace")}
+            placeholder="Workplace"
           />
+          {errors.workplace && (
+            <p className="text-sm text-red-500">{errors.workplace.message}</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label>Bio</Label>
+          <Textarea
+            {...register("bio")}
+            placeholder="Bio"
+          />
+          {errors.bio && (
+            <p className="text-sm text-red-500">{errors.bio.message}</p>
+          )}
         </div>
       </div>
 
