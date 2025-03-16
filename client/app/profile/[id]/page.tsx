@@ -130,7 +130,7 @@ const Profile = () => {
         </TabsList>
 
         <TabsContent value="whatido" className="p-4 bg-gray-50 rounded-md">
-          <p>{user?.bio || "No information available"}</p>
+          <p className="whitespace-pre-line">{user?.bio || "No information available"}</p>
         </TabsContent>
 
         <TabsContent value="announcements" className="p-4 bg-gray-50 rounded-md">

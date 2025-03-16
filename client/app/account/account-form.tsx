@@ -184,6 +184,7 @@ export default function AccountForm({ user }: { user: any }) {
           <Textarea
             {...register("bio")}
             placeholder="Bio"
+            rows={6}
           />
           {errors.bio && (
             <p className="text-sm text-red-500">{errors.bio.message}</p>
