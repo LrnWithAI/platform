@@ -49,7 +49,7 @@ export function UserOptions() {
             src={avatarUrl ? avatarUrl : "https://github.com/shadcn.png"}
             alt={user?.full_name}
           />
-          <AvatarFallback>{`${user?.first_name[0]} + ${user?.last_name[0]}`}</AvatarFallback>
+          <AvatarFallback>{user?.full_name}</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="p-1">

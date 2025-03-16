@@ -6,8 +6,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { addMemberToClassSchema } from '@/schema/addMemberToClass';
 import { useForm } from 'react-hook-form';
 
-import { Trash2, Mail, CirclePlus } from 'lucide-react';
-import { useParams } from 'next/navigation';
+import { Trash2, Mail, CirclePlus, SquareArrowOutUpRight } from 'lucide-react';
+import { useParams, useRouter } from 'next/navigation';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from './ui/button';
 import { Label } from './ui/label';
@@ -23,6 +23,7 @@ import { useUserStore } from '@/stores/userStore';
 type FormData = z.infer<typeof addMemberToClassSchema>;
 
 const ClassMembers = () => {
+  const router = useRouter();
   const params = useParams<{ id: string }>();
   const id = params.id;
   const classData = useClassStore((state) => state.classes.find((c) => c.id === Number(id)));
@@ -162,13 +163,11 @@ const ClassMembers = () => {
           <h2 className="text-2xl font-bold mb-1">Teacher</h2>
           <div className="flex items-center justify-between pb-3">
             <div>
-              <p className="text-lg mb-1 text-white">{teacher.name}</p>
-              <a
-                href={`mailto:${teacher.email}`}
-                className="text-sm underline hover:text-gray-200"
-              >
-                {teacher.email}
-              </a>
+              <div className='flex items-center gap-2 cursor-pointer hover:text-gray-200' onClick={() => { router.push(`/profile/${teacher?.id}`) }}>
+                <p className="text-lg mb-1">{teacher.name}</p>
+                <SquareArrowOutUpRight size={16} />
+              </div>
+              <p className="text-sm text-gray-200">{teacher.email} </p>
             </div>
             <div className="flex items-center gap-2">
               <a

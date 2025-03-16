@@ -1,26 +1,26 @@
 "use client";
 
-import { z } from "zod";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { accountSchema } from "@/schema/account";
-import { useForm } from "react-hook-form";
-
-import { useCallback, useEffect, useState } from "react";
-import { createClient } from "@/utils/supabase/client";
-import { type User } from "@supabase/supabase-js";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { getUserProfile, updateUserProfile } from "@/actions/userActions";
+
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import Avatar from "./avatar";
+import { z } from "zod";
+import { useLoadingStore } from "@/stores/loadingStore";
 
 type AccountFormValues = z.infer<typeof accountSchema>;
 
-export default function AccountForm({ user }: { user: User | null }) {
-  const supabase = createClient();
-  const [fetchedUser, setFetchedUser] = useState<AccountFormValues>();
+export default function AccountForm({ user }: { user: any }) {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const setLoading = useLoadingStore((state) => state.setLoading);
+  const loading = useLoadingStore((state) => state.loading);
 
   const {
     register,
@@ -30,112 +30,103 @@ export default function AccountForm({ user }: { user: User | null }) {
   } = useForm<AccountFormValues>({
     resolver: zodResolver(accountSchema),
     defaultValues: {
-      firstName: user?.user_metadata.firstName ?? "",
-      lastName: user?.user_metadata.lastName ?? "",
-      username: fetchedUser?.username ?? "",
-      website: fetchedUser?.website ?? "",
+      firstName: "",
+      lastName: "",
+      username: "",
+      website: "",
+      phone: "",
+      workplace: "",
+      bio: "",
     },
   });
 
-  const onSubmit = async (data: AccountFormValues) => {
-    console.log("submitted data", data);
-    await updateProfile(data);
+  const fetchUserData = async () => {
+    setLoading(true);
+
+    const response = await getUserProfile(user?.id);
+    if (response.success) {
+      const data = response.data;
+      setValue("firstName", data?.first_name || "");
+      setValue("lastName", data?.last_name || "");
+      setValue("username", data?.username || "");
+      setValue("website", data?.website || "");
+      setValue("phone", data?.phone || "");
+      setValue("workplace", data?.workplace || "");
+      setValue("bio", data?.bio || "");
+      setAvatarUrl(data?.avatar_url || null);
+      toast.success("User data fetched successfully.");
+    } else {
+      toast.error("Error fetching user data.");
+    }
+
+    setLoading(false);
   };
 
-  const getProfile = useCallback(async () => {
-    try {
-      setLoading(true);
+  const onSubmit = async (data: AccountFormValues) => {
+    setLoading(true);
 
-      const { data, error, status } = await supabase
-        .from("profiles")
-        .select(`*`)
-        .eq("id", user?.id)
-        .single();
+    const response = await updateUserProfile(user?.id, {
+      first_name: data.firstName,
+      last_name: data.lastName,
+      full_name: `${data.firstName} ${data.lastName}`,
+      username: data.username,
+      website: data.website,
+      phone: data.phone,
+      workplace: data.workplace,
+      bio: data.bio,
+      avatar_url: avatarUrl,
+    });
 
-      if (error && status !== 406) {
-        console.log(error);
-        throw error;
-      }
-
-      if (data) {
-        setFetchedUser({
-          ...data,
-        });
-        setAvatarUrl(data.avatar_url);
-        setValue("username", data.username);
-        setValue("website", data.website);
-      }
-    } catch (error) {
-      alert("Error loading user data!");
-    } finally {
-      setLoading(false);
+    if (response.success) {
+      toast.success("Profile updated successfully!");
+    } else {
+      toast.error("Error updating profile.");
     }
-  }, [user, supabase]);
+
+    setLoading(false);
+  };
 
   useEffect(() => {
-    getProfile();
-  }, [user, getProfile]);
-
-  async function updateProfile(data: AccountFormValues) {
-    try {
-      setLoading(true);
-
-      const { error } = await supabase.from("profiles").upsert({
-        id: user?.id as string,
-        full_name: `${data.firstName} ${data.lastName}`,
-        first_name: data.firstName,
-        last_name: data.lastName,
-        username: data.username,
-        website: data.website,
-        avatar_url: avatarUrl,
-        updated_at: new Date().toISOString(),
-      });
-      if (error) throw error;
-      toast.success("Profile updated successfully!");
-    } catch (error) {
-      toast.success("Error updating the data!");
-    } finally {
-      setLoading(false);
+    if (user) {
+      fetchUserData();
     }
-  }
+  }, [user]);
 
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="mx-auto mt-8 md:mt-14 p-6 max-w-xl bg-white dark:bg-muted border space-y-4 rounded-lg"
+      className="space-y-8 p-6 shadow-md rounded-lg bg-gray-50 w-3/4 mx-auto mt-10"
     >
       <div>
         <Label className="text-md">Avatar</Label>
         <div className="flex flex-row mt-2">
           <Avatar
-            uid={user?.id ?? null}
+            uid={user?.id}
             url={avatarUrl}
             size={100}
-            onUpload={(url) => {
-              setAvatarUrl(url);
-            }}
+            onUpload={(url) => setAvatarUrl(url)}
           />
         </div>
       </div>
 
-      {/* Form Section */}
       <div className="space-y-6">
-        <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <Input id="email" type="email" value={user?.email} disabled />
-        </div>
-
-        <div className="flex flex-row gap-4">
-          <div className="flex flex-col space-y-2 w-1/2">
-            <Label htmlFor="firstName">First Name</Label>
-            <Input id="firstName" type="text" {...register("firstName")} />
+        <div className="flex gap-4">
+          <div className="space-y-2 w-1/2">
+            <Label>First Name</Label>
+            <Input
+              {...register("firstName")}
+              placeholder="First Name"
+            />
             {errors.firstName && (
               <p className="text-sm text-red-500">{errors.firstName.message}</p>
             )}
           </div>
-          <div className="flex flex-col space-y-2 w-1/2">
-            <Label htmlFor="firstName">Last Name</Label>
-            <Input id="lastName" type="text" {...register("lastName")} />
+          <div className="space-y-2 w-1/2">
+            <Label>Last Name</Label>
+            <Input
+              {...register("lastName")}
+              placeholder="Last Name"
+            />
             {errors.lastName && (
               <p className="text-sm text-red-500">{errors.lastName.message}</p>
             )}
@@ -143,32 +134,67 @@ export default function AccountForm({ user }: { user: User | null }) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="username">Username</Label>
-          <Input id="username" type="text" {...register("username")} />
+          <Label>Username</Label>
+          <Input
+            {...register("username")}
+            placeholder="Username"
+          />
           {errors.username && (
             <p className="text-sm text-red-500">{errors.username.message}</p>
           )}
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="website">Website</Label>
-          <Input id="website" type="url" {...register("website")} />
+          <Label>Website</Label>
+          <Input
+            type="url"
+            {...register("website")}
+            placeholder="Website"
+          />
           {errors.website && (
             <p className="text-sm text-red-500">{errors.website.message}</p>
           )}
         </div>
+
+        <div className="space-y-2">
+          <Label>Phone</Label>
+          <Input
+            type="tel"
+            {...register("phone")}
+            placeholder="Phone"
+          />
+          {errors.phone && (
+            <p className="text-sm text-red-500">{errors.phone.message}</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label>Workplace</Label>
+          <Input
+            {...register("workplace")}
+            placeholder="Workplace"
+          />
+          {errors.workplace && (
+            <p className="text-sm text-red-500">{errors.workplace.message}</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label>Bio</Label>
+          <Textarea
+            {...register("bio")}
+            placeholder="Bio"
+            rows={6}
+          />
+          {errors.bio && (
+            <p className="text-sm text-red-500">{errors.bio.message}</p>
+          )}
+        </div>
       </div>
 
-      {/* Buttons Section */}
       <div className="flex justify-end pt-4">
-        <Button
-          className={`bg-purple hover:bg-violet-500 text-white hover:text-white ${
-            loading ? "opacity-50 cursor-not-allowed" : ""
-          }`}
-          disabled={loading}
-          type="submit"
-        >
-          {loading ? "Loading ..." : "Update"}
+        <Button type="submit" disabled={loading}>
+          {loading ? "Loading..." : "Update"}
         </Button>
       </div>
     </form>

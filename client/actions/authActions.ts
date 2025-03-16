@@ -110,7 +110,7 @@ export async function inviteToClass(email: string, classId: number) {
     // ✅ Pridáme ho rovno do members
     await addStudentToClass(classId, {
       id: user.id,
-      name: user.first_name + " " + user.last_name,
+      name: user.full_name,
       role: user.role,
       email: user.email,
     });
