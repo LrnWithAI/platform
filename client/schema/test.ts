@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const testSchema = z.object({
+  id: z.number().int().optional(),
   title: z.string().min(1, "Title is required."),
   description: z.string().min(1, "Description is required."),
   visibility: z.string().min(1, "Visibility is required."),

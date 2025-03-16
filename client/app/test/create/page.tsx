@@ -4,6 +4,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { testSchema } from "@/schema/test";
 import { useForm, useFieldArray } from "react-hook-form";
+import { useState } from "react";
 
 import { useSearchParams } from "next/navigation";
 import { Label } from "@/components/ui/label";
@@ -31,6 +32,10 @@ type CreateTestFormValues = z.infer<typeof testSchema>;
 export default function CreateTest() {
   const params = useSearchParams();
   const { user } = useUserStore();
+
+  const [selectedCorrectAnswers, setSelectedCorrectAnswers] = useState<
+    Record<number, number>
+  >({});
 
   console.log("user", user);
 
@@ -60,6 +65,10 @@ export default function CreateTest() {
 
   const setCorrectAnswer = (questionIndex: number, answerIndex: number) => {
     setValue(`questions.${questionIndex}.correct`, answerIndex);
+    setSelectedCorrectAnswers((prev) => ({
+      ...prev,
+      [questionIndex]: answerIndex,
+    }));
   };
 
   const addQuestion = () => {
@@ -105,7 +114,7 @@ export default function CreateTest() {
 
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col justify-center max-w-4xl mx-auto"
+        className="flex flex-col bg-red-200 justify-center max-w-4xl mx-auto"
       >
         <div className="dark:bg-muted border rounded-md p-6 space-y-4 bg-gray-100">
           <div className="space-y-2 pb-2">
@@ -177,55 +186,61 @@ export default function CreateTest() {
           {fields.map((field, questionIndex) => (
             <div
               key={field.id}
-              className="dark:bg-muted border rounded-md p-6 space-y-2"
+              className="flex flex-col dark:bg-muted border rounded-md p-6 space-y-2"
             >
-              <div className="mb-2 space-y-2">
-                <Label>Question {questionIndex + 1}</Label>
-                <Input
-                  type="text"
-                  placeholder="Enter a question, like What is AI?"
-                  {...register(`questions.${questionIndex}.question`)}
-                />
-              </div>
+              <div>
+                <div className="mb-2 space-y-2">
+                  <Label>Question {questionIndex + 1}</Label>
+                  <Input
+                    type="text"
+                    placeholder="Enter a question, like What is AI?"
+                    {...register(`questions.${questionIndex}.question`)}
+                  />
+                </div>
 
-              <div className="mb-2 space-y-2">
-                <Label>Answers</Label>
-                {Array(4)
-                  .fill(null)
-                  .map((_, answerIndex) => {
-                    const isCorrect = field.correct === answerIndex;
-                    return (
-                      <div
-                        key={answerIndex}
-                        className="flex items-center space-x-2"
-                      >
-                        <Input
-                          type="text"
-                          placeholder={`Answer ${String.fromCharCode(
-                            65 + answerIndex
-                          )}`}
-                          {...register(
-                            `questions.${questionIndex}.answers.${answerIndex}`
-                          )}
-                        />
-                        <Button
-                          variant={isCorrect ? "default" : "outline"}
-                          size="icon"
-                          onClick={() =>
-                            setCorrectAnswer(questionIndex, answerIndex)
-                          }
-                          type="button"
+                <div className="mb-2 space-y-2">
+                  <Label>Answers</Label>
+                  {Array(4)
+                    .fill(null)
+                    .map((_, answerIndex) => {
+                      return (
+                        <div
+                          key={answerIndex}
+                          className="flex items-center space-x-2"
                         >
-                          <Check />
-                        </Button>
-                      </div>
-                    );
-                  })}
+                          <Input
+                            type="text"
+                            placeholder={`Answer ${String.fromCharCode(
+                              65 + answerIndex
+                            )}`}
+                            {...register(
+                              `questions.${questionIndex}.answers.${answerIndex}`
+                            )}
+                          />
+                          <Button
+                            variant={
+                              selectedCorrectAnswers[questionIndex] ===
+                              answerIndex
+                                ? "default"
+                                : "outline"
+                            }
+                            size="icon"
+                            onClick={() =>
+                              setCorrectAnswer(questionIndex, answerIndex)
+                            }
+                            type="button"
+                          >
+                            <Check />
+                          </Button>
+                        </div>
+                      );
+                    })}
+                </div>
               </div>
 
               <Button
-                type="button"
-                className="bg-red-500"
+                variant="destructive"
+                className="bg-red-500 w-36 self-end"
                 onClick={() => removeQuestion(questionIndex)}
               >
                 Remove question
@@ -235,16 +250,16 @@ export default function CreateTest() {
         </div>
 
         {/* Add New Question */}
-        <div className="flex justify-center">
-          <Button type="button" className="bg-blue-500" onClick={addQuestion}>
+        <div className="flex justify-center my-6">
+          <Button variant="outline" onClick={addQuestion}>
             Add Question
           </Button>
         </div>
 
         {/* Submit Button */}
         <div className="flex justify-center">
-          <Button type="submit" className="bg-purple">
-            Create
+          <Button type="submit" className="bg-purple hover:bg-purple-500">
+            Create Test
           </Button>
         </div>
       </form>

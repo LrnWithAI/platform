@@ -98,3 +98,26 @@ export async function createTest(test: Test) {
     };
   }
 }
+
+/* UPDATE Test */
+export async function updateTest(test: Test) {
+  const supabase = await createClient();
+
+  console.log("test:", test);
+
+  const { data, error } = await supabase
+    .from("tests")
+    .update(test)
+    .eq("id", test.id);
+
+  if (error) {
+    console.error("Error updating test:", error.message);
+    return { success: false, message: error.message, data: [] };
+  } else {
+    return {
+      success: true,
+      message: "Test successfully updated",
+      data: data,
+    };
+  }
+}
