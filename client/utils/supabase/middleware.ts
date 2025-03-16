@@ -47,7 +47,7 @@ export async function updateSession(request: NextRequest) {
       request.nextUrl.pathname.startsWith(path)
     )
   ) {
-    // no user, potentially respond by redirecting the user to the login page
+    // user, potentially respond by redirecting the user to the home page
     const url = request.nextUrl.clone()
     url.pathname = '/home'
     return NextResponse.redirect(url)

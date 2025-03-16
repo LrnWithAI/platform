@@ -9,6 +9,9 @@ export type User = {
   updated_at: string;
   avatar_url: string;
   website: string;
+  phone: string;
+  workplace: string;
+  about: string;
 } | null;
 
 export type UserState = {

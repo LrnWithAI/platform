@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
+import { toast } from 'react-toastify';
+
 import { CircleAlert, CirclePlus, Trash2, EditIcon, EllipsisVertical, Download } from 'lucide-react';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -12,14 +14,14 @@ import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useClassStore } from '@/stores/classStore';
 import { useLoadingStore } from '@/stores/loadingStore';
-import { getClasses, editClass } from '@/actions/classActions';
-import { toast } from 'react-toastify';
 import { useUserStore } from '@/stores/userStore';
 import ReportDialog from './report_dialog';
 import { formatDate } from '@/utils/supabase/utils';
+import { getClasses, editClass } from '@/actions/classActions';
 import { downloadImage, updateClassContent, uploadFilesToClassContent, deleteFileFromClassContent } from '@/actions/storageActions';
 
 const ClassDashboard = () => {
+  const router = useRouter();
   const params = useParams();
   const id = params.id;
   const classData = useClassStore((state) => state.classes.find((c) => c.id === Number(id)));
@@ -297,12 +299,12 @@ const ClassDashboard = () => {
           classData.content.map((post) => (
             <div className="mt-5 first:mt-0 bg-white rounded-lg shadow-lg p-6 pe-16 relative">
               <div className='flex items-center gap-4'>
-                <Avatar className="cursor-pointer hover:opacity-75">
+                <Avatar className="cursor-pointer hover:opacity-75" onClick={() => { router.push(`/profile/${user?.id}`) }}>
                   <AvatarImage
                     src={avatarUrl || "https://github.com/shadcn.png"}
                     alt={user?.full_name}
                   />
-                  <AvatarFallback>{(user?.first_name?.[0] || '') + (user?.last_name?.[0] || '')}</AvatarFallback>
+                  <AvatarFallback>{user?.full_name}</AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col">
                   <span className="text-gray-500 font-bold">{post.title}</span>
