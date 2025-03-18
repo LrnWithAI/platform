@@ -114,7 +114,7 @@ export default function CreateTest() {
 
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col bg-red-200 justify-center max-w-4xl mx-auto"
+        className="flex flex-col justify-center max-w-4xl mx-auto"
       >
         <div className="dark:bg-muted border rounded-md p-6 space-y-4 bg-gray-100">
           <div className="space-y-2 pb-2">
