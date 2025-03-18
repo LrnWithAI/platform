@@ -192,7 +192,9 @@ const ClassMembers = () => {
                 className="flex items-center justify-between border-b pb-3 last:border-none"
               >
                 <div>
-                  <p className="text-lg font-semibold">{student.name}</p>
+                  <div onClick={() => { router.push(`/profile/${student.username}`) }} className='flex items-center gap-2 cursor-pointer hover:text-gray-500'>
+                    <p className="text-lg font-semibold">{student.name} </p>
+                  </div>
                   <a
                     href={`mailto:${student.email}`}
                     className="text-sm text-violet-500 underline hover:text-violet-600"

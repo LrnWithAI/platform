@@ -308,7 +308,7 @@ const ClassDashboard = () => {
                 </Avatar>
                 <div className="flex flex-col">
                   <span className="text-gray-500 font-bold">{post.title}</span>
-                  <span className="text-gray-500">{post.created_by.full_name}</span>
+                  <span className="text-gray-500 hover:cursor-pointer hover:opacity-75" onClick={() => { router.push(`/profile/${post.created_by.username}`) }}>{post.created_by.full_name}</span>
                 </div>
               </div>
 
