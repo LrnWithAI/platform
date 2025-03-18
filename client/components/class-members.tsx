@@ -210,13 +210,17 @@ const ClassMembers = () => {
                     <Mail size={16} />
                     Email
                   </a>
-                  <button
-                    onClick={() => handleDelete(student.id)}
-                    className="bg-red-500 text-white px-3 py-1.5 rounded-lg hover:bg-red-600 flex items-center gap-1"
-                  >
-                    <Trash2 size={16} />
-                    Delete
-                  </button>
+                  {
+                    isTeacher && (
+                      <button
+                        onClick={() => handleDelete(student.id)}
+                        className="bg-red-500 text-white px-3 py-1.5 rounded-lg hover:bg-red-600 flex items-center gap-1"
+                      >
+                        <Trash2 size={16} />
+                        Delete
+                      </button>
+                    )
+                  }
                 </div>
               </div>
             ))}
