@@ -1,12 +1,10 @@
+'use client'
+
+import { useUserStore } from "@/stores/userStore";
 import AccountForm from "./account-form";
-import { createClient } from "@/utils/supabase/server";
 
-export default async function Account() {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+export default function Account() {
+  const user = useUserStore((state) => state.user);
 
   return (
     <div className="m-4 ">

@@ -47,7 +47,7 @@ const ClassDashboard = () => {
   useEffect(() => {
     const fetchAvatar = async () => {
       if (user?.avatar_url) {
-        const res = await downloadImage(user.avatar_url);
+        const res = await downloadImage(classData?.content[0]?.created_by.avatar_url ?? "");
         if (res.success) {
           setAvatarUrl(res.data);
         }
@@ -55,7 +55,7 @@ const ClassDashboard = () => {
     };
 
     fetchAvatar();
-  }, [user?.avatar_url]);
+  }, [classData]);
 
   const handleUpdateClass = async (updatedContent) => {
     if (!classData) return;
@@ -186,7 +186,7 @@ const ClassDashboard = () => {
     setLoading(false);
   };
 
-  const handleDownloadFileFromPost = async (url, fileName) => {
+  const handleDownloadFileFromPost = async (url: string, fileName: string) => {
     const response = await fetch(url);
     const blob = await response.blob();
 
@@ -299,16 +299,16 @@ const ClassDashboard = () => {
           classData.content.map((post) => (
             <div className="mt-5 first:mt-0 bg-white rounded-lg shadow-lg p-6 pe-16 relative">
               <div className='flex items-center gap-4'>
-                <Avatar className="cursor-pointer hover:opacity-75" onClick={() => { router.push(`/profile/${user?.id}`) }}>
+                <Avatar className="cursor-pointer hover:opacity-75" onClick={() => { router.push(`/profile/${post.created_by.username}`) }}>
                   <AvatarImage
                     src={avatarUrl || "https://github.com/shadcn.png"}
-                    alt={user?.full_name}
+                    alt={post.created_by.full_name || "User Avatar"}
                   />
                   <AvatarFallback>{user?.full_name}</AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col">
                   <span className="text-gray-500 font-bold">{post.title}</span>
-                  <span className="text-gray-500">{user?.full_name}</span>
+                  <span className="text-gray-500">{post.created_by.full_name}</span>
                 </div>
               </div>
 

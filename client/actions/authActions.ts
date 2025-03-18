@@ -111,6 +111,7 @@ export async function inviteToClass(email: string, classId: number) {
     await addStudentToClass(classId, {
       id: user.id,
       name: user.full_name,
+      username: user.username,
       role: user.role,
       email: user.email,
     });

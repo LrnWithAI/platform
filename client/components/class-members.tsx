@@ -163,7 +163,7 @@ const ClassMembers = () => {
           <h2 className="text-2xl font-bold mb-1">Teacher</h2>
           <div className="flex items-center justify-between pb-3">
             <div>
-              <div className='flex items-center gap-2 cursor-pointer hover:text-gray-200' onClick={() => { router.push(`/profile/${teacher?.id}`) }}>
+              <div className='flex items-center gap-2 cursor-pointer hover:text-gray-200' onClick={() => { router.push(`/profile/${teacher?.username}`) }}>
                 <p className="text-lg mb-1">{teacher.name}</p>
                 <SquareArrowOutUpRight size={16} />
               </div>

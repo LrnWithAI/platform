@@ -19,6 +19,7 @@ export type Class = {
       name: string;
       role: string;
       email: string;
+      username: string;
     }
   ];
   content: [
@@ -30,7 +31,12 @@ export type Class = {
       updated_at: string;
       created_by: {
         id: number;
-        name: string
+        name: string,
+        full_name: string;
+        username: string;
+        role: string;
+        email: string;
+        avatar_url: string;
       }
       files: [
         {

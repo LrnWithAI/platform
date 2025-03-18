@@ -22,6 +22,5 @@ export const ClassSchema = z.object({
       }
       return file instanceof File && file.type.startsWith('image/');
     }, 'Only image files are allowed.')
-
     .optional()
 });

@@ -12,6 +12,17 @@ export type User = {
   phone: string;
   workplace: string;
   bio: string;
+  whatIDo: string;
+  announcements: string;
+  files: [
+    {
+      id: string;
+      name: string;
+      size: number;
+      type: string;
+      url: string;
+    }
+  ]
 } | null;
 
 export type UserState = {

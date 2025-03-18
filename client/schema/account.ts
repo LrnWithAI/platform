@@ -19,4 +19,6 @@ export const accountSchema = z.object({
   ),
   workplace: z.string().optional().nullable(),
   bio: z.string().optional().nullable(),
+  whatIDo: z.string().optional().nullable(),
+  announcements: z.string().optional().nullable()
 });

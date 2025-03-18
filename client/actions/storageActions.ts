@@ -8,19 +8,23 @@ import { getClasses } from "./classActions";
 export async function downloadImage(path: string) {
   const supabase = createClient();
 
-  try {
-    const { data, error } = await supabase.storage
-      .from("avatars")
-      .download(path);
-    if (error) {
-      throw error;
-    }
+  if (path !== null && path !== "") {
+    try {
+      const { data, error } = await supabase.storage
+        .from("avatars")
+        .download(path);
+      if (error) {
+        throw error;
+      }
 
-    const url = URL.createObjectURL(data);
-    return { success: true, message: "user url downloaded successfully", data: url };
-  } catch (error) {
-    console.log("Error downloading image: ", error);
-    return { success: false, message: (error as Error).message };
+      const url = URL.createObjectURL(data);
+      return { success: true, message: "user url downloaded successfully", data: url };
+    } catch (error) {
+      return { success: false, message: (error as Error).message };
+    }
+  }
+  else {
+    return { success: false, message: "No image path provided" };
   }
 }
 
@@ -140,4 +144,38 @@ export async function deleteFileFromClassContent(userId: string, classId: number
     const res = await getClasses(user_id);
     return { success: true, message: `File ${fileName} deleted successfully!`, data: res.data };
   }
+}
+
+/* USER */
+/* POST File into user bucket */
+export async function uploadFileToUser(file: File, userId: string) {
+  const supabase = createClient();
+
+  const filePath = `private/${userId}/${file.name}`;
+  const { data, error } = await supabase.storage.from("user-files").upload(filePath, file);
+
+  if (error) {
+    toast.error("Failed to upload image");
+    console.error("Failed to upload file", error);
+    return null;
+  }
+
+  const { data: publicUrlData } = supabase.storage.from("user-files").getPublicUrl(filePath);
+
+  return publicUrlData.publicUrl;
+}
+
+/* DELETE File from user bucket */
+export async function deleteFileFromUser(imageName: string, userId: string) {
+  const supabase = createClient();
+
+  const filePath = `private/${userId}/${imageName}`;
+  const { error } = await supabase.storage.from("user-files").remove([filePath]);
+
+  if (error) {
+    console.error("Error deleting file", error);
+    return { success: false, message: (error as Error).message };
+  }
+
+  return { success: true, message: "File deleted successfully!" };
 }

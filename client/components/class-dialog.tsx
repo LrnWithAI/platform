@@ -69,7 +69,7 @@ const ClassDialog: React.FC<ClassDialogProps> = ({ type, onClose, isOpen, initia
             role: user.role,
             email: user.email,
           },
-          members: [{ id: user.id, name: user.full_name, role: user.role, email: user.email }],
+          members: [{ id: user.id, name: user.full_name, role: user.role, email: user.email, username: user.username }],
         });
 
         if (!createResponse.success) {
