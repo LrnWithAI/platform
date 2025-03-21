@@ -89,7 +89,14 @@ const TestSubmitPage = () => {
             </h4>
             <p>
               by{" "}
-              {user?.id === test?.created_by ? user?.username : "some nickname"}
+              <Link
+                href={`/profile/${user?.username}`}
+                className="hover:cursor-pointer hover:opacity-75"
+              >
+                {user?.id === test?.created_by
+                  ? user?.username
+                  : "some nickname"}
+              </Link>
             </p>
           </div>
         </div>
