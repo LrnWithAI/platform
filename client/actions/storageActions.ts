@@ -18,23 +18,32 @@ export async function downloadImage(path: string) {
       }
 
       const url = URL.createObjectURL(data);
-      return { success: true, message: "user url downloaded successfully", data: url };
+      return {
+        success: true,
+        message: "user url downloaded successfully",
+        data: url,
+      };
     } catch (error) {
       return { success: false, message: (error as Error).message };
     }
-  }
-  else {
+  } else {
     return { success: false, message: "No image path provided" };
   }
 }
 
 /* CLASS */
 /* POST File (img) into class_files bucket as class cover image*/
-export async function uploadFileToClassCoverPhoto(file: File, userId: string, classId: number,) {
+export async function uploadFileToClassCoverPhoto(
+  file: File,
+  userId: string,
+  classId: number
+) {
   const supabase = createClient();
 
   const filePath = `private/${userId}/${classId}/${file.name}`;
-  const { data, error } = await supabase.storage.from("class_files").upload(filePath, file);
+  const { data, error } = await supabase.storage
+    .from("class_files")
+    .upload(filePath, file);
 
   if (error) {
     toast.error("Failed to upload image");
@@ -42,17 +51,25 @@ export async function uploadFileToClassCoverPhoto(file: File, userId: string, cl
     return null;
   }
 
-  const { data: publicUrlData } = supabase.storage.from("class_files").getPublicUrl(filePath);
+  const { data: publicUrlData } = supabase.storage
+    .from("class_files")
+    .getPublicUrl(filePath);
 
   return publicUrlData.publicUrl;
 }
 
 /* DELETE File from class_files bucket */
-export async function deleteFileFromClassCoverPhoto(imageName: string, userId: string, classId: number) {
+export async function deleteFileFromClassCoverPhoto(
+  imageName: string,
+  userId: string,
+  classId: number
+) {
   const supabase = createClient();
 
   const filePath = `private/${userId}/${classId}/${imageName}`;
-  const { error } = await supabase.storage.from("class_files").remove([filePath]);
+  const { error } = await supabase.storage
+    .from("class_files")
+    .remove([filePath]);
 
   if (error) {
     console.error("Error deleting file", error);
@@ -63,15 +80,22 @@ export async function deleteFileFromClassCoverPhoto(imageName: string, userId: s
 }
 
 /* POST files into class_files bucket as post files */
-export async function uploadFilesToClassContent(files: File[] | null, userId: string, classId: number, postId: number) {
+export async function uploadFilesToClassContent(
+  files: File[] | null,
+  userId: string,
+  classId: number,
+  postId: number
+) {
   if (!files || files.length === 0) return [];
 
   const supabase = createClient();
 
   const uploadedFiles = await Promise.all(
     Array.from(files).map(async (file) => {
-      const filePath = `private/${userId}/${classId}/${postId}/${file.name}`;   // Must match RLS policy
-      const { data, error } = await supabase.storage.from("class_files").upload(filePath, file);
+      const filePath = `private/${userId}/${classId}/${postId}/${file.name}`; // Must match RLS policy
+      const { data, error } = await supabase.storage
+        .from("class_files")
+        .upload(filePath, file);
 
       if (error) {
         toast.error(`Failed to upload ${file.name}`);
@@ -79,7 +103,9 @@ export async function uploadFilesToClassContent(files: File[] | null, userId: st
         return null;
       }
 
-      const { data: publicUrlData } = supabase.storage.from("class_files").getPublicUrl(filePath);
+      const { data: publicUrlData } = supabase.storage
+        .from("class_files")
+        .getPublicUrl(filePath);
 
       return {
         id: crypto.randomUUID(), // Lokálny identifikátor
@@ -95,7 +121,12 @@ export async function uploadFilesToClassContent(files: File[] | null, userId: st
 }
 
 /* UPDATE `files` array in `class.content` in class table */
-export async function updateClassContent(classId: number, postId: number, files: any[], user_id: string) {
+export async function updateClassContent(
+  classId: number,
+  postId: number,
+  files: any[],
+  user_id: string
+) {
   const supabase = createClient();
 
   const { data: classData, error: fetchError } = await supabase
@@ -110,7 +141,9 @@ export async function updateClassContent(classId: number, postId: number, files:
   }
 
   // Odstránime duplikáty
-  files = files.filter((file, index, self) => self.findIndex((f) => f.id === file.id) === index);
+  files = files.filter(
+    (file, index, self) => self.findIndex((f) => f.id === file.id) === index
+  );
 
   // Nájdeme príspevok a pridáme do neho už existujúce aj nové súbory
   const updatedContent = classData.content.map((post: any) =>
@@ -127,22 +160,38 @@ export async function updateClassContent(classId: number, postId: number, files:
     return { success: false, message: (updateError as Error).message };
   } else {
     const res = await getClasses(user_id);
-    return { success: true, message: "Files uploaded and saved successfully!", data: res.data };
+    return {
+      success: true,
+      message: "Files uploaded and saved successfully!",
+      data: res.data,
+    };
   }
 }
 
 /* DELETE File from class_files bucket for class post */
-export async function deleteFileFromClassContent(userId: string, classId: number, postId: number, fileName: string, user_id: string) {
+export async function deleteFileFromClassContent(
+  userId: string,
+  classId: number,
+  postId: number,
+  fileName: string,
+  user_id: string
+) {
   const supabase = createClient();
 
   const filePath = `private/${userId}/${classId}/${postId}/${fileName}`;
-  const { error } = await supabase.storage.from("class_files").remove([filePath]);
+  const { error } = await supabase.storage
+    .from("class_files")
+    .remove([filePath]);
 
   if (error) {
     return { success: false, message: (error as Error).message };
   } else {
     const res = await getClasses(user_id);
-    return { success: true, message: `File ${fileName} deleted successfully!`, data: res.data };
+    return {
+      success: true,
+      message: `File ${fileName} deleted successfully!`,
+      data: res.data,
+    };
   }
 }
 
@@ -152,7 +201,9 @@ export async function uploadFileToUser(file: File, userId: string) {
   const supabase = createClient();
 
   const filePath = `private/${userId}/${file.name}`;
-  const { data, error } = await supabase.storage.from("user-files").upload(filePath, file);
+  const { data, error } = await supabase.storage
+    .from("user-files")
+    .upload(filePath, file);
 
   if (error) {
     toast.error("Failed to upload image");
@@ -160,7 +211,9 @@ export async function uploadFileToUser(file: File, userId: string) {
     return null;
   }
 
-  const { data: publicUrlData } = supabase.storage.from("user-files").getPublicUrl(filePath);
+  const { data: publicUrlData } = supabase.storage
+    .from("user-files")
+    .getPublicUrl(filePath);
 
   return publicUrlData.publicUrl;
 }
@@ -170,7 +223,9 @@ export async function deleteFileFromUser(imageName: string, userId: string) {
   const supabase = createClient();
 
   const filePath = `private/${userId}/${imageName}`;
-  const { error } = await supabase.storage.from("user-files").remove([filePath]);
+  const { error } = await supabase.storage
+    .from("user-files")
+    .remove([filePath]);
 
   if (error) {
     console.error("Error deleting file", error);
@@ -178,4 +233,32 @@ export async function deleteFileFromUser(imageName: string, userId: string) {
   }
 
   return { success: true, message: "File deleted successfully!" };
+}
+
+/* TESTS */
+/* POST File into tests bucket */
+
+export async function uploadFileToTestFilesBucket(
+  file: File,
+  userId: string,
+  testId?: number
+) {
+  const supabase = createClient();
+
+  const filePath = `/${userId}/1/${file.name}`;
+  const { data, error } = await supabase.storage
+    .from("test-files")
+    .upload(filePath, file);
+
+  if (error) {
+    toast.error("Failed to upload file");
+    console.error("Failed to upload file", error);
+    return null;
+  }
+
+  const { data: publicUrlData } = supabase.storage
+    .from("test-files")
+    .getPublicUrl(filePath);
+
+  return publicUrlData.publicUrl;
 }

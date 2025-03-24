@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { testSchema } from "@/schema/test";
 import { useForm, useFieldArray } from "react-hook-form";
 import { useState } from "react";
+import Link from "next/link";
 
 import { useSearchParams } from "next/navigation";
 import { Label } from "@/components/ui/label";
@@ -12,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { Check } from "lucide-react";
+import { FileUpload } from "@/components/ui/file-upload";
 import {
   Select,
   SelectContent,
@@ -26,12 +28,59 @@ import { toast } from "react-toastify";
 
 import { createTest } from "@/actions/testActions";
 import { useUserStore } from "@/stores/userStore";
+import { uploadFileToTestFilesBucket } from "@/actions/storageActions";
 
 type CreateTestFormValues = z.infer<typeof testSchema>;
+
+type FileUploadFormValues = {
+  uploadedFile: File[];
+};
 
 export default function CreateTest() {
   const params = useSearchParams();
   const { user } = useUserStore();
+  const [uploading, setUploading] = useState(false);
+  const [fileUrl, setFileUrl] = useState<string | null>(null);
+
+  const {
+    register: registerFileUpload,
+    handleSubmit: onSubmitFileUpload,
+    setValue: setFileValue,
+    watch: watchFileUpload,
+    formState: { errors: fileUploadErrors },
+  } = useForm<FileUploadFormValues>();
+
+  const handleFileUpload = async (files: File[]) => {
+    if (!files.length) return;
+    setUploading(true);
+
+    const uploadedFile = files[0]; // Only support single file upload
+
+    try {
+      const publicUrl = await uploadFileToTestFilesBucket(
+        uploadedFile,
+        user?.id as string
+      );
+      if (publicUrl) {
+        setFileValue("uploadedFile", files, { shouldValidate: true });
+        setFileUrl(publicUrl);
+        toast.success("File uploaded successfully!");
+      }
+    } catch (error) {
+      toast.error("Upload failed!");
+      console.error(error);
+    }
+
+    setUploading(false);
+  };
+
+  const onSubmitFileUPloadForm = (data: FileUploadFormValues) => {
+    console.log("File uploaded:", data.uploadedFile);
+    console.log("Public URL:", fileUrl);
+    alert("presuvas sa na dalsi krok");
+  };
+
+  const uploadedFiles = watchFileUpload("uploadedFile");
 
   const [selectedCorrectAnswers, setSelectedCorrectAnswers] = useState<
     Record<number, number>
@@ -267,7 +316,44 @@ export default function CreateTest() {
           </div>
         </form>
       ) : option === "withAI" ? (
-        <p>Upload file here </p>
+        <form
+          onSubmit={onSubmitFileUpload(onSubmitFileUPloadForm)}
+          className="space-y-4 flex flex-col justify-center max-w-4xl mx-auto"
+        >
+          <div className="w-full max-w-4xl mx-auto min-h-80 border border-dashed bg-white dark:bg-black border-neutral-200 dark:border-neutral-800 rounded-lg mb-4">
+            <FileUpload onChange={handleFileUpload} />
+          </div>
+
+          {fileUploadErrors.uploadedFile && (
+            <p className="text-red-500">File is required</p>
+          )}
+
+          {uploadedFiles?.length > 0 && (
+            <Button
+              type="submit"
+              className="bg-purple hover:bg-purple-500 dark:text-white mx-auto"
+            >
+              Continue
+            </Button>
+          )}
+
+          {uploadedFiles?.length > 0 && fileUrl && (
+            <div className="mt-4">
+              <p>Uploaded File: {uploadedFiles[0].name}</p>
+              <p>
+                Public file URL:{" "}
+                <Link
+                  href={fileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-500"
+                >
+                  Click to view.
+                </Link>
+              </p>
+            </div>
+          )}
+        </form>
       ) : (
         <p>Bad option provided</p>
       )}
