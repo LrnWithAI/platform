@@ -14,7 +14,7 @@ const ClassFiles = () => {
     <div className="space-y-6 z-10">
       {/* Iterate over all posts in the class */}
       {classData?.content.map((post) => (
-        post.files.length > 1 && (
+        post.files.length > 0 && (
           <div key={post.id} className="bg-white p-6 rounded-lg shadow-lg space-y-4">
             <h2 className="text-2xl font-semibold text-gray-800">{post.title}</h2>
 
