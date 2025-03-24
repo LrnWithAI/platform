@@ -32,8 +32,8 @@ const ClassMembers = () => {
   const setClasses = useClassStore((state) => state.setClasses);
 
   const user = useUserStore((state) => state.user);
-  const teacher = classData?.members.find((member) => member.role === 'teacher');
 
+  const teachers = classData?.members.filter((member) => member.role === 'teacher');
   const students = classData?.members.filter((member) => member.role === 'student') || [];
   const isTeacher = classData?.members.some((member) => member.role === 'teacher' && member.id === user?.id);
 
@@ -158,30 +158,33 @@ const ClassMembers = () => {
         </DialogContent>
       </Dialog>
 
-      {teacher && (
-        <div className="bg-gradient-to-r from-indigo-500 via-violet-500 to-pink-500 text-white p-4 rounded-lg shadow-lg">
-          <h2 className="text-2xl font-bold mb-1">Teacher</h2>
-          <div className="flex items-center justify-between pb-3">
-            <div>
-              <div className='flex items-center gap-2 cursor-pointer hover:text-gray-200' onClick={() => { router.push(`/profile/${teacher?.username}`) }}>
-                <p className="text-lg mb-1">{teacher.name}</p>
-                <SquareArrowOutUpRight size={16} />
+      <div className="bg-gradient-to-r from-indigo-500 via-violet-500 to-pink-500 text-white p-4 rounded-lg shadow-lg">
+        <h2 className="text-2xl font-bold mb-1">{teachers.length > 1 ? "Teachers" : "Teacher"} </h2>
+        {teachers?.map((teacher) => (
+          <>
+            <div className="flex items-center justify-between pb-3">
+              <div>
+                <div className='flex items-center gap-2 cursor-pointer hover:text-gray-200' onClick={() => { router.push(`/profile/${teacher?.username}`) }}>
+                  <p className="text-lg mb-1">{teacher.name}</p>
+                  <SquareArrowOutUpRight size={16} />
+                </div>
+                <p className="text-sm text-gray-200">{teacher.email} </p>
               </div>
-              <p className="text-sm text-gray-200">{teacher.email} </p>
+              <div className="flex items-center gap-2">
+                <a
+                  href={`mailto:${teacher.email}`}
+                  className="bg-violet-500 text-white px-3 py-1.5 rounded-lg hover:bg-violet-600 flex items-center gap-1"
+                >
+                  <Mail size={16} />
+                  Email
+                </a>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <a
-                href={`mailto:${teacher.email}`}
-                className="bg-violet-500 text-white px-3 py-1.5 rounded-lg hover:bg-violet-600 flex items-center gap-1"
-              >
-                <Mail size={16} />
-                Email
-              </a>
-            </div>
-          </div>
-        </div>
-      )
-      }
+          </>
+        ))
+        }
+      </div>
+
       <div className="bg-white p-6 rounded-lg shadow-lg">
         <h2 className="text-2xl font-bold mb-4">Students</h2>
         {students.length > 0 ? (
