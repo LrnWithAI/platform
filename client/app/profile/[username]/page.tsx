@@ -9,7 +9,6 @@ import { User } from '@/types/user'
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { getUserProfile } from '@/actions/userActions'
-import { downloadImage } from '@/actions/storageActions'
 
 type UploadedFile = {
   id: string;
@@ -21,9 +20,7 @@ type UploadedFile = {
 
 const Profile = () => {
   const { username } = useParams()
-
   const [user, setUser] = useState<User | null>(null)
-  const [userAvatarUrl, setUserAvatarUrl] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -40,24 +37,6 @@ const Profile = () => {
 
     fetchUser()
   }, [username])
-
-  useEffect(() => {
-    const fetchAvatar = async () => {
-      if (user?.avatar_url) {
-        const res = await downloadImage(user.avatar_url)
-        if (res.success) {
-          setUserAvatarUrl(res.data)
-          toast.success("Avatar fetched successfully")
-        } else {
-          toast.error("Failed to fetch avatar")
-        }
-      }
-    }
-
-    if (user) {
-      fetchAvatar()
-    }
-  }, [user])
 
   const handleDownloadFile = async (url: string, fileName: string) => {
     const response = await fetch(url);
@@ -80,7 +59,7 @@ const Profile = () => {
       <div className="flex items-center gap-6">
         <Avatar className="w-24 h-24">
           <AvatarImage
-            src={userAvatarUrl || "https://github.com/shadcn.png"}
+            src={user?.avatar_url || "https://github.com/shadcn.png"}
             alt={user?.full_name || "User Avatar"}
           />
           <AvatarFallback className="text-4xl font-bold">
