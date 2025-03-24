@@ -197,6 +197,7 @@ const ClassMembers = () => {
                 <div>
                   <div onClick={() => { router.push(`/profile/${student.username}`) }} className='flex items-center gap-2 cursor-pointer hover:text-gray-500'>
                     <p className="text-lg font-semibold">{student.name} </p>
+                    <SquareArrowOutUpRight size={16} />
                   </div>
                   <a
                     href={`mailto:${student.email}`}

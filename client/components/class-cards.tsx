@@ -11,6 +11,7 @@ import { useUserStore } from '@/stores/userStore';
 import { Button } from './ui/button';
 import ClassDialog from './class-dialog';
 import { deleteFileFromClassContent } from '@/actions/storageActions';
+import { Class } from '@/types/class';
 
 export function ClassesCards({ orderOption, filterOption }: { orderOption: string, filterOption: Record<string, string> }) {
   const setLoading = useLoadingStore((state) => state.setLoading);
@@ -18,6 +19,8 @@ export function ClassesCards({ orderOption, filterOption }: { orderOption: strin
   const classes = useClassStore((state) => state.classes)
   const [openDialogs, setOpenDialogs] = useState<{ [key: number]: boolean }>({});
   const user = useUserStore((state) => state.user);
+
+  const isTeacher = (classData: Class) => classData?.members.some((member) => member.role === 'teacher' && member.id === user?.id);
 
   const toggleDialog = (id: number) => {
     setOpenDialogs((prev) => ({
@@ -110,14 +113,16 @@ export function ClassesCards({ orderOption, filterOption }: { orderOption: strin
         >
 
           {/* Action Buttons */}
-          <div className="absolute top-2 right-2 flex gap-1">
-            <Button className="bg-violet-500 rounded-sm hover:bg-violet-600 h-7 w-7" onClick={() => toggleDialog(card.id)}>
-              <Pencil size={16} />
-            </Button>
-            <Button className="bg-red-500 rounded-sm text-sm hover:bg-red-600 h-7 w-7" onClick={(e) => { e.stopPropagation(); handleDelete(card.id); }}>
-              <Trash2 size={16} />
-            </Button>
-          </div>
+          {isTeacher(card) && (
+            <div className="absolute top-2 right-2 flex gap-1">
+              <Button className="bg-violet-500 rounded-sm hover:bg-violet-600 h-7 w-7" onClick={() => toggleDialog(card.id)}>
+                <Pencil size={16} />
+              </Button>
+              <Button className="bg-red-500 rounded-sm text-sm hover:bg-red-600 h-7 w-7" onClick={(e) => { e.stopPropagation(); handleDelete(card.id); }}>
+                <Trash2 size={16} />
+              </Button>
+            </div>
+          )}
 
           <ClassDialog type="edit" isOpen={openDialogs[card.id] || false} onClose={() => toggleDialog(card.id)} initialData={card} />
 
