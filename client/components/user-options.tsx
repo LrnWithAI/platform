@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 
 import {
   DropdownMenu,
@@ -14,39 +14,15 @@ import { Separator } from "./ui/separator";
 import Link from "next/link";
 import { useUserStore } from "@/stores/userStore";
 
-import { createClient } from "@/utils/supabase/client";
-
 export function UserOptions() {
-  const supabase = createClient();
-  const [avatarUrl, setAvatarUrl] = useState<string | null>();
   const user = useUserStore((state) => state.user);
-
-  useEffect(() => {
-    async function downloadImage(path: string) {
-      try {
-        const { data, error } = await supabase.storage
-          .from("avatars")
-          .download(path);
-        if (error) {
-          throw error;
-        }
-
-        const url = URL.createObjectURL(data);
-        setAvatarUrl(url);
-      } catch (error) {
-        console.log("Error downloading image: ", error);
-      }
-    }
-
-    if (user?.avatar_url) downloadImage(user.avatar_url);
-  }, [user?.avatar_url, supabase]);
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Avatar className="cursor-pointer hover:opacity-75">
           <AvatarImage
-            src={avatarUrl ? avatarUrl : "https://github.com/shadcn.png"}
+            src={user?.avatar_url ? user.avatar_url : "https://github.com/shadcn.png"}
             alt={user?.full_name}
           />
           <AvatarFallback>{user?.full_name}</AvatarFallback>

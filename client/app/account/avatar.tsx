@@ -1,9 +1,12 @@
 "use client";
-import React, { useEffect, useState, useRef } from "react";
-import { createClient } from "@/utils/supabase/client";
-import Image from "next/image";
 
+import React, { useEffect, useState, useRef } from "react";
+import Image from "next/image";
+import { createClient } from "@/utils/supabase/client";
 import { Button } from "@/components/ui/button";
+import { useUserStore } from "@/stores/userStore";
+import { updateUserProfile } from "@/actions/userActions";
+import { toast } from "react-toastify";
 
 export default function Avatar({
   uid,
@@ -19,60 +22,77 @@ export default function Avatar({
   const supabase = createClient();
   const [avatarUrl, setAvatarUrl] = useState<string | null>(url);
   const [uploading, setUploading] = useState(false);
+  const user = useUserStore((state) => state.user);
+  const setUser = useUserStore((state) => state.setUser);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleUploadButtonClick = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
+    fileInputRef.current?.click();
   };
 
+  // Keďže bucket je verejný, môžeme priamo použiť URL z databázy.
   useEffect(() => {
-    async function downloadImage(path: string) {
-      try {
-        const { data, error } = await supabase.storage
-          .from("avatars")
-          .download(path);
-        if (error) {
-          throw error;
-        }
-
-        const url = URL.createObjectURL(data);
-        setAvatarUrl(url);
-      } catch (error) {
-        console.log("Error downloading image: ", error);
-      }
+    if (url) {
+      setAvatarUrl(url);
     }
+  }, [url]);
 
-    if (url) downloadImage(url);
-  }, [url, supabase]);
-
-  const uploadAvatar: React.ChangeEventHandler<HTMLInputElement> = async (
-    event
-  ) => {
+  const uploadAvatar: React.ChangeEventHandler<HTMLInputElement> = async (event) => {
     try {
       setUploading(true);
 
       if (!event.target.files || event.target.files.length === 0) {
         throw new Error("You must select an image to upload.");
       }
-
       const file = event.target.files[0];
       const fileExt = file.name.split(".").pop();
+      if (!uid) {
+        throw new Error("UID is null");
+      }
       const filePath = `${uid}-${Math.random()}.${fileExt}`;
 
+      // Upload súboru do bucketu "avatars"
       const { error: uploadError } = await supabase.storage
         .from("avatars")
         .upload(filePath, file);
-
       if (uploadError) {
+        console.error("Upload error:", uploadError);
         throw uploadError;
       }
 
-      onUpload(filePath);
+      // Získanie verejnej URL pomocou getPublicUrl
+      const { data: publicUrlData, error: publicUrlError } =
+        supabase.storage.from("avatars").getPublicUrl(filePath);
+      if (publicUrlError) {
+        console.error("Error getting public URL:", publicUrlError);
+        throw publicUrlError;
+      }
+      if (!publicUrlData || !publicUrlData.publicUrl) {
+        throw new Error("Public URL is undefined");
+      }
+
+      // Spusti callback, ak je potrebné (napr. pre lokálne uloženie filePath)
+      onUpload(publicUrlData.publicUrl);
+
+      // Aktualizácia profilu používateľa s verejnou URL
+      const responseUpdate = await updateUserProfile(user?.id, {
+        avatar_url: publicUrlData.publicUrl,
+      });
+      if (responseUpdate.success) {
+        setAvatarUrl(publicUrlData.publicUrl);
+        if (user?.id) {
+          setUser({ ...user, avatar_url: publicUrlData.publicUrl });
+        } else {
+          console.error("User ID is undefined");
+        }
+      } else {
+        console.error("Profile update failed", responseUpdate);
+        throw new Error("Profile update failed");
+      }
     } catch (error) {
-      alert("Error uploading avatar!");
+      console.error("Error uploading avatar:", error);
+      toast.error("Error uploading avatar!");
     } finally {
       setUploading(false);
     }
@@ -86,29 +106,21 @@ export default function Avatar({
           height={size}
           src={avatarUrl}
           alt="Avatar"
+          unoptimized
           className="rounded-full aspect-square object-cover border"
         />
       ) : (
-        <div
-          className="avatar no-image"
-          style={{ height: size, width: size }}
-        />
+        <div className="avatar no-image" style={{ height: size, width: size }} />
       )}
       <div className="flex flex-col md:flex-row gap-4">
         <Button onClick={handleUploadButtonClick} variant="outline">
           {avatarUrl ? "Change avatar" : "Upload"}
         </Button>
-
         {avatarUrl && <Button variant="destructive">Delete avatar</Button>}
-
         <input
           ref={fileInputRef}
-          style={{
-            visibility: "hidden",
-            position: "absolute",
-          }}
+          style={{ visibility: "hidden", position: "absolute" }}
           type="file"
-          id="single"
           accept="image/*"
           onChange={uploadAvatar}
           disabled={uploading}

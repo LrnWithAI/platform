@@ -36,26 +36,12 @@ const ClassDashboard = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [openPostDialog, setOpenPostDialog] = useState(false);
   const [openReportDialog, setOpenReportDialog] = useState(false);
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
   const postSettings = [
     { label: 'Edit', value: 'edit', icon: EditIcon },
     { label: 'Delete', value: 'delete', icon: Trash2 },
     { label: 'Report', value: 'report', icon: CircleAlert },
-  ];
-
-  useEffect(() => {
-    const fetchAvatar = async () => {
-      if (user?.avatar_url) {
-        const res = await downloadImage(classData?.content[0]?.created_by.avatar_url ?? "");
-        if (res.success) {
-          setAvatarUrl(res.data);
-        }
-      }
-    };
-
-    fetchAvatar();
-  }, [classData]);
+  ]
 
   const handleUpdateClass = async (updatedContent) => {
     if (!classData) return;
@@ -301,7 +287,7 @@ const ClassDashboard = () => {
               <div className='flex items-center gap-4'>
                 <Avatar className="cursor-pointer hover:opacity-75" onClick={() => { router.push(`/profile/${post.created_by.username}`) }}>
                   <AvatarImage
-                    src={avatarUrl || "https://github.com/shadcn.png"}
+                    src={post.created_by.avatar_url || "https://github.com/shadcn.png"}
                     alt={post.created_by.full_name || "User Avatar"}
                   />
                   <AvatarFallback>{user?.full_name}</AvatarFallback>
