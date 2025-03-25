@@ -27,7 +27,7 @@ const ClassFiles = () => {
                     href={file.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline text-lg font-medium"
+                    className="text-purple hover:underline text-lg font-medium"
                   >
                     {file.name}
                   </a>

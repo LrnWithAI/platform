@@ -86,7 +86,7 @@ const Profile = () => {
             </p>
             {user?.email && (
               <a href={`mailto:${user.email}`}>
-                <Mail size={16} className="text-gray-500 hover:text-purple" />
+                <Mail size={16} className="text-purple hover:text-violet-500" />
               </a>
             )}
           </div>
@@ -97,7 +97,7 @@ const Profile = () => {
             </p>
             {user?.phone && (
               <a href={`tel:${user.phone}`}>
-                <Phone size={16} className="text-gray-500 hover:text-purple" />
+                <Phone size={16} className="text-purple hover:text-violet-500" />
               </a>
             )}
           </div>
@@ -108,7 +108,7 @@ const Profile = () => {
             </p>
             {user?.website && (
               <a href={user.website} target="_blank" rel="noopener noreferrer">
-                <Globe size={16} className="text-gray-500 hover:text-purple" />
+                <Globe size={16} className="text-purple hover:text-violet-500" />
               </a>
             )}
           </div>
@@ -118,7 +118,7 @@ const Profile = () => {
               Workplace: {user?.workplace || "Not provided"}
             </p>
             {user?.workplace && (
-              <BriefcaseBusiness size={16} className="text-gray-500" />
+              <BriefcaseBusiness size={16} className="text-purple " />
             )}
           </div>
         </div>
@@ -169,7 +169,7 @@ const Profile = () => {
                     className="text-blue-600 hover:underline"
                     onClick={() => handleDownloadFile(file.url, file.name)}
                   >
-                    <Download className="h-4 w-4" />
+                    <Download className="h-4 w-4 text-purple" />
                   </button>
                 </li>
               ))}

@@ -113,7 +113,7 @@ const ClassMembers = () => {
       <Dialog open={open} onOpenChange={setOpen}>
         {isTeacher && (
           <DialogTrigger className='absolute right-0 top-[-75px]'>
-            <Button className="bg-violet-500 hover:bg-violet-600 text-white" onClick={() => setOpen(true)}>
+            <Button className="bg-purple hover:bg-violet-500 text-white" onClick={() => setOpen(true)}>
               <CirclePlus size={20} /> Add Student
             </Button>
           </DialogTrigger>
@@ -158,7 +158,7 @@ const ClassMembers = () => {
         </DialogContent>
       </Dialog>
 
-      <div className="bg-gradient-to-r from-indigo-500 via-violet-500 to-pink-500 text-white p-4 rounded-lg shadow-lg">
+      <div className="bg-gradient-to-r from-indigo-500 via-purple to-pink-500 text-white p-4 rounded-lg shadow-lg">
         <h2 className="text-2xl font-bold mb-1">{teachers.length > 1 ? "Teachers" : "Teacher"} </h2>
         {teachers?.map((teacher) => (
           <>
@@ -173,7 +173,7 @@ const ClassMembers = () => {
               <div className="flex items-center gap-2">
                 <a
                   href={`mailto:${teacher.email}`}
-                  className="bg-violet-500 text-white px-3 py-1.5 rounded-lg hover:bg-violet-600 flex items-center gap-1"
+                  className="bg-purple text-white px-3 py-1.5 rounded-lg hover:bg-violet-500 flex items-center gap-1"
                 >
                   <Mail size={16} />
                   Email
@@ -199,17 +199,14 @@ const ClassMembers = () => {
                     <p className="text-lg font-semibold">{student.name} </p>
                     <SquareArrowOutUpRight size={16} />
                   </div>
-                  <a
-                    href={`mailto:${student.email}`}
-                    className="text-sm text-violet-500 underline hover:text-violet-600"
-                  >
+                  <p className="text-sm text-purple">
                     {student.email}
-                  </a>
+                  </p>
                 </div>
                 <div className="flex items-center gap-2">
                   <a
                     href={`mailto:${student.email}`}
-                    className="bg-violet-500 text-white px-3 py-1.5 rounded-lg hover:bg-violet-600 flex items-center gap-1"
+                    className="bg-purple text-white px-3 py-1.5 rounded-lg hover:bg-violet-500 flex items-center gap-1"
                   >
                     <Mail size={16} />
                     Email

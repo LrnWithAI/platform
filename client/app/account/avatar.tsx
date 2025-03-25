@@ -116,7 +116,7 @@ export default function Avatar({
         <Button onClick={handleUploadButtonClick} variant="outline">
           {avatarUrl ? "Change avatar" : "Upload"}
         </Button>
-        {avatarUrl && <Button variant="destructive">Delete avatar</Button>}
+        {avatarUrl && <Button className="bg-red-500 hover:bg-red-600" >Delete avatar</Button>}
         <input
           ref={fileInputRef}
           style={{ visibility: "hidden", position: "absolute" }}

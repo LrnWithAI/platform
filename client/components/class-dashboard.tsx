@@ -39,8 +39,8 @@ const ClassDashboard = () => {
 
   const postSettings = [
     { label: 'Edit', value: 'edit', icon: EditIcon },
-    { label: 'Delete', value: 'delete', icon: Trash2 },
     { label: 'Report', value: 'report', icon: CircleAlert },
+    { label: 'Delete', value: 'delete', icon: Trash2 },
   ]
 
   const handleUpdateClass = async (updatedContent) => {
@@ -191,7 +191,7 @@ const ClassDashboard = () => {
   return (
     <div className="space-y-6 relative z-10">
       {isTeacher && (
-        <Button className="bg-violet-500 hover:bg-violet-600 text-white absolute right-0 top-[-75px]" onClick={() => {
+        <Button className="bg-purple hover:bg-violet-500 text-white absolute right-0 top-[-75px]" onClick={() => {
           setPostData({ id: null, title: '', content: '', files: [], created_at: new Date(), updated_at: new Date() });
           setIsEditing(false);
           setOpenPostDialog(true);
@@ -300,7 +300,7 @@ const ClassDashboard = () => {
 
               <div key={post.id} className="flex items-center justify-between border-b pb-3 last:border-none">
                 <div>
-                  <p className="py-5">{post.content}</p>
+                  <p className="py-5 whitespace-pre-line">{post.content}</p>
                   <p className="text-gray-500">Created at: {formatDate(post.created_at)}</p>
                   <p className="text-gray-500"> Last updated at: {formatDate(post.updated_at)}</p>
                 </div>
@@ -336,7 +336,7 @@ const ClassDashboard = () => {
                   <div className="flex items-center gap-2 cursor-pointer hover:opacity-75" onClick={() => { }}>
                     <button
                       onClick={() => handleDownloadFileFromPost(file.url, file.name)}
-                      className="flex items-center gap-2 text-blue-600 text-lg font-medium"
+                      className="flex items-center gap-2 text-purple text-lg font-medium"
                     >
                       <Download className="h-4 w-4" />
                       <p>{file.name}</p>

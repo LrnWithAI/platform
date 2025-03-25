@@ -139,7 +139,7 @@ export function ClassesCards({ orderOption, filterOption }: { orderOption: strin
               />
               <div className="ml-4 flex flex-col justify-center">
                 <p className="text-sm text-gray-700 font-bold">{card.class_time}</p>
-                <p className="text-sm text-gray-500 mt-2">{card.members.length + " Members"}</p>
+                <p className="text-sm text-gray-500 mt-2">{card.members.length} {card.members.length > 1 ? "Members" : "Member"}</p>
               </div>
             </div>
           </Link>

@@ -19,11 +19,11 @@ import { deleteFileFromClassContent } from '@/actions/storageActions';
 import { useUserStore } from '@/stores/userStore';
 
 const classSettings = [
-  { label: "Delete", value: "delete", icon: Trash2 },
   { label: "Edit", value: "edit", icon: FilePenLine },
   { label: "Report", value: "report", icon: CircleAlert },
   { label: "Remove all students", value: "remove_students", icon: SquareMinus },
   { label: "Remove all content", value: "remove_content", icon: SquareMinus },
+  { label: "Delete", value: "delete", icon: Trash2 },
 ]
 
 const Class = () => {
