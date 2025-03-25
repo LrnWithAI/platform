@@ -245,7 +245,7 @@ export async function uploadFileToTestFilesBucket(
 ) {
   const supabase = createClient();
 
-  const filePath = `/${userId}/1/${file.name}`;
+  const filePath = `/${userId}/${testId}/pdf/${file.name}`;
   const { data, error } = await supabase.storage
     .from("test-files")
     .upload(filePath, file);

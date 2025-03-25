@@ -82,6 +82,7 @@ export async function deleteTest(testId: number, userId: string) {
 }
 
 /* CREATE Test */
+/*
 export async function createTest(test: Test) {
   const supabase = await createClient();
 
@@ -97,6 +98,28 @@ export async function createTest(test: Test) {
       data: data,
     };
   }
+}
+*/
+
+export async function createTest(test: Test) {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("tests")
+    .insert([test])
+    .select("id")
+    .single();
+
+  if (error) {
+    console.error("Error creating test:", error.message);
+    return { success: false, message: error.message, testId: null };
+  }
+
+  return {
+    success: true,
+    message: "Test successfully created",
+    testId: data?.id || null,
+  };
 }
 
 /* UPDATE Test */
