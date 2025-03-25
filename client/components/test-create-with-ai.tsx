@@ -2,11 +2,9 @@
 
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { testSchema } from "@/schema/test";
 import { useForm, useFieldArray } from "react-hook-form";
 import { useState } from "react";
 import Link from "next/link";
-import CreateTestWithAIForm from "@/components/test-create-with-ai";
 
 import { useSearchParams } from "next/navigation";
 import { Label } from "@/components/ui/label";
@@ -31,17 +29,29 @@ import { createTest } from "@/actions/testActions";
 import { useUserStore } from "@/stores/userStore";
 import { uploadFileToTestFilesBucket } from "@/actions/storageActions";
 
-type CreateTestFormValues = z.infer<typeof testSchema>;
-
 type FileUploadFormValues = {
   uploadedFile: File[];
 };
 
-export default function CreateTest() {
-  const params = useSearchParams();
+const testSchemaForBasicInfo = z.object({
+  id: z.number().int().optional(),
+  title: z.string().min(1, "Title is required."),
+  description: z.string().min(1, "Description is required."),
+  visibility: z.string().min(1, "Visibility is required."),
+  category: z.string().min(1, "Category is required."),
+  created_by: z.string().uuid().optional(),
+});
+
+type CreateTestFormValues = z.infer<typeof testSchemaForBasicInfo>;
+
+const CreateTestWithAIForm = () => {
   const { user } = useUserStore();
   const [uploading, setUploading] = useState(false);
   const [fileUrl, setFileUrl] = useState<string | null>(null);
+  const [basicTestInfoSubmitted, setBasicTestInfoSubmitted] = useState(false);
+  const [createdTestId, setCreatedTestId] = useState<number | null>(null);
+  const [clickedToGenerateQuestions, setClickedToGenerateQuestions] =
+    useState(false);
 
   const {
     register: registerFileUpload,
@@ -60,15 +70,16 @@ export default function CreateTest() {
     try {
       const publicUrl = await uploadFileToTestFilesBucket(
         uploadedFile,
-        user?.id as string
+        user?.id as string,
+        createdTestId as number
       );
       if (publicUrl) {
         setFileValue("uploadedFile", files, { shouldValidate: true });
         setFileUrl(publicUrl);
         toast.success("File uploaded successfully!");
       }
-    } catch (error) {
-      toast.error("Upload failed!");
+    } catch (error: any) {
+      toast.error(`Error uploading file: ${error.message}`);
       console.error(error);
     }
 
@@ -78,91 +89,39 @@ export default function CreateTest() {
   const onSubmitFileUPloadForm = (data: FileUploadFormValues) => {
     console.log("File uploaded:", data.uploadedFile);
     console.log("Public URL:", fileUrl);
-    alert("presuvas sa na dalsi krok");
+    setClickedToGenerateQuestions(true);
   };
 
   const uploadedFiles = watchFileUpload("uploadedFile");
-
-  const [selectedCorrectAnswers, setSelectedCorrectAnswers] = useState<
-    Record<number, number>
-  >({});
-
-  console.log("user", user);
-
-  const option = params.get("option");
 
   const {
     register,
     handleSubmit,
     setValue,
-    getValues,
-    control,
     formState: { errors },
   } = useForm<CreateTestFormValues>({
-    resolver: zodResolver(testSchema),
+    resolver: zodResolver(testSchemaForBasicInfo),
     defaultValues: {
       visibility: "everyone",
-      questions: [
-        { id: 1, question: "", answers: ["", "", "", ""], correct: 0 },
-      ],
     },
   });
 
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "questions",
-  });
-
-  const setCorrectAnswer = (questionIndex: number, answerIndex: number) => {
-    setValue(`questions.${questionIndex}.correct`, answerIndex);
-    setSelectedCorrectAnswers((prev) => ({
-      ...prev,
-      [questionIndex]: answerIndex,
-    }));
-  };
-
-  const addQuestion = () => {
-    const existingQuestions = getValues("questions") || [];
-
-    // Ensure we only use valid numbers for max calculation
-    const ids = existingQuestions
-      .map((q) => q.id)
-      .filter((id): id is number => id !== undefined);
-
-    const nextId = ids.length > 0 ? Math.max(...ids) + 1 : 1;
-
-    append({ id: nextId, question: "", answers: ["", "", "", ""], correct: 0 });
-  };
-
-  const removeQuestion = (index: number) => {
-    remove(index);
-
-    setTimeout(() => {
-      const updatedFields = getValues("questions"); // Get the updated array
-      updatedFields.forEach((_, i: number) => {
-        setValue(`questions.${i}.id`, i + 1); // Reassign IDs sequentially
-      });
-    }, 0);
-  };
-
-  console.log("Form errors ", errors);
+  console.log("errors", errors);
 
   const onSubmit = async (data: CreateTestFormValues) => {
     console.log("submitted data", data);
     data.created_by = user?.id;
-    await createTest(data);
+
+    const createdTestData = await createTest(data);
+    setCreatedTestId(createdTestData.testId);
+    setBasicTestInfoSubmitted(true);
+
     toast.success("Test created successfully!");
   };
 
   return (
-    <div className="mx-4 mb-20">
-      <div className="flex flex-row justify-center my-8">
-        <h2 className="text-2xl font-bold">
-          Create a new test {option == "withAI" ? "with AI" : "manually"}
-        </h2>
-      </div>
-
-      {option === "manually" ? (
+    <div>
+      {!basicTestInfoSubmitted ? (
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="flex flex-col justify-center max-w-4xl mx-auto"
@@ -231,96 +190,75 @@ export default function CreateTest() {
             </div>
           </div>
 
-          <div className="my-4">
-            <h2 className="text-xl font-bold">Questions</h2>
-          </div>
-
-          <div className="space-y-6">
-            {fields.map((field, questionIndex) => (
-              <div
-                key={field.id}
-                className="flex flex-col dark:bg-muted border rounded-md p-6 space-y-2"
-              >
-                <div>
-                  <div className="mb-2 space-y-2">
-                    <Label>Question {questionIndex + 1}</Label>
-                    <Input
-                      type="text"
-                      placeholder="Enter a question, like What is AI?"
-                      {...register(`questions.${questionIndex}.question`)}
-                    />
-                  </div>
-
-                  <div className="mb-2 space-y-2">
-                    <Label>Answers</Label>
-                    {Array(4)
-                      .fill(null)
-                      .map((_, answerIndex) => {
-                        return (
-                          <div
-                            key={answerIndex}
-                            className="flex items-center space-x-2"
-                          >
-                            <Input
-                              type="text"
-                              placeholder={`Answer ${String.fromCharCode(
-                                65 + answerIndex
-                              )}`}
-                              {...register(
-                                `questions.${questionIndex}.answers.${answerIndex}`
-                              )}
-                            />
-                            <Button
-                              variant={
-                                selectedCorrectAnswers[questionIndex] ===
-                                answerIndex
-                                  ? "default"
-                                  : "outline"
-                              }
-                              size="icon"
-                              onClick={() =>
-                                setCorrectAnswer(questionIndex, answerIndex)
-                              }
-                              type="button"
-                            >
-                              <Check />
-                            </Button>
-                          </div>
-                        );
-                      })}
-                  </div>
-                </div>
-
-                <Button
-                  variant="destructive"
-                  className="bg-red-500 w-36 self-end"
-                  onClick={() => removeQuestion(questionIndex)}
-                >
-                  Remove question
-                </Button>
-              </div>
-            ))}
-          </div>
-
-          {/* Add New Question */}
-          <div className="flex justify-center my-6">
-            <Button variant="outline" onClick={addQuestion}>
-              Add Question
-            </Button>
-          </div>
-
           {/* Submit Button */}
-          <div className="flex justify-center">
+          <div className="flex justify-center my-8">
             <Button type="submit" className="bg-purple hover:bg-purple-500">
-              Create Test
+              Save and Continue
             </Button>
           </div>
         </form>
-      ) : option === "withAI" ? (
-        <CreateTestWithAIForm />
       ) : (
-        <p>Bad option provided</p>
+        <>
+          {!clickedToGenerateQuestions ? (
+            <form
+              onSubmit={onSubmitFileUpload(onSubmitFileUPloadForm)}
+              className="space-y-4 flex flex-col justify-center max-w-4xl mx-auto"
+            >
+              {uploadedFiles?.length === 0 && (
+                <p className="text-center mb-4">
+                  Your test has been saved to database. Now upload a pdf file to
+                  generate questions.
+                </p>
+              )}
+
+              <div className="w-full max-w-4xl mx-auto min-h-80 border border-dashed bg-white dark:bg-black border-neutral-200 dark:border-neutral-800 rounded-lg mb-4">
+                <FileUpload onChange={handleFileUpload} />
+              </div>
+
+              {fileUploadErrors.uploadedFile && (
+                <p className="text-red-500">File is required</p>
+              )}
+
+              {uploadedFiles?.length > 0 && (
+                <Button
+                  type="submit"
+                  className="bg-purple hover:bg-purple-500 dark:text-white mx-auto"
+                >
+                  Continue to Generate Questions
+                </Button>
+              )}
+            </form>
+          ) : (
+            <div>
+              {uploadedFiles?.length > 0 && fileUrl && (
+                <div className="mt-4">
+                  <p>
+                    We are generating questions for you. This might take a few
+                    seconds...
+                  </p>
+                  <p>Uploaded File: {uploadedFiles[0].name}</p>
+                  <p>
+                    Public link of your file on our server{" "}
+                    <Link
+                      href={fileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-500"
+                    >
+                      Click to view.
+                    </Link>
+                  </p>
+                  TODO: <br /> - preview the file here <br /> - input field for
+                  number of questions to generate <br /> - button to start
+                  generating
+                </div>
+              )}
+            </div>
+          )}
+        </>
       )}
     </div>
   );
-}
+};
+
+export default CreateTestWithAIForm;
