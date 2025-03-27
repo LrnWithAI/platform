@@ -1,7 +1,7 @@
 "use server";
 
 import { createClient } from "@/utils/supabase/server";
-import { Test } from "@/types/test";
+import { Test, TestSubmission } from "@/types/test";
 
 /* GET Tests */
 export async function getTests() {
@@ -82,25 +82,6 @@ export async function deleteTest(testId: number, userId: string) {
 }
 
 /* CREATE Test */
-/*
-export async function createTest(test: Test) {
-  const supabase = await createClient();
-
-  const { data, error } = await supabase.from("tests").insert([test]);
-
-  if (error) {
-    console.error("Error creating test:", error.message);
-    return { success: false, message: error.message, data: [] };
-  } else {
-    return {
-      success: true,
-      message: "Test successfully created",
-      data: data,
-    };
-  }
-}
-*/
-
 export async function createTest(test: Test) {
   const supabase = await createClient();
 
@@ -143,4 +124,73 @@ export async function updateTest(test: Test) {
       data: data,
     };
   }
+}
+
+/* --- TEST SUBMISSIONS --- */
+
+/* GET Test Submissions by Test ID */
+export async function getTestSubmissionsByTestId(testId: number) {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("test-submissions")
+    .select(`*`)
+    .eq("test_id", testId);
+
+  if (error) {
+    console.error("Error fetching test submissions:", error.message);
+    return { success: false, message: error.message, data: [] };
+  } else {
+    return {
+      success: true,
+      message: "Test submissions successfully fetched",
+      data: data,
+    };
+  }
+}
+
+/* CREATE Test Submission */
+export async function createTestSubmission(testSubmission: TestSubmission) {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("test-submissions")
+    .insert([testSubmission])
+    .select("id")
+    .single();
+
+  if (error) {
+    console.error("Error creating test submission:", error.message);
+    return { success: false, message: error.message, testSubmissionId: null };
+  }
+
+  return {
+    success: true,
+    message: "Test submission successfully created",
+    testSubmissionId: data?.id || null,
+  };
+}
+
+/* GET Test Submission by ID */
+export async function getTestSubmissionById(submissionId: number) {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("test-submissions")
+    .select("*") // Select all columns
+    .eq("id", submissionId) // Match by submission ID
+    .single(); // Expect only one row
+
+  console.log("Supabase response:", { data, error });
+
+  if (error) {
+    console.error("Error fetching test submission:", error.message);
+    return null;
+  }
+
+  return {
+    success: true,
+    message: "Test submission successfully fetched",
+    data: data,
+  };
 }
