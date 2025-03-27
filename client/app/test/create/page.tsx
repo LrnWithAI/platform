@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { testSchema } from "@/schema/test";
@@ -42,6 +43,8 @@ export default function CreateTest() {
   const { user } = useUserStore();
   const [uploading, setUploading] = useState(false);
   const [fileUrl, setFileUrl] = useState<string | null>(null);
+
+  const router = useRouter();
 
   const {
     register: registerFileUpload,
@@ -150,8 +153,9 @@ export default function CreateTest() {
   const onSubmit = async (data: CreateTestFormValues) => {
     console.log("submitted data", data);
     data.created_by = user?.id;
-    await createTest(data);
+    const test = await createTest(data);
     toast.success("Test created successfully!");
+    router.push(`/test/${test?.testId}`);
   };
 
   return (
@@ -311,7 +315,10 @@ export default function CreateTest() {
 
           {/* Submit Button */}
           <div className="flex justify-center">
-            <Button type="submit" className="bg-purple hover:bg-purple-500">
+            <Button
+              type="submit"
+              className="bg-purple hover:bg-purple-500 dark:text-white"
+            >
               Create Test
             </Button>
           </div>

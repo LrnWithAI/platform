@@ -159,7 +159,7 @@ const TestSubmitPage = () => {
 
         {/* Submit Button */}
         <div className="flex justify-center">
-          <Button className="bg-purple">
+          <Button className="bg-purple dark:text-white hover:bg-purple-500">
             <Link href={`/test/${test?.id}`}>Submit new answer</Link>
           </Button>
         </div>

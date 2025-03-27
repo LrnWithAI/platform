@@ -325,7 +325,10 @@ const TestPage = () => {
 
           {/* Submit Button */}
           <div className="flex justify-center">
-            <Button type="submit" className="bg-purple">
+            <Button
+              type="submit"
+              className="bg-purple dark:text-white hover:bg-purple-500"
+            >
               Submit
             </Button>
           </div>
