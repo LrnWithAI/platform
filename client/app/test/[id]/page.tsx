@@ -19,7 +19,12 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify";
-import { getTestById, deleteTest, updateTest } from "@/actions/testActions";
+import {
+  getTestById,
+  deleteTest,
+  updateTest,
+  createTestSubmission,
+} from "@/actions/testActions";
 import { Test } from "@/types/test";
 import { useUserStore } from "@/stores/userStore";
 import { useForm, Controller, useFieldArray } from "react-hook-form";
@@ -27,6 +32,7 @@ import { testSchema } from "@/schema/test";
 
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { TestSubmission, TestSubmissionAnswers } from "@/types/test";
 
 type CreateTestFormValues = z.infer<typeof testSchema>;
 
@@ -129,12 +135,55 @@ const TestPage = () => {
   }, [test]); // Runs when `test` is loaded
 
   const onSubmitTestAnswers = async (data: any) => {
-    const queryParams = new URLSearchParams({
-      answers: JSON.stringify(data.answers),
-    });
+    if (!test) return;
 
-    router.push(`/test/${test?.id}/submit?${queryParams.toString()}`);
-    console.log("test check data", data);
+    // Remove null values from answers
+    const cleanedAnswers: number[] = data.answers.filter(
+      (ans: number | null) => ans !== null
+    ) as number[];
+
+    // Map answers to include question IDs correctly
+    const formattedAnswers = cleanedAnswers
+      .map((selected_answer: number, index: number) => {
+        const question = test?.questions?.[index]; // Get correct question
+        if (!question) {
+          console.warn(`Skipping: No question found for index ${index}`);
+          return null;
+        }
+        return { question_id: question.id, selected_answer };
+      })
+      .filter(
+        (ans): ans is { question_id: number; selected_answer: number } =>
+          ans !== null
+      ); // Remove null values safely
+
+    const correctAnswers = formattedAnswers.filter((ans) => {
+      const question = test?.questions?.find((q) => q.id === ans.question_id);
+      return question && question.correct === ans.selected_answer;
+    }).length;
+
+    const formattedSubmission: TestSubmission = {
+      test_id: testId,
+      user_id: user?.id || "", // Ensure user ID is available
+      submitted_at: new Date().toISOString(), // Current timestamp
+      number_of_questions: test?.questions?.length || 0,
+      correct_answers: correctAnswers,
+      answers: formattedAnswers,
+    };
+
+    const testSubmission = await createTestSubmission(formattedSubmission);
+
+    console.log("testSubmission", testSubmission);
+
+    if (!testSubmission.success) {
+      console.error(
+        "Failed to create test submission:",
+        testSubmission.message
+      );
+      return;
+    }
+
+    router.push(`/test/${test?.id}/submit/${testSubmission?.testSubmissionId}`);
   };
 
   const onDeleteTest = async () => {

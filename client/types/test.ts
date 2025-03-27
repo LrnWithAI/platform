@@ -15,3 +15,18 @@ export type Question = {
   answers: string[];
   correct: number;
 };
+
+export type TestSubmission = {
+  id?: number;
+  test_id: number;
+  user_id: string;
+  submitted_at?: string;
+  number_of_questions: number;
+  correct_answers: number;
+  answers: TestSubmissionAnswers[];
+};
+
+type TestSubmissionAnswers = {
+  question_id: number;
+  selected_answer: number;
+};
