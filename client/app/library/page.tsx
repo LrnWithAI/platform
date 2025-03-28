@@ -3,17 +3,13 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ClassesCards } from "@/components/class-cards";
 import { toast } from "react-toastify";
 
 import { getTestsByUserId, getTests } from "@/actions/testActions";
 import { Test } from "@/types/test";
 import { useLoadingStore } from "@/stores/loadingStore";
 import { useUserStore } from "@/stores/userStore";
-import {
-  CreateTestDialog,
-  CreateFlashcardsDialog,
-} from "@/components/create-test-dialog";
+import { CreateTestDialog, CreateFlashcardsDialog, CreateNotesDialog } from "@/components/create-test-dialog";
 
 const orderOptions = [
   { label: "Newest", value: "newest" },
@@ -80,6 +76,7 @@ export default function Library() {
     <div className="flex flex-1 flex-col gap-4 p-8">
       <h1 className="text-2xl font-bold">Your Library</h1>
 
+      {/* Tests */}
       <div className="flex justify-between">
         <div className="flex gap-1 items-center">
           <p>Tests</p>
@@ -109,12 +106,12 @@ export default function Library() {
                       Created at{" "}
                       {test.created_at
                         ? new Date(
-                            Date.parse(test.created_at)
-                          ).toLocaleDateString("sk-SK", {
-                            day: "numeric",
-                            month: "numeric",
-                            year: "numeric",
-                          })
+                          Date.parse(test.created_at)
+                        ).toLocaleDateString("sk-SK", {
+                          day: "numeric",
+                          month: "numeric",
+                          year: "numeric",
+                        })
                         : "Invalid date"}
                     </p>
                     <p className="text-sm text-gray-500 mt-2">
@@ -134,17 +131,25 @@ export default function Library() {
           test.
         </div>
       )}
+      {/* <Cards orderOption={orderOption} filterOption={filterOption} data={tests} /> */}
 
-      <ClassesCards orderOption={orderOption} filterOption={filterOption} />
-
+      {/* FlashCards */}
       <div className="flex justify-between">
         <div className="flex gap-1 items-center">
           <p>Flashcards</p>
           <CreateFlashcardsDialog />
         </div>
       </div>
+      {/* <Cards orderOption={orderOption} filterOption={filterOption} data={flashcards}  /> */}
 
-      <ClassesCards orderOption={orderOption} filterOption={filterOption} />
+      {/* Notes */}
+      <div className="flex justify-between">
+        <div className="flex gap-1 items-center">
+          <p>Notes</p>
+          <CreateNotesDialog />
+        </div>
+      </div>
+      {/* <Cards orderOption={orderOption} filterOption={filterOption} data={notes} /> */}
     </div>
   );
 }
