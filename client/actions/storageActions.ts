@@ -262,3 +262,31 @@ export async function uploadFileToTestFilesBucket(
 
   return publicUrlData.publicUrl;
 }
+
+/* TEST Questions */
+/* POST File into tests bucket as image for each question */
+export async function uploadFileToTestQuestionsBucket(
+  file: File,
+  userId: string,
+  testId: number,
+  questionId: number
+) {
+  const supabase = createClient();
+
+  const filePath = `/${userId}/${testId}/questions/${questionId}/${file.name}`;
+  const { data, error } = await supabase.storage
+    .from("test-files")
+    .upload(filePath, file);
+
+  if (error) {
+    toast.error("Failed to upload file");
+    console.error("Failed to upload file", error);
+    return null;
+  }
+
+  const { data: publicUrlData } = supabase.storage
+    .from("test-files")
+    .getPublicUrl(filePath);
+
+  return publicUrlData.publicUrl;
+}

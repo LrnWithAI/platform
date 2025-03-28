@@ -18,6 +18,7 @@ export const testSchema = z.object({
           .number()
           .int()
           .min(0, "Correct answer index must be a non-negative integer."),
+        image_url: z.string().optional(),
       })
     )
     .min(1, "At least one question is required."),

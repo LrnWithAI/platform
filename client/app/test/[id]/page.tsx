@@ -33,6 +33,7 @@ import { testSchema } from "@/schema/test";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { TestSubmission, TestSubmissionAnswers } from "@/types/test";
+import { uploadFileToTestQuestionsBucket } from "@/actions/storageActions";
 
 type CreateTestFormValues = z.infer<typeof testSchema>;
 
@@ -85,10 +86,51 @@ const TestPage = () => {
       category: test?.category,
       visibility: test?.visibility,
       questions: [
-        { id: 1, question: "", answers: ["", "", "", ""], correct: 0 },
+        {
+          id: 1,
+          question: "",
+          answers: ["", "", "", ""],
+          correct: 0,
+          image_url: undefined,
+        },
       ],
     },
   });
+
+  const handleImageUpload = async (
+    questionIndex: number,
+    files: FileList | null
+  ) => {
+    if (!files || files.length === 0) return;
+
+    const file = files[0];
+    const userId = user?.id;
+    const questions = getValuesEdit("questions");
+
+    if (!userId || !testId || !questions[questionIndex]?.id) {
+      toast.error("Invalid data for upload.");
+      return;
+    }
+
+    try {
+      const publicUrl = await uploadFileToTestQuestionsBucket(
+        file,
+        userId,
+        testId,
+        questions[questionIndex].id
+      );
+
+      if (publicUrl) {
+        setValueEdit(`questions.${questionIndex}.image_url`, publicUrl, {
+          shouldValidate: true,
+        });
+        toast.success("Image uploaded successfully!");
+      }
+    } catch (error) {
+      toast.error("Upload failed!");
+      console.error(error);
+    }
+  };
 
   useEffect(() => {
     fetchTestById();
@@ -244,16 +286,15 @@ const TestPage = () => {
   };
 
   const onSubmitEditTest = async (data: CreateTestFormValues) => {
-    console.log("new editted data", data);
     data.created_by = user?.id;
     data.id = test?.id;
 
-    await updateTest(data);
+    console.log("new editted data", data);
 
+    await updateTest(data);
     toast.success("Test edited successfully!");
 
     await fetchTestById();
-
     setIsEditMode(false);
   };
 
@@ -338,6 +379,15 @@ const TestPage = () => {
               <p>
                 {index + 1}. {question.question}
               </p>
+
+              {question.image_url && (
+                <img
+                  src={question.image_url}
+                  alt="Uploaded question image"
+                  className="mt-2 w-full h-96 object-cover border"
+                />
+              )}
+
               <div className="py-2">
                 <Controller
                   name={`answers.${index + 1}`}
@@ -472,6 +522,29 @@ const TestPage = () => {
                       placeholder="Enter a question, like What is AI?"
                       {...registerEdit(`questions.${questionIndex}.question`)}
                     />
+                  </div>
+
+                  <div key={field.id} className="py-2 space-y-2">
+                    <Label>Image (optional)</Label>
+                    <Input
+                      type="file"
+                      className="border bg-gray-50 cursor-pointer"
+                      accept="image/*"
+                      onChange={(e) =>
+                        handleImageUpload(questionIndex, e.target.files)
+                      }
+                    />
+                    {getValuesEdit(`questions.${questionIndex}.image_url`) && (
+                      <img
+                        src={
+                          getValuesEdit(
+                            `questions.${questionIndex}.image_url`
+                          ) || ""
+                        }
+                        alt="Uploaded"
+                        className="mt-2 w-full h-96 object-cover border"
+                      />
+                    )}
                   </div>
 
                   <div className="mb-2 space-y-2">
