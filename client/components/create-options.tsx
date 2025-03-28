@@ -1,27 +1,22 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "./ui/button";
-import { FilePlus, Plus, SquarePlus, Users } from "lucide-react";
-import { Separator } from "./ui/separator";
+import { ClipboardPlus, FilePlus, Plus, SquarePlus, Users } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu";
 import ClassDialog from "@/components/class-dialog";
+import { Button } from "./ui/button";
+import { Separator } from "./ui/separator";
+import { useUserStore } from "@/stores/userStore";
 
 export function CreateOptionsLoggedIn() {
-  const [isClassDialogOpen, setIsClassDialogOpen] = useState(false);
+  const user = useUserStore((state) => state.user);
 
-  const toggleClassDialog = () => {
-    setIsClassDialogOpen(!isClassDialogOpen);
-  };
+  const [isClassDialogOpen, setIsClassDialogOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   return (
     <>
-      <DropdownMenu>
+      <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
         <DropdownMenuTrigger asChild>
           <Button
             variant="outline"
@@ -38,25 +33,36 @@ export function CreateOptionsLoggedIn() {
             <DropdownMenuItem className="cursor-pointer">
               <SquarePlus /> FlashCards
             </DropdownMenuItem>
-            <Separator />
-            <DropdownMenuItem
-              className="cursor-pointer"
-              onSelect={(e) => {
-                e.preventDefault();
-                setIsClassDialogOpen(true);
-              }}
-            >
-              <Users /> Class
+            <DropdownMenuItem className="cursor-pointer">
+              <ClipboardPlus /> Notes
             </DropdownMenuItem>
+            {user?.role === "teacher" && (
+              <>
+                <Separator />
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onSelect={(e) => {
+                    e.preventDefault();
+                    setIsDropdownOpen(false);
+                    setIsClassDialogOpen(true);
+                  }}
+                >
+                  <Users /> Class
+                </DropdownMenuItem>
+              </>
+            )}
           </div>
         </DropdownMenuContent>
       </DropdownMenu>
 
       {/* Dialog for creating/editing a class */}
       <ClassDialog
-        type="create" // Set type as 'create' when adding a new class
+        type="create"
         isOpen={isClassDialogOpen}
-        onClose={toggleClassDialog}
+        onClose={() => {
+          setIsClassDialogOpen(false);
+          setIsDropdownOpen(false);
+        }}
       />
     </>
   );
