@@ -194,3 +194,26 @@ export async function getTestSubmissionById(submissionId: number) {
     data: data,
   };
 }
+
+/* GET Test submission by user id*/
+export async function getTestSubmissionsByUserId(userId: string) {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("test-submissions")
+    .select(`*`)
+    .eq("user_id", userId);
+
+  console.log("Supabase response:", { data, error });
+
+  if (error) {
+    console.error("Error fetching test submissions by user id:", error.message);
+    return { success: false, message: error.message, data: [] };
+  } else {
+    return {
+      success: true,
+      message: "Test submissions by user id successfully fetched",
+      data: data,
+    };
+  }
+}
