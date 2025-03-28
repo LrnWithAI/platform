@@ -111,6 +111,14 @@ const TestSubmitPageWithId = () => {
               <p className="font-semibold">
                 {qIndex + 1}. {question.question}
               </p>
+
+              {question.image_url && (
+                <img
+                  src={question.image_url}
+                  alt="Uploaded question image"
+                  className="mt-2 w-full h-96 object-cover border"
+                />
+              )}
               <div className="py-2">
                 <RadioGroup className="space-y-2">
                   {question.answers.map((answer, aIndex) => {

@@ -30,7 +30,10 @@ import { toast } from "react-toastify";
 
 import { createTest } from "@/actions/testActions";
 import { useUserStore } from "@/stores/userStore";
-import { uploadFileToTestFilesBucket } from "@/actions/storageActions";
+import {
+  uploadFileToTestFilesBucket,
+  uploadFileToTestQuestionsBucket,
+} from "@/actions/storageActions";
 
 type CreateTestFormValues = z.infer<typeof testSchema>;
 
@@ -106,10 +109,51 @@ export default function CreateTest() {
     defaultValues: {
       visibility: "everyone",
       questions: [
-        { id: 1, question: "", answers: ["", "", "", ""], correct: 0 },
+        {
+          id: 1,
+          question: "",
+          answers: ["", "", "", ""],
+          correct: 0,
+        },
       ],
     },
   });
+
+  const handleImageUpload = async (
+    questionIndex: number,
+    files: FileList | null
+  ) => {
+    if (!files || files.length === 0) return;
+
+    const file = files[0];
+    const userId = user?.id;
+    const testId = params.get("testId"); // Ensure this comes from the URL
+    const questions = getValues("questions");
+
+    if (!userId || !testId || !questions[questionIndex]?.id) {
+      toast.error("Invalid data for upload.");
+      return;
+    }
+
+    try {
+      const publicUrl = await uploadFileToTestQuestionsBucket(
+        file,
+        userId,
+        parseInt(testId, 10),
+        questions[questionIndex].id
+      );
+
+      if (publicUrl) {
+        setValue(`questions.${questionIndex}.image_url`, publicUrl, {
+          shouldValidate: true,
+        });
+        toast.success("Image uploaded successfully!");
+      }
+    } catch (error) {
+      toast.error("Upload failed!");
+      console.error(error);
+    }
+  };
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -151,8 +195,9 @@ export default function CreateTest() {
   console.log("Form errors ", errors);
 
   const onSubmit = async (data: CreateTestFormValues) => {
-    console.log("submitted data", data);
+    console.log("Submitted data", data);
     data.created_by = user?.id;
+
     const test = await createTest(data);
     toast.success("Test created successfully!");
     router.push(`/test/${test?.testId}`);

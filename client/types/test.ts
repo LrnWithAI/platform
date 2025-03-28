@@ -13,6 +13,7 @@ export type Question = {
   id?: number;
   question: string;
   answers: string[];
+  image_url?: string;
   correct: number;
 };
 
