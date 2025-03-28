@@ -16,14 +16,20 @@ import { Button } from "@/components/ui/button";
 
 type TestDialogType = {
   isInMenu?: boolean;
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen?: boolean;
+  onClose?: () => void;
 };
 
 type FlashcardsDialogType = {
   isInMenu?: boolean;
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen?: boolean;
+  onClose?: () => void;
+};
+
+type NotesDialogType = {
+  isInMenu?: boolean;
+  isOpen?: boolean;
+  onClose?: () => void;
 };
 
 export const CreateTestDialog = ({
@@ -186,15 +192,17 @@ export const CreateFlashcardsDialog = ({
   );
 };
 
-export const CreateNotesDialog = () => {
+export const CreateNotesDialog = ({ isOpen, onClose, isInMenu }: NotesDialogType) => {
   const router = useRouter();
   const [createNotesOption, setCreateNotesOption] = useState<"withAI" | "manually" | "">("");
 
   return (
-    <Dialog onOpenChange={() => setCreateNotesOption("")}>
-      <DialogTrigger>
-        <CirclePlus size={20} />
-      </DialogTrigger>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      {!isInMenu && (
+        <DialogTrigger>
+          <CirclePlus size={20} />
+        </DialogTrigger>
+      )}
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
@@ -213,7 +221,9 @@ export const CreateNotesDialog = () => {
                 With AI
               </button>
             </div>
-            <div className={`border rounded-md flex justify-center items-center align-center w-1/2 hover:cursor-pointer ${createNotesOption == "manually" ? "bg-slate-200" : "bg-white"}`}>
+            <div
+              className={`border rounded-md flex justify-center items-center align-center w-1/2 hover:cursor-pointer ${createNotesOption == "manually" ? "bg-slate-200" : "bg-white"}`}
+            >
               <button
                 className="text-4xl py-24 w-full h-full"
                 onClick={() => { setCreateNotesOption("manually"); }}

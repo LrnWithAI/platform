@@ -131,7 +131,7 @@ export default function Library() {
           test.
         </div>
       )}
-      {/* <Cards orderOption={orderOption} filterOption={filterOption} data={tests} /> */}
+      {/* <Cards orderOption={orderOption} filterOption={filterOption} data={tests} type="tests" /> */}
 
       {/* FlashCards */}
       <div className="flex justify-between">
@@ -140,7 +140,7 @@ export default function Library() {
           <CreateFlashcardsDialog />
         </div>
       </div>
-      {/* <Cards orderOption={orderOption} filterOption={filterOption} data={flashcards}  /> */}
+      {/* <Cards orderOption={orderOption} filterOption={filterOption} data={flashcards} type="flashcards"/> */}
 
       {/* Notes */}
       <div className="flex justify-between">
@@ -149,7 +149,7 @@ export default function Library() {
           <CreateNotesDialog />
         </div>
       </div>
-      {/* <Cards orderOption={orderOption} filterOption={filterOption} data={notes} /> */}
+      {/* <Cards orderOption={orderOption} filterOption={filterOption} data={notes} type="notes"/> */}
     </div>
   );
 }

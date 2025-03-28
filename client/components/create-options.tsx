@@ -2,17 +2,9 @@
 
 import React, { useState } from "react";
 import { ClipboardPlus, FilePlus, Plus, SquarePlus, Users } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import ClassDialog from "@/components/class-dialog";
-import {
-  CreateTestDialog,
-  CreateFlashcardsDialog,
-} from "@/components/create-test-dialog";
+import { CreateTestDialog, CreateFlashcardsDialog, CreateNotesDialog } from "@/components/create-test-dialog";
 import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
 import { useUserStore } from "@/stores/userStore";
@@ -23,6 +15,7 @@ export function CreateOptionsLoggedIn() {
   const [isClassDialogOpen, setIsClassDialogOpen] = useState(false);
   const [isTestDialogOpen, setIsTestDialogOpen] = useState(false);
   const [isFlashcardsDialogOpen, setIsFlashcardsDialogOpen] = useState(false);
+  const [isNotesDialogOpen, setIsNotesDialogOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   return (
@@ -58,7 +51,14 @@ export function CreateOptionsLoggedIn() {
             >
               <SquarePlus /> FlashCards
             </DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer">
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onSelect={(e) => {
+                e.preventDefault();
+                setIsDropdownOpen(false);
+                setIsNotesDialogOpen(true);
+              }}
+            >
               <ClipboardPlus /> Notes
             </DropdownMenuItem>
             {user?.role === "teacher" && (
@@ -80,16 +80,6 @@ export function CreateOptionsLoggedIn() {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* Dialog for creating/editing a class */}
-      <ClassDialog
-        type="create"
-        isOpen={isClassDialogOpen}
-        onClose={() => {
-          setIsClassDialogOpen(false);
-          setIsDropdownOpen(false);
-        }}
-      />
-
       <CreateTestDialog
         isOpen={isTestDialogOpen}
         onClose={() => {
@@ -106,6 +96,25 @@ export function CreateOptionsLoggedIn() {
           setIsDropdownOpen(false);
         }}
         isInMenu={true}
+      />
+
+      <CreateNotesDialog
+        isOpen={isNotesDialogOpen}
+        onClose={() => {
+          setIsNotesDialogOpen(false);
+          setIsDropdownOpen(false);
+        }}
+        isInMenu={true}
+      />
+
+      {/* Dialog for creating/editing a class */}
+      <ClassDialog
+        type="create"
+        isOpen={isClassDialogOpen}
+        onClose={() => {
+          setIsClassDialogOpen(false);
+          setIsDropdownOpen(false);
+        }}
       />
     </>
   );

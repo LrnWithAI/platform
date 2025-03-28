@@ -1,15 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { usePathname } from "next/navigation";
-import {
-  Users,
-  Home,
-  Folder,
-  FilePlus,
-  SquarePlus,
-  LogOut,
-  ClipboardPlus,
-} from "lucide-react";
+import { Users, Home, Folder, FilePlus, SquarePlus, LogOut, ClipboardPlus } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -19,17 +12,13 @@ import {
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem,
+  SidebarMenuItem
 } from "@/components/ui/sidebar";
-import { Separator } from "./ui/separator";
+import ClassDialog from "@/components/class-dialog";
+import { CreateTestDialog, CreateFlashcardsDialog, CreateNotesDialog } from "@/components/create-test-dialog";
+import { Separator } from "@/components/ui/separator";
 import NavLogo from "./nav-logo";
 import { useUserStore } from "@/stores/userStore";
-import ClassDialog from "./class-dialog";
-import { useState } from "react";
-import {
-  CreateTestDialog,
-  CreateFlashcardsDialog,
-} from "@/components/create-test-dialog";
 
 const items = [
   {
@@ -62,7 +51,6 @@ const items = [
     url: "#",
     icon: ClipboardPlus,
   },
-
   {
     title: "Class",
     url: "#",
@@ -144,13 +132,7 @@ export function AppSidebar() {
         </SidebarContent>
       </Sidebar>
 
-      {/* Modály */}
-      <ClassDialog
-        type="create"
-        isOpen={isClassDialogOpen}
-        onClose={() => setIsClassDialogOpen(false)}
-      />
-
+      {/* Dialogs */}
       <CreateTestDialog
         isOpen={isTestDialogOpen}
         onClose={() => setIsTestDialogOpen(false)}
@@ -161,6 +143,18 @@ export function AppSidebar() {
         isOpen={isFlashcardsDialogOpen}
         onClose={() => setIsFlashcardsDialogOpen(false)}
         isInMenu={true}
+      />
+
+      <CreateNotesDialog
+        isOpen={isNotesDialogOpen}
+        onClose={() => setIsNotesDialogOpen(false)}
+        isInMenu={true}
+      />
+
+      <ClassDialog
+        type="create"
+        isOpen={isClassDialogOpen}
+        onClose={() => setIsClassDialogOpen(false)}
       />
     </>
   );
