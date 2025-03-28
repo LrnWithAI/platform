@@ -1,13 +1,35 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { Users, Home, Folder, FilePlus, SquarePlus, LogOut, ClipboardPlus, } from "lucide-react";
-import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, } from "@/components/ui/sidebar";
+import {
+  Users,
+  Home,
+  Folder,
+  FilePlus,
+  SquarePlus,
+  LogOut,
+  ClipboardPlus,
+} from "lucide-react";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from "@/components/ui/sidebar";
 import { Separator } from "./ui/separator";
 import NavLogo from "./nav-logo";
 import { useUserStore } from "@/stores/userStore";
 import ClassDialog from "./class-dialog";
 import { useState } from "react";
+import {
+  CreateTestDialog,
+  CreateFlashcardsDialog,
+} from "@/components/create-test-dialog";
 
 const items = [
   {
@@ -42,7 +64,6 @@ const items = [
   },
 
   {
-
     title: "Class",
     url: "#",
     icon: Users,
@@ -99,10 +120,14 @@ export function AppSidebar() {
                       ) : (
                         <button
                           onClick={() => {
-                            if (item.title === "Class") setIsClassDialogOpen(true);
-                            if (item.title === "Test") setIsTestDialogOpen(true);
-                            if (item.title === "Flashcards") setIsFlashcardsDialogOpen(true);
-                            if (item.title === "Notes") setIsNotesDialogOpen(true);
+                            if (item.title === "Class")
+                              setIsClassDialogOpen(true);
+                            if (item.title === "Test")
+                              setIsTestDialogOpen(true);
+                            if (item.title === "Flashcards")
+                              setIsFlashcardsDialogOpen(true);
+                            if (item.title === "Notes")
+                              setIsNotesDialogOpen(true);
                           }}
                           className="flex items-center gap-2 w-full text-left"
                         >
@@ -124,6 +149,18 @@ export function AppSidebar() {
         type="create"
         isOpen={isClassDialogOpen}
         onClose={() => setIsClassDialogOpen(false)}
+      />
+
+      <CreateTestDialog
+        isOpen={isTestDialogOpen}
+        onClose={() => setIsTestDialogOpen(false)}
+        isInMenu={true}
+      />
+
+      <CreateFlashcardsDialog
+        isOpen={isFlashcardsDialogOpen}
+        onClose={() => setIsFlashcardsDialogOpen(false)}
+        isInMenu={true}
       />
     </>
   );

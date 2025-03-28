@@ -31,13 +31,13 @@ export type Class = {
       updated_at: string;
       created_by: {
         id: number;
-        name: string,
+        name: string;
         full_name: string;
         username: string;
         role: string;
         email: string;
         avatar_url: string;
-      }
+      };
       files: [
         {
           id: string;
@@ -46,17 +46,17 @@ export type Class = {
           type: string;
           url: string;
         }
-      ]
+      ];
     }
-  ]
-}
+  ];
+};
 
 export type ClassStore = {
   classes: Class[];
   setClasses: (classes: Class[]) => void;
   class: Class;
   getClassById: (id: number) => void;
-}
+};
 
 export type ClassDialogProps = {
   type: "create" | "edit";
@@ -73,4 +73,4 @@ export type ClassDialogProps = {
       url: string;
     };
   };
-}
+};

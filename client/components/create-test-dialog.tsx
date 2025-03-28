@@ -14,17 +14,35 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
-export const CreateTestDialog = () => {
+type TestDialogType = {
+  isInMenu?: boolean;
+  isOpen: boolean;
+  onClose: () => void;
+};
+
+type FlashcardsDialogType = {
+  isInMenu?: boolean;
+  isOpen: boolean;
+  onClose: () => void;
+};
+
+export const CreateTestDialog = ({
+  isInMenu,
+  isOpen,
+  onClose,
+}: TestDialogType) => {
   const router = useRouter();
   const [createTestOption, setCreateTestOption] = useState<
     "withAI" | "manually" | ""
   >("");
 
   return (
-    <Dialog onOpenChange={() => setCreateTestOption("")}>
-      <DialogTrigger>
-        <CirclePlus size={20} />
-      </DialogTrigger>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      {!isInMenu && (
+        <DialogTrigger>
+          <CirclePlus size={20} />
+        </DialogTrigger>
+      )}
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
@@ -87,17 +105,23 @@ export const CreateTestDialog = () => {
   );
 };
 
-export const CreateFlashcardsDialog = () => {
+export const CreateFlashcardsDialog = ({
+  isOpen,
+  onClose,
+  isInMenu,
+}: FlashcardsDialogType) => {
   const router = useRouter();
   const [createFlashcardsOption, setCreateFlashcardsOption] = useState<
     "withAI" | "manually" | ""
   >("");
 
   return (
-    <Dialog onOpenChange={() => setCreateFlashcardsOption("")}>
-      <DialogTrigger>
-        <CirclePlus size={20} />
-      </DialogTrigger>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      {!isInMenu && (
+        <DialogTrigger>
+          <CirclePlus size={20} />
+        </DialogTrigger>
+      )}
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
