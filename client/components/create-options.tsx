@@ -2,8 +2,17 @@
 
 import React, { useState } from "react";
 import { ClipboardPlus, FilePlus, Plus, SquarePlus, Users } from "lucide-react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import ClassDialog from "@/components/class-dialog";
+import {
+  CreateTestDialog,
+  CreateFlashcardsDialog,
+} from "@/components/create-test-dialog";
 import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
 import { useUserStore } from "@/stores/userStore";
@@ -12,6 +21,8 @@ export function CreateOptionsLoggedIn() {
   const user = useUserStore((state) => state.user);
 
   const [isClassDialogOpen, setIsClassDialogOpen] = useState(false);
+  const [isTestDialogOpen, setIsTestDialogOpen] = useState(false);
+  const [isFlashcardsDialogOpen, setIsFlashcardsDialogOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   return (
@@ -27,10 +38,24 @@ export function CreateOptionsLoggedIn() {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="p-1">
           <div className="flex flex-col gap-1">
-            <DropdownMenuItem className="cursor-pointer">
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onSelect={(e) => {
+                e.preventDefault();
+                setIsDropdownOpen(false);
+                setIsTestDialogOpen(true);
+              }}
+            >
               <FilePlus /> Test
             </DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer">
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onSelect={(e) => {
+                e.preventDefault();
+                setIsDropdownOpen(false);
+                setIsFlashcardsDialogOpen(true);
+              }}
+            >
               <SquarePlus /> FlashCards
             </DropdownMenuItem>
             <DropdownMenuItem className="cursor-pointer">
@@ -63,6 +88,24 @@ export function CreateOptionsLoggedIn() {
           setIsClassDialogOpen(false);
           setIsDropdownOpen(false);
         }}
+      />
+
+      <CreateTestDialog
+        isOpen={isTestDialogOpen}
+        onClose={() => {
+          setIsTestDialogOpen(false);
+          setIsDropdownOpen(false);
+        }}
+        isInMenu={true}
+      />
+
+      <CreateFlashcardsDialog
+        isOpen={isFlashcardsDialogOpen}
+        onClose={() => {
+          setIsFlashcardsDialogOpen(false);
+          setIsDropdownOpen(false);
+        }}
+        isInMenu={true}
       />
     </>
   );
