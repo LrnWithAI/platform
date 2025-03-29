@@ -57,7 +57,7 @@ export default function CreateNotes() {
       <div className="flex flex-col justify-center max-w-4xl mx-auto">
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="bg-red-200 border rounded-md p-4 space-y-4"
+          className="dark:bg-muted border rounded-md p-6 space-y-4 bg-gray-100"
         >
           <div className="space-y-2">
             <Label htmlFor="note-title">Note Title</Label>

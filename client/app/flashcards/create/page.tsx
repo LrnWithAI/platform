@@ -19,7 +19,7 @@ export default function CreateFlashcards() {
       </div>
 
       <div className="flex flex-col justify-center max-w-4xl mx-auto">
-        <div className="bg-red-200 border rounded-md p-4">
+        <div className="dark:bg-muted border rounded-md p-6 space-y-4 bg-gray-100">
           <div className="space-y-2">
             <Label htmlFor="test-title">Flashcards set title</Label>
             <Input

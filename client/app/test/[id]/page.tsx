@@ -529,7 +529,7 @@ const TestPage = () => {
                     <Label>Image (optional)</Label>
                     <Input
                       type="file"
-                      className="border bg-gray-50 cursor-pointer"
+                      className="border bg-gray-50 cursor-pointer dark:bg-neutral-900 dark:border-neutral-700"
                       accept="image/*"
                       onChange={(e) =>
                         handleImageUpload(questionIndex, e.target.files)
@@ -612,7 +612,7 @@ const TestPage = () => {
             <Button
               variant="outline"
               type="submit"
-              className="bg-green-100 border-green-500 hover:bg-green-200"
+              className="bg-green-100 border-green-500 hover:bg-green-200 dark:bg-green-400 dark:text-black"
             >
               Save changes
             </Button>
