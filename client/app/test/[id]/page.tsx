@@ -153,6 +153,7 @@ const TestPage = () => {
             question: q.question || "",
             answers: q.answers || ["", "", "", ""],
             correct: q.correct ?? 0,
+            image_url: q.image_url || undefined,
           }))
         );
 
