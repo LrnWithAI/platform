@@ -1,10 +1,20 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { ClipboardPlus, FilePlus, Plus, SquarePlus, Users } from "lucide-react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import ClassDialog from "@/components/class-dialog";
-import { CreateTestDialog, CreateFlashcardsDialog, CreateNotesDialog } from "@/components/create-test-dialog";
+import {
+  CreateTestDialog,
+  CreateFlashcardsDialog,
+  CreateNotesDialog,
+} from "@/components/create-test-dialog";
 import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
 import { useUserStore } from "@/stores/userStore";
@@ -121,6 +131,8 @@ export function CreateOptionsLoggedIn() {
 }
 
 export function CreateOptionsLoggedOut() {
+  const router = useRouter();
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -130,14 +142,29 @@ export function CreateOptionsLoggedOut() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="p-1">
         <div className="flex flex-col gap-1">
-          <DropdownMenuItem className="cursor-pointer">
+          <DropdownMenuItem
+            onClick={() => router.push("/login")}
+            className="cursor-pointer"
+          >
             <FilePlus /> Test
           </DropdownMenuItem>
-          <DropdownMenuItem className="cursor-pointer">
+          <DropdownMenuItem
+            onClick={() => router.push("/login")}
+            className="cursor-pointer"
+          >
             <SquarePlus /> FlashCards
           </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => router.push("/login")}
+            className="cursor-pointer"
+          >
+            <ClipboardPlus /> Notes
+          </DropdownMenuItem>
           <Separator />
-          <DropdownMenuItem className="cursor-pointer">
+          <DropdownMenuItem
+            onClick={() => router.push("/login")}
+            className="cursor-pointer"
+          >
             <Users /> Class
           </DropdownMenuItem>
         </div>
