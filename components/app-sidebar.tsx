@@ -55,12 +55,7 @@ const items = [
     title: "Class",
     url: "#",
     icon: Users,
-  },
-  {
-    title: "Log out",
-    url: "#",
-    icon: LogOut,
-  },
+  }
 ];
 
 export function AppSidebar() {
@@ -126,6 +121,21 @@ export function AppSidebar() {
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}
+
+                <Separator className="mb-1" />
+                <SidebarMenuItem key="logout" className="hover:cursor-pointer">
+                  <SidebarMenuButton
+                    asChild
+                    tooltip="Log out"
+                    isActive={pathname === "/logout"}
+                  >
+                    <form action="/auth/signout" method="post">
+                      <button type="submit" className="flex items-center gap-2 py-1">
+                        <LogOut size={16} /> Logout
+                      </button>
+                    </form>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
