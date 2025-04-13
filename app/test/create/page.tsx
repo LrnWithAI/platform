@@ -44,59 +44,15 @@ type FileUploadFormValues = {
 export default function CreateTest() {
   const params = useSearchParams();
   const { user } = useUserStore();
-  const [uploading, setUploading] = useState(false);
-  const [fileUrl, setFileUrl] = useState<string | null>(null);
+  const option = params.get("option");
 
   const router = useRouter();
-
-  const {
-    register: registerFileUpload,
-    handleSubmit: onSubmitFileUpload,
-    setValue: setFileValue,
-    watch: watchFileUpload,
-    formState: { errors: fileUploadErrors },
-  } = useForm<FileUploadFormValues>();
-
-  const handleFileUpload = async (files: File[]) => {
-    if (!files.length) return;
-    setUploading(true);
-
-    const uploadedFile = files[0]; // Only support single file upload
-
-    try {
-      const publicUrl = await uploadFileToTestFilesBucket(
-        uploadedFile,
-        user?.id as string
-      );
-      if (publicUrl) {
-        setFileValue("uploadedFile", files, { shouldValidate: true });
-        setFileUrl(publicUrl);
-        toast.success("File uploaded successfully!");
-      }
-    } catch (error) {
-      toast.error("Upload failed!");
-      console.error(error);
-    }
-
-    setUploading(false);
-  };
-
-  const onSubmitFileUPloadForm = (data: FileUploadFormValues) => {
-    console.log("File uploaded:", data.uploadedFile);
-    console.log("Public URL:", fileUrl);
-    alert("presuvas sa na dalsi krok");
-  };
-
-  const uploadedFiles = watchFileUpload("uploadedFile");
 
   const [selectedCorrectAnswers, setSelectedCorrectAnswers] = useState<
     Record<number, number>
   >({});
 
   console.log("user", user);
-
-  const option = params.get("option");
-
   const {
     register,
     handleSubmit,
@@ -118,42 +74,6 @@ export default function CreateTest() {
       ],
     },
   });
-
-  const handleImageUpload = async (
-    questionIndex: number,
-    files: FileList | null
-  ) => {
-    if (!files || files.length === 0) return;
-
-    const file = files[0];
-    const userId = user?.id;
-    const testId = params.get("testId"); // Ensure this comes from the URL
-    const questions = getValues("questions");
-
-    if (!userId || !testId || !questions[questionIndex]?.id) {
-      toast.error("Invalid data for upload.");
-      return;
-    }
-
-    try {
-      const publicUrl = await uploadFileToTestQuestionsBucket(
-        file,
-        userId,
-        parseInt(testId, 10),
-        questions[questionIndex].id
-      );
-
-      if (publicUrl) {
-        setValue(`questions.${questionIndex}.image_url`, publicUrl, {
-          shouldValidate: true,
-        });
-        toast.success("Image uploaded successfully!");
-      }
-    } catch (error) {
-      toast.error("Upload failed!");
-      console.error(error);
-    }
-  };
 
   const { fields, append, remove } = useFieldArray({
     control,
