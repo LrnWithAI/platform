@@ -63,7 +63,7 @@ export default function CreateFlashcards() {
     name: "flashcards",
   });
 
-  const addCard = () => {
+  const addFlashcard = () => {
     const existing = getValues("flashcards") || [];
 
     const ids = existing
@@ -79,7 +79,7 @@ export default function CreateFlashcards() {
     });
   };
 
-  const removeCard = (index: number) => {
+  const removeFlashcard = (index: number) => {
     remove(index);
 
     setTimeout(() => {
@@ -206,18 +206,18 @@ export default function CreateFlashcards() {
                 <Button
                   variant="destructive"
                   className="bg-red-500 w-36 self-end"
-                  onClick={() => removeCard(cardIndex)}
+                  onClick={() => removeFlashcard(cardIndex)}
                   type="button"
                 >
-                  Remove card
+                  Remove flashcard
                 </Button>
               </div>
             ))}
           </div>
 
           <div className="flex justify-center my-6">
-            <Button variant="outline" onClick={addCard} type="button">
-              Add Card
+            <Button variant="outline" onClick={addFlashcard} type="button">
+              Add Flashcard
             </Button>
           </div>
 

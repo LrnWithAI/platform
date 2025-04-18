@@ -34,6 +34,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { FlashcardsSubmission } from "@/types/flashcards";
 import { uploadFileToFlashcardsBucket } from "@/actions/storageActions";
+import FlashcardsCardsStack from "@/components/flashcards-cards-stack";
 
 type CreateFlashcardsFormValues = z.infer<typeof flashcardsSchema>;
 
@@ -179,7 +180,6 @@ const FlashcardsPage = () => {
     }
   };
 
-  // ❌ For deleting a flashcard set
   const onDeleteFlashcardsSet = async () => {
     if (!flashcardsSet) return;
 
@@ -199,7 +199,6 @@ const FlashcardsPage = () => {
       });
   };
 
-  // ➕ For adding a flashcard (uses useFieldArray)
   const { fields, append, remove } = useFieldArray({
     control: controlEdit,
     name: "flashcards",
@@ -222,7 +221,6 @@ const FlashcardsPage = () => {
     });
   };
 
-  // ❌ For removing a flashcard
   const removeFlashcard = (index: number) => {
     remove(index);
 
@@ -236,7 +234,7 @@ const FlashcardsPage = () => {
   };
 
   return (
-    <div className="mx-4 mb-20 mt-0 md:mt-6">
+    <div className="mx-4 mb-20 mt-6 md:mt-6">
       {user?.id === flashcardsSet?.created_by && (
         <div className="max-w-4xl mx-auto">
           <div className="flex flex-row justify-end space-x-2">
@@ -299,18 +297,9 @@ const FlashcardsPage = () => {
             </div>
           </div>
 
-          {flashcardsSet?.flashcards?.map((card, index) => (
-            <div
-              key={index}
-              className="dark:bg-muted border flex flex-col rounded-md p-6 space-y-2 bg-gray-100 my-2 md:my-4"
-            >
-              <p className="text-md font-semibold">Term:</p>
-              <p className="text-lg">{card.term}</p>
-
-              <p className="text-md font-semibold">Definition:</p>
-              <p className="text-lg">{card.definition}</p>
-            </div>
-          ))}
+          {flashcardsSet && (
+            <FlashcardsCardsStack flashcardsSet={flashcardsSet} />
+          )}
         </div>
       ) : (
         <form
@@ -359,9 +348,8 @@ const FlashcardsPage = () => {
               >
                 <div className="space-y-2">
                   <Label>Term {index + 1}</Label>
-                  <Input
-                    type="text"
-                    placeholder="e.g. Artificial Intelligence"
+                  <Textarea
+                    placeholder="Enter the term"
                     {...registerEdit(`flashcards.${index}.term`)}
                   />
                 </div>
@@ -369,7 +357,7 @@ const FlashcardsPage = () => {
                 <div className="space-y-2">
                   <Label>Definition</Label>
                   <Textarea
-                    placeholder="e.g. The simulation of human intelligence in machines"
+                    placeholder="Enter the definition"
                     {...registerEdit(`flashcards.${index}.definition`)}
                   />
                 </div>

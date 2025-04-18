@@ -19,8 +19,10 @@ import {
 } from "@/components/ui/popover";
 import { getTestsByUserId } from "@/actions/testActions";
 import { getNotesByUserId } from "@/actions/notesActions";
+import { getFlashcardsSetsByUserId } from "@/actions/flashcardsActions";
 import { Test } from "@/types/test";
 import { Note } from "@/types/note";
+import { FlashcardsSet } from "@/types/flashcards";
 import { useLoadingStore } from "@/stores/loadingStore";
 import { useUserStore } from "@/stores/userStore";
 import {
@@ -47,7 +49,7 @@ export default function Library() {
   const user = useUserStore((state) => state.user);
 
   const [tests, setTests] = useState([] as Test[]);
-  const [flashcards, setFlashcards] = useState([] as FlashCard[]);
+  const [flashcards, setFlashcards] = useState([] as FlashcardsSet[]);
   const [notes, setNotes] = useState([] as Note[]);
 
   async function fetchTests() {
@@ -92,9 +94,29 @@ export default function Library() {
     }
   }
 
+  async function fetchFlashcards() {
+    try {
+      setLoading(true);
+      if (!user) return;
+      const response = await getFlashcardsSetsByUserId(user?.id);
+      if (response.success) {
+        setFlashcards(response.data);
+        toast.success("Flashcards fetched successfully!");
+      } else {
+        toast.error(response.message || "Failed to fetch flashcards.");
+      }
+      return response.data ?? [];
+    } catch (error) {
+      toast.error("An error occurred while fetching flashcards.");
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  }
+
   useEffect(() => {
     fetchTests();
-    // fetchFlashcards();
+    fetchFlashcards();
     fetchNotes();
   }, [user]);
 
@@ -376,7 +398,7 @@ export default function Library() {
         filterOption={filterOptionForFlashcards}
         data={flashcards}
         type="flashcards"
-        refreshData={() => {}}
+        refreshData={fetchFlashcards}
       />
 
       {/* Notes */}
