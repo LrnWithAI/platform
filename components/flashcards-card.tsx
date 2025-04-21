@@ -2,9 +2,7 @@ import { Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const renderTextWithLineBreaks = (text: string) => {
-  return text.split("\n").map((line, index) => (
-    <p key={index}>{line}</p> // Each line gets rendered as a new <p> element
-  ));
+  return text.split("\n").map((line, index) => <p key={index}>{line}</p>);
 };
 
 export default function FlashcardsCard({
@@ -14,6 +12,7 @@ export default function FlashcardsCard({
   toggleStar,
   showBack,
   flip,
+  image_url,
 }: {
   term: string;
   definition: string;
@@ -21,10 +20,10 @@ export default function FlashcardsCard({
   toggleStar: () => void;
   showBack: boolean;
   flip: () => void;
+  image_url?: string;
 }) {
   return (
     <div className="lg:w-[900px] lg:h-[500px] w-80 h-64">
-      {/* Card Flip Button */}
       <button
         type="button"
         onClick={flip}
@@ -38,7 +37,14 @@ export default function FlashcardsCard({
         >
           {/* FRONT */}
           <div className="absolute inset-0 w-full h-full [backface-visibility:hidden]">
-            <div className="relative flex h-full w-full flex-col items-center justify-center rounded-xl border bg-gray-100 dark:bg-muted text-black dark:text-white p-4 text-xl text-center">
+            <div
+              className={cn(
+                "relative h-full w-full rounded-xl border bg-gray-100 dark:bg-muted text-black dark:text-white p-4 text-xl",
+                image_url
+                  ? "grid grid-cols-2 gap-4"
+                  : "flex flex-col items-center justify-center text-center"
+              )}
+            >
               {/* Star on the front */}
               <div
                 onClick={toggleStar}
@@ -51,8 +57,26 @@ export default function FlashcardsCard({
                 )}
               </div>
 
-              {/* Term with line breaks */}
-              {renderTextWithLineBreaks(term)}
+              {/* Optional image */}
+              {image_url ? (
+                <>
+                  {/* Centered term on left */}
+                  <div className="flex items-center justify-center text-left">
+                    <div>{renderTextWithLineBreaks(term)}</div>
+                  </div>
+
+                  {/* Centered image on right */}
+                  <div className="flex items-center justify-center">
+                    <img
+                      src={image_url}
+                      alt="Uploaded flashcard image"
+                      className="max-h-96 max-w-auto object-contain border rounded-lg"
+                    />
+                  </div>
+                </>
+              ) : (
+                renderTextWithLineBreaks(term)
+              )}
             </div>
           </div>
 

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { FlashcardsSet } from "@/types/flashcards";
 import FlashcardsCard from "@/components/flashcards-card";
+import { Button } from "@/components/ui/button";
 
 type Props = {
   flashcardsSet: FlashcardsSet;
@@ -82,17 +83,18 @@ export default function FlashcardsCardsStack({ flashcardsSet }: Props) {
         toggleStar={() => toggleStar(currentIndex)}
         showBack={showBack}
         flip={flip}
+        image_url={currentCard.image_url}
       />
 
       <div className="flex flex-row justify-between align-center mt-14 w-full">
         <div>
-          <button
+          <Button
             onClick={handlePrevious}
             disabled={currentIndex === 0}
-            className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
+            variant={currentIndex === 0 ? "outline" : "secondary"}
           >
             Previous
-          </button>
+          </Button>
         </div>
         <div>
           <p className="text-lg text-gray-500">
@@ -101,13 +103,15 @@ export default function FlashcardsCardsStack({ flashcardsSet }: Props) {
         </div>
 
         <div>
-          <button
+          <Button
             onClick={handleNext}
             disabled={currentIndex === flashcards.length - 1}
-            className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
+            variant={
+              currentIndex === flashcards.length - 1 ? "outline" : "default"
+            }
           >
             Next
-          </button>
+          </Button>
         </div>
       </div>
     </div>

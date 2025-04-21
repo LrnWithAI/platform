@@ -334,6 +334,43 @@ const FlashcardsPage = () => {
                 </p>
               )}
             </div>
+
+            <div className="flex flex-row">
+              <div className="flex items-center gap-3 w-1/2">
+                <Label htmlFor="title">Visible to</Label>
+                <Select
+                  onValueChange={(value) => setValueEdit("visibility", value)}
+                >
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Everyone" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem value="everyone">Everyone</SelectItem>
+                      <SelectItem value="users-with-password">
+                        Users with password
+                      </SelectItem>
+                      <SelectItem value="just-me">Just me</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex items-center w-1/2">
+                <Label htmlFor="category">Category</Label>
+                <Input
+                  id="category"
+                  type="text"
+                  placeholder="AI"
+                  {...registerEdit("category")}
+                />
+                {errors.category &&
+                  typeof errors.category.message === "string" && (
+                    <p className="text-sm text-red-500">
+                      {errors.category.message}
+                    </p>
+                  )}
+              </div>
+            </div>
           </div>
 
           <div className="my-4">
@@ -352,6 +389,23 @@ const FlashcardsPage = () => {
                     placeholder="Enter the term"
                     {...registerEdit(`flashcards.${index}.term`)}
                   />
+                </div>
+
+                <div key={field.id} className="py-2 space-y-2">
+                  <Label>Image (optional)</Label>
+                  <Input
+                    type="file"
+                    className="border bg-gray-50 cursor-pointer dark:bg-neutral-900 dark:border-neutral-700"
+                    accept="image/*"
+                    onChange={(e) => handleImageUpload(index, e.target.files)}
+                  />
+                  {getValuesEdit(`flashcards.${index}.image_url`) && (
+                    <img
+                      src={getValuesEdit(`flashcards.${index}.image_url`) || ""}
+                      alt="Uploaded"
+                      className="mt-2 w-full h-96 object-cover border"
+                    />
+                  )}
                 </div>
 
                 <div className="space-y-2">
