@@ -1,14 +1,15 @@
-import React, { useState } from 'react';
-import { Trash2 } from 'lucide-react';
+import React, { useState } from "react";
+import { Trash2 } from "lucide-react";
 
-import Image from 'next/image';
-import Link from 'next/link';
-import { toast } from 'react-toastify';
-import { useLoadingStore } from '@/stores/loadingStore';
-import { useUserStore } from '@/stores/userStore';
-import { Button } from './ui/button';
-import { deleteTest } from '@/actions/testActions';
-import { deleteNote } from '@/actions/notesActions';
+import Image from "next/image";
+import Link from "next/link";
+import { toast } from "react-toastify";
+import { useLoadingStore } from "@/stores/loadingStore";
+import { useUserStore } from "@/stores/userStore";
+import { Button } from "./ui/button";
+import { deleteTest } from "@/actions/testActions";
+import { deleteNote } from "@/actions/notesActions";
+import { deleteFlashcardsSet } from "@/actions/flashcardsActions";
 
 interface CardsProps {
   orderOption: string;
@@ -18,7 +19,13 @@ interface CardsProps {
   refreshData: () => void;
 }
 
-export function Cards({ orderOption, filterOption, data, type, refreshData }: CardsProps) {
+export function Cards({
+  orderOption,
+  filterOption,
+  data,
+  type,
+  refreshData,
+}: CardsProps) {
   const setLoading = useLoadingStore((state) => state.setLoading);
   const user = useUserStore((state) => state.user);
 
@@ -26,7 +33,9 @@ export function Cards({ orderOption, filterOption, data, type, refreshData }: Ca
   const filteredData = data.filter((card) => {
     // Ak je nastavený filter pre title, porovnáme len tento atribút
     if (filterOption["title"]) {
-      return card.title?.toLowerCase().includes(filterOption["title"].toLowerCase());
+      return card.title
+        ?.toLowerCase()
+        .includes(filterOption["title"].toLowerCase());
     }
     return true;
   });
@@ -34,10 +43,14 @@ export function Cards({ orderOption, filterOption, data, type, refreshData }: Ca
   // Sorting – triedime len podľa created_at a title
   const sortedData = filteredData.sort((a, b) => {
     if (orderOption === "newest") {
-      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      return (
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
     }
     if (orderOption === "older") {
-      return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+      return (
+        new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+      );
     }
     if (orderOption === "a-z") {
       return a.title.localeCompare(b.title);
@@ -54,14 +67,14 @@ export function Cards({ orderOption, filterOption, data, type, refreshData }: Ca
       setLoading(true);
 
       if (!user?.id) {
-        toast.error('User ID is missing. Cannot delete the card.');
+        toast.error("User ID is missing. Cannot delete the card.");
         return;
       }
 
       if (type === "tests") {
         await deleteTest(id, user.id);
       } else if (type === "flashcards") {
-        // await deleteFlashcard(id);
+        await deleteFlashcardsSet(id, user.id);
       } else if (type === "notes") {
         await deleteNote(id, user.id);
       }
@@ -69,7 +82,7 @@ export function Cards({ orderOption, filterOption, data, type, refreshData }: Ca
       refreshData();
       toast.success(`${type} deleted successfully!`);
     } catch (error) {
-      toast.error('An error occurred while deleting the card.');
+      toast.error("An error occurred while deleting the card.");
     } finally {
       setLoading(false);
     }
@@ -79,8 +92,8 @@ export function Cards({ orderOption, filterOption, data, type, refreshData }: Ca
   const getLinkPath = (id: number) => {
     if (type === "tests") return `/test/${id}`;
     if (type === "notes") return `/notes/${id}`;
-    if (type === "flashcards") return `/flashcard/${id}`;
-    return '/';
+    if (type === "flashcards") return `/flashcards/${id}`;
+    return "/";
   };
 
   return (
@@ -116,10 +129,10 @@ export function Cards({ orderOption, filterOption, data, type, refreshData }: Ca
               />
               <div className="ml-4 flex flex-col justify-center">
                 <p className="text-sm text-gray-700 font-bold">
-                  {new Date(card.created_at).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
+                  {new Date(card.created_at).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
                   })}
                 </p>
               </div>

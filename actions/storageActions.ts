@@ -290,3 +290,31 @@ export async function uploadFileToTestQuestionsBucket(
 
   return publicUrlData.publicUrl;
 }
+
+/* FLASHCARDS */
+/* POST File into flashcards bucket */
+export async function uploadFileToFlashcardsBucket(
+  file: File,
+  userId: string,
+  flashcardsId: number,
+  cardId: number
+) {
+  const supabase = createClient();
+
+  const filePath = `/${userId}/${flashcardsId}/flashcards/${cardId}/${file.name}`;
+  const { data, error } = await supabase.storage
+    .from("flashcards-files")
+    .upload(filePath, file);
+
+  if (error) {
+    toast.error("Failed to upload file");
+    console.error("Failed to upload file", error);
+    return null;
+  }
+
+  const { data: publicUrlData } = supabase.storage
+    .from("flashcards-files")
+    .getPublicUrl(filePath);
+
+  return publicUrlData.publicUrl;
+}
