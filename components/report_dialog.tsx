@@ -17,7 +17,7 @@ import { createReport } from '@/actions/reportActions';
 
 type ReportFormData = z.infer<typeof ReportSchema>;
 
-const ReportDialog: React.FC<ReportDialogProps> = ({ isOpen, onClose, type }) => {
+const ReportDialog: React.FC<ReportDialogProps> = ({ isOpen, content_id, onClose, type }) => {
   const user = useUserStore((state) => state.user);
   const setLoading = useLoadingStore((state) => state.setLoading);
 
@@ -46,13 +46,17 @@ const ReportDialog: React.FC<ReportDialogProps> = ({ isOpen, onClose, type }) =>
 
       const payload = {
         ...data,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
         created_by: {
-          id: user.id,
+          id: Number(user.id),
           name: user.full_name,
           role: user.role,
           email: user.email,
         },
-        type: type
+        type: type,
+        content_id: Number(content_id),
+        status: "pending",
       };
 
       const response = await createReport(payload);

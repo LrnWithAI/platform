@@ -231,6 +231,7 @@ const Class = () => {
       {/* Report dialog */}
       <ReportDialog
         type="class"
+        content_id={classData?.id ?? ''}
         isOpen={openReportDialog}
         onClose={() => setOpenReportDialog(false)}
       />

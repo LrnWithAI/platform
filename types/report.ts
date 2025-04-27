@@ -1,6 +1,7 @@
 export type Report = {
-  id: number;
+  id?: number;
   created_at: string;
+  updated_at: string;
   title: string;
   description: string;
   created_by: {
@@ -10,10 +11,13 @@ export type Report = {
     email: string;
   };
   type: string;
+  content_id: number;
+  status: string;
 }
 
 export type ReportDialogProps = {
   isOpen: boolean;
+  content_id: number | string;
   onClose: () => void;
   type: string;
 }

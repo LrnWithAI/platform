@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
 
@@ -18,7 +18,7 @@ import { useUserStore } from '@/stores/userStore';
 import ReportDialog from './report_dialog';
 import { formatDate } from '@/utils/supabase/utils';
 import { getClasses, editClass } from '@/actions/classActions';
-import { downloadImage, updateClassContent, uploadFilesToClassContent, deleteFileFromClassContent } from '@/actions/storageActions';
+import { updateClassContent, uploadFilesToClassContent, deleteFileFromClassContent } from '@/actions/storageActions';
 
 const ClassDashboard = () => {
   const router = useRouter();
@@ -352,7 +352,12 @@ const ClassDashboard = () => {
         )}
       </div>
 
-      <ReportDialog isOpen={openReportDialog} onClose={() => setOpenReportDialog(false)} type="post" />
+      <ReportDialog
+        isOpen={openReportDialog}
+        content_id={postData.id || ''}
+        onClose={() => setOpenReportDialog(false)}
+        type="post"
+      />
     </div>
   );
 };
