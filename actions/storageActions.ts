@@ -352,7 +352,7 @@ export async function deleteFileFromNotesBucket(
 ) {
   const supabase = createClient();
 
-  const filePath = `/${userId}/${noteId}/notes/${fileName}`;
+  const filePath = `${userId}/${noteId}/${fileName}`;
   const { error } = await supabase.storage
     .from("notes-files")
     .remove([filePath]);

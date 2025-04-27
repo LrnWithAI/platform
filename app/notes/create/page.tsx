@@ -12,9 +12,10 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { createNote, updateNote } from "@/actions/notesActions";
-import { useUserStore } from "@/stores/userStore";
 import { noteSchema } from "@/schema/note";
 import { uploadFileToNotesBucket } from "@/actions/storageActions";
+import { useUserStore } from "@/stores/userStore";
+import { useLoadingStore } from "@/stores/loadingStore";
 
 // Typ pre existujúci uploadnutý súbor
 type UploadedFile = {
@@ -32,7 +33,8 @@ export default function CreateNotes() {
   const option = params.get("option");
   const user = useUserStore((state) => state.user);
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
+  const loading = useLoadingStore((state) => state.loading);
+  const setLoading = useLoadingStore((state) => state.setLoading);
 
   const [files, setFiles] = useState<File[]>([]);
 
@@ -57,7 +59,7 @@ export default function CreateNotes() {
         role: user?.role || "",
         email: user?.email || "",
       },
-      files: [],
+      files: [{}] as [{ id: string; name: string; size: number; type: string; url: string }],
     };
 
     // 1. Najskôr poznámku bez files, dostaneš noteId
@@ -73,6 +75,12 @@ export default function CreateNotes() {
     let uploadedFiles: UploadedFile[] = [];
     try {
       for (const file of files) {
+        if (!user) {
+          toast.error("User information is missing.");
+          setLoading(false);
+          return;
+        }
+
         const publicUrl = await uploadFileToNotesBucket(file, user.id, noteId);
         if (publicUrl) {
           uploadedFiles.push({

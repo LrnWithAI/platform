@@ -57,8 +57,6 @@ export default function Library() {
       setLoading(true);
       if (!user) return;
       const response = await getTestsByUserId(user?.id);
-      console.log("tests response ", response);
-      console.log("user id", user?.id);
       if (response.success) {
         setTests(response.data);
         toast.success("Tests fetched successfully!");
@@ -188,8 +186,8 @@ export default function Library() {
               >
                 {orderOptionForTests
                   ? orderOptions.find(
-                      (option) => option.value === orderOptionForTests
-                    )?.label
+                    (option) => option.value === orderOptionForTests
+                  )?.label
                   : "Order by"}
                 <ChevronDown className="opacity-50" />
               </Button>
@@ -305,8 +303,8 @@ export default function Library() {
               >
                 {orderOptionForFlashcards
                   ? orderOptions.find(
-                      (option) => option.value === orderOptionForFlashcards
-                    )?.label
+                    (option) => option.value === orderOptionForFlashcards
+                  )?.label
                   : "Order by"}
                 <ChevronDown className="opacity-50" />
               </Button>
@@ -422,8 +420,8 @@ export default function Library() {
               >
                 {orderOptionForNotes
                   ? orderOptions.find(
-                      (option) => option.value === orderOptionForNotes
-                    )?.label
+                    (option) => option.value === orderOptionForNotes
+                  )?.label
                   : "Order by"}
                 <ChevronDown className="opacity-50" />
               </Button>

@@ -33,7 +33,11 @@ export async function getNoteById(id: number) {
 export async function deleteNote(id: number, userId: string) {
   const supabase = await createClient();
 
-  const { data, error } = await supabase.from("notes").delete().eq("id", id).eq("created_by", userId);
+  const { data, error } = await supabase
+    .from("notes")
+    .delete()
+    .eq("id", id)
+    .eq("created_by->>id", userId); // ← filterujeme podľa id v JSON
 
   if (error) {
     console.error("Error deleting note:", error.message);
