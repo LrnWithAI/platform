@@ -318,3 +318,49 @@ export async function uploadFileToFlashcardsBucket(
 
   return publicUrlData.publicUrl;
 }
+
+/* NOTES */
+export async function uploadFileToNotesBucket(
+  file: File,
+  userId: string,
+  noteId: number
+) {
+  const supabase = createClient();
+
+  const filePath = `/${userId}/${noteId}/${file.name}`;
+  const { data, error } = await supabase.storage
+    .from("notes-files")
+    .upload(filePath, file);
+
+  if (error) {
+    toast.error("Failed to upload file");
+    console.error("Failed to upload file", error);
+    return null;
+  }
+
+  const { data: publicUrlData } = supabase.storage
+    .from("notes-files")
+    .getPublicUrl(filePath);
+
+  return publicUrlData.publicUrl;
+}
+
+export async function deleteFileFromNotesBucket(
+  fileName: string,
+  userId: string,
+  noteId: number
+) {
+  const supabase = createClient();
+
+  const filePath = `/${userId}/${noteId}/notes/${fileName}`;
+  const { error } = await supabase.storage
+    .from("notes-files")
+    .remove([filePath]);
+
+  if (error) {
+    console.error("Error deleting file", error);
+    return { success: false, message: (error as Error).message };
+  }
+
+  return { success: true, message: "File deleted successfully!" };
+}

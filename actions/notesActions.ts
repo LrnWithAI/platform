@@ -7,7 +7,7 @@ import { Note } from "@/types/note";
 export async function getNotesByUserId(userId: string) {
   const supabase = await createClient();
 
-  const { data, error } = await supabase.from("notes").select("*").eq("created_by", userId).order("created_at", { ascending: false });
+  const { data, error } = await supabase.from("notes").select("*").eq("created_by->>id", userId).order("created_at", { ascending: false });
 
   if (error) {
     return { success: false, message: error.message, data: [], };
@@ -55,4 +55,18 @@ export async function createNote(note: Note) {
   }
 
   return { success: true, message: "Note created successfully", data: data[0] as Note };
+}
+
+/* UPDATE Note */
+export async function updateNote(note: Note) {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase.from("notes").update(note as Note).eq("id", note.id).select("*");
+
+  if (error) {
+    console.error("Error updating note:", error.message);
+    return { success: false, message: error.message };
+  }
+
+  return { success: true, message: "Note updated successfully", data: data[0] as Note };
 }
