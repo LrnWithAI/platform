@@ -5,11 +5,13 @@ import { useParams, useRouter } from "next/navigation";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Trash2, Eye } from "lucide-react";
+
+import { Trash2, Eye, EditIcon, CircleAlert, CircleX } from "lucide-react";
 import { toast } from "react-toastify";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import ReportDialog from "@/components/report_dialog";
 import { deleteNote, getNoteById, updateNote } from "@/actions/notesActions";
 import { uploadFileToNotesBucket, deleteFileFromNotesBucket } from "@/actions/storageActions";
 import { noteSchema } from "@/schema/note";
@@ -39,6 +41,8 @@ export default function NoteDetail() {
   const [currentFiles, setCurrentFiles] = useState<UploadedFile[]>([]); // existujúce, ešte v poznámke
   const [addedFiles, setAddedFiles] = useState<File[]>([]); // nové, neuploadnuté
   const [deletedFiles, setDeletedFiles] = useState<UploadedFile[]>([]); // ktoré existovali a budú zmazané
+
+  const [openReportDialog, setOpenReportDialog] = useState(false);
 
   const {
     register,
@@ -179,183 +183,198 @@ export default function NoteDetail() {
         <div className="flex flex-row justify-end space-x-2">
           {!isEditMode && (
             <Button onClick={() => setIsEditMode(true)} variant="outline">
-              Edit note
+              <EditIcon size={16} />
             </Button>
           )}
           {isEditMode && (
             <Button onClick={() => setIsEditMode(false)} variant="outline">
-              Cancel
+              <CircleX size={16} />
             </Button>
           )}
           <Button onClick={onDeleteNote} variant="destructive">
-            Delete Note
+            <Trash2 size={16} />
+          </Button>
+          <Button onClick={() => setOpenReportDialog(true)} variant="outline">
+            <CircleAlert size={16} />
           </Button>
         </div>
       </div>
 
-      {!isEditMode && note && (
-        <div className="max-w-2xl mt-8 w-full bg-white rounded-lg p-8 shadow border">
-          <h2 className="text-2xl font-bold mb-2">{note.title}</h2>
-          <p className="mb-4">{note.content}</p>
-          {note.files && note.files.length > 0 && (
-            <div>
-              <h3 className="font-semibold mb-2">Attachments:</h3>
-              <ul className="space-y-4">
-                {note.files.map((file: UploadedFile) => (
-                  <li key={file.id} className="flex flex-col gap-2 border-b pb-3">
-                    <div className="flex items-center gap-2">
-                      <span className="truncate max-w-[160px] font-medium">{file.name}</span>
-                      <span className="text-xs text-gray-400 ml-2">
-                        ({(file.size / 1024).toFixed(1)} KB)
-                      </span>
-                    </div>
-                    {/* Inline preview obrázka */}
-                    {file.type.startsWith("image/") && (
-                      <img
-                        src={file.url}
-                        alt={file.name}
-                        className="max-h-[260px] rounded border shadow mb-2"
-                        style={{ objectFit: "contain" }}
-                      />
-                    )}
-                    {/* Inline preview PDF */}
-                    {file.type === "application/pdf" && (
-                      <iframe
-                        src={file.url}
-                        title={file.name}
-                        className="w-full h-80 rounded border shadow"
-                      />
-                    )}
-                    {/* Pre iné typy */}
-                    {!file.type.startsWith("image/") && file.type !== "application/pdf" && (
-                      <span className="italic text-gray-500 text-xs">
-                        (Preview not supported)
-                      </span>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
+      {
+        !isEditMode && note && (
+          <div className="max-w-2xl mt-8 w-full bg-white rounded-lg p-8 shadow border">
+            <h2 className="text-2xl font-bold mb-2">{note.title}</h2>
+            <p className="mb-4">{note.content}</p>
+            {note.files && note.files.length > 0 && (
+              <div>
+                <h3 className="font-semibold mb-2">Attachments:</h3>
+                <ul className="space-y-4">
+                  {note.files.map((file: UploadedFile) => (
+                    <li key={file.id} className="flex flex-col gap-2 border-b pb-3">
+                      <div className="flex items-center gap-2">
+                        <span className="truncate max-w-[160px] font-medium">{file.name}</span>
+                        <span className="text-xs text-gray-400 ml-2">
+                          ({(file.size / 1024).toFixed(1)} KB)
+                        </span>
+                      </div>
+                      {/* Inline preview obrázka */}
+                      {file.type.startsWith("image/") && (
+                        <img
+                          src={file.url}
+                          alt={file.name}
+                          className="max-h-[260px] rounded border shadow mb-2"
+                          style={{ objectFit: "contain" }}
+                        />
+                      )}
+                      {/* Inline preview PDF */}
+                      {file.type === "application/pdf" && (
+                        <iframe
+                          src={file.url}
+                          title={file.name}
+                          className="w-full h-80 rounded border shadow"
+                        />
+                      )}
+                      {/* Pre iné typy */}
+                      {!file.type.startsWith("image/") && file.type !== "application/pdf" && (
+                        <span className="italic text-gray-500 text-xs">
+                          (Preview not supported)
+                        </span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
-          {note.created_at && (
-            <p className="mt-6 text-sm text-gray-500">
-              Created at: {new Date(note.created_at).toLocaleString()}
-            </p>
-          )}
-        </div>
-      )}
-
-      {isEditMode && (
-        <>
-          <div className="mb-8 max-w-2xl w-full">
-            <h2 className="text-2xl font-bold text-center mb-2">
-              Edit Note
-            </h2>
+            {note.created_at && (
+              <p className="mt-6 text-sm text-gray-500">
+                Created at: {new Date(note.created_at).toLocaleString()}
+              </p>
+            )}
           </div>
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="dark:bg-muted border rounded-xl p-8 space-y-6 bg-gray-100 shadow-md w-full max-w-5xl"
-          >
-            <div className="space-y-2">
-              <Label htmlFor="note-title">Title</Label>
-              <Input
-                id="note-title"
-                type="text"
-                placeholder="Enter a title"
-                {...register("title")}
-                disabled={loading}
-              />
-              {errors.title && (
-                <p className="text-sm text-red-600">{errors.title.message}</p>
-              )}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="note-content">Content</Label>
-              <textarea
-                id="note-content"
-                placeholder="Write your note here..."
-                className="border rounded-lg p-2 w-full min-h-[120px] resize-y"
-                {...register("content")}
-                disabled={loading}
-              />
-              {errors.content && (
-                <p className="text-sm text-red-600">{errors.content.message}</p>
-              )}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="note-file">Attachments</Label>
-              <Input
-                id="note-file"
-                type="file"
-                multiple
-                onChange={handleFilesAdd}
-                disabled={loading}
-              />
-              {/* Uploaded files */}
-              {currentFiles.length > 0 && (
-                <>
-                  <h3 className="mb-1 mt-2">Uploaded Files</h3>
-                  <ul className="space-y-2">
-                    {currentFiles.map(file => (
-                      <li key={file.id} className="flex items-center justify-between border p-2 rounded-lg">
-                        <div className="flex items-center gap-2 flex-1 min-w-0">
-                          <span className="truncate max-w-[120px]">{file.name}</span>
-                          <a
-                            href={file.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            title="Preview"
-                            className="text-gray-600 hover:text-purple-700"
-                          >
-                            <Eye className="w-5 h-5" />
-                          </a>
-                          <span className="text-xs text-gray-400 ml-2">
-                            ({(file.size / 1024).toFixed(1)} KB)
-                          </span>
-                        </div>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => handleRemoveCurrentFile(file)}
-                        >
-                          <Trash2 size={16} />
-                        </Button>
-                      </li>
-                    ))}
-                  </ul>
-                </>
-              )}
-              {/* New files */}
-              {addedFiles.length > 0 && (
-                <>
-                  <h3 className="mb-1 mt-2">New Files</h3>
-                  <ul className="space-y-2">
-                    {addedFiles.map(file => (
-                      <li key={file.name + file.lastModified} className="flex items-center justify-between border p-2 rounded-lg">
-                        <span className="truncate">{file.name}</span>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => handleRemoveAddedFile(file)}
-                        >
-                          <Trash2 size={16} />
-                        </Button>
-                      </li>
-                    ))}
-                  </ul>
-                </>
-              )}
-            </div>
+        )
+      }
 
-            <div className="flex justify-end mt-4">
-              <Button type="submit" disabled={loading}>
-                {loading ? "Saving..." : "Update Note"}
-              </Button>
+      {
+        isEditMode && (
+          <>
+            <div className="mb-8 max-w-2xl w-full">
+              <h2 className="text-2xl font-bold text-center mb-2">
+                Edit Note
+              </h2>
             </div>
-          </form>
-        </>
-      )}
-    </div>
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className="dark:bg-muted border rounded-xl p-8 space-y-6 bg-gray-100 shadow-md w-full max-w-5xl"
+            >
+              <div className="space-y-2">
+                <Label htmlFor="note-title">Title</Label>
+                <Input
+                  id="note-title"
+                  type="text"
+                  placeholder="Enter a title"
+                  {...register("title")}
+                  disabled={loading}
+                />
+                {errors.title && (
+                  <p className="text-sm text-red-600">{errors.title.message}</p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="note-content">Content</Label>
+                <textarea
+                  id="note-content"
+                  placeholder="Write your note here..."
+                  className="border rounded-lg p-2 w-full min-h-[120px] resize-y"
+                  {...register("content")}
+                  disabled={loading}
+                />
+                {errors.content && (
+                  <p className="text-sm text-red-600">{errors.content.message}</p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="note-file">Attachments</Label>
+                <Input
+                  id="note-file"
+                  type="file"
+                  multiple
+                  onChange={handleFilesAdd}
+                  disabled={loading}
+                />
+                {/* Uploaded files */}
+                {currentFiles.length > 0 && (
+                  <>
+                    <h3 className="mb-1 mt-2">Uploaded Files</h3>
+                    <ul className="space-y-2">
+                      {currentFiles.map(file => (
+                        <li key={file.id} className="flex items-center justify-between border p-2 rounded-lg">
+                          <div className="flex items-center gap-2 flex-1 min-w-0">
+                            <span className="truncate max-w-[120px]">{file.name}</span>
+                            <a
+                              href={file.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              title="Preview"
+                              className="text-gray-600 hover:text-purple-700"
+                            >
+                              <Eye className="w-5 h-5" />
+                            </a>
+                            <span className="text-xs text-gray-400 ml-2">
+                              ({(file.size / 1024).toFixed(1)} KB)
+                            </span>
+                          </div>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => handleRemoveCurrentFile(file)}
+                          >
+                            <Trash2 size={16} />
+                          </Button>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+                {/* New files */}
+                {addedFiles.length > 0 && (
+                  <>
+                    <h3 className="mb-1 mt-2">New Files</h3>
+                    <ul className="space-y-2">
+                      {addedFiles.map(file => (
+                        <li key={file.name + file.lastModified} className="flex items-center justify-between border p-2 rounded-lg">
+                          <span className="truncate">{file.name}</span>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => handleRemoveAddedFile(file)}
+                          >
+                            <Trash2 size={16} />
+                          </Button>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+              </div>
+
+              <div className="flex justify-end mt-4">
+                <Button type="submit" disabled={loading}>
+                  {loading ? "Saving..." : "Update Note"}
+                </Button>
+              </div>
+            </form>
+          </>
+        )
+      }
+
+      {/* Report dialog */}
+      <ReportDialog
+        type="note"
+        content_id={Number(id)}
+        isOpen={openReportDialog}
+        onClose={() => setOpenReportDialog(false)}
+      />
+    </div >
   );
 }
