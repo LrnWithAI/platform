@@ -30,7 +30,7 @@ type NoteFormInputs = z.infer<typeof noteSchema>;
 
 export default function NoteDetail() {
   const params = useParams();
-  const id = params.id;
+  const id = typeof params.id === "string" ? parseInt(params.id, 10) : undefined;
   const user = useUserStore((state) => state.user);
   const router = useRouter();
 
@@ -58,13 +58,23 @@ export default function NoteDetail() {
     const fetchNote = async () => {
       setLoading(true);
       try {
+        if (typeof id !== "number") {
+          toast.error("Invalid note ID.");
+          setLoading(false);
+          return;
+        }
+
         const res = await getNoteById(id);
         if (res.success) {
           const note = res.data;
           setNote(note);
-          setValue("title", note.title);
-          setValue("content", note.content);
-          setCurrentFiles(note.files || []);
+
+          if (note) {
+            setValue("title", note.title);
+            setValue("content", note.content);
+            setCurrentFiles(note.files || []);
+          }
+
           setAddedFiles([]);
           setDeletedFiles([]);
         } else {
@@ -108,7 +118,15 @@ export default function NoteDetail() {
     // 1. Delete files označené na zmazanie
     for (const file of deletedFiles) {
       try {
-        await deleteFileFromNotesBucket(file.name, user.id, id);
+        if (user?.id) {
+          if (id !== undefined) {
+            await deleteFileFromNotesBucket(file.name, user.id, id);
+          } else {
+            toast.error("Note ID is missing. Cannot delete file.");
+          }
+        } else {
+          toast.error("User ID is missing. Cannot delete file.");
+        }
       } catch {
         toast.error(`Failed to delete file: ${file.name}`);
       }
@@ -153,9 +171,12 @@ export default function NoteDetail() {
       // Re-fetch note
       const fresh = await getNoteById(id);
       setNote(fresh.data);
-      setCurrentFiles(fresh.data.files || []);
-      setValue("title", fresh.data.title);
-      setValue("content", fresh.data.content);
+
+      if (fresh.data) {
+        setCurrentFiles(fresh.data?.files);
+        setValue("title", fresh.data.title);
+        setValue("content", fresh.data.content);
+      }
     } else {
       toast.error(res.message || "Failed to update note.");
     }
@@ -202,7 +223,7 @@ export default function NoteDetail() {
 
       {
         !isEditMode && note && (
-          <div className="max-w-2xl mt-8 w-full bg-white rounded-lg p-8 shadow border">
+          <div className="max-w-2xl mt-8 w-full bg-sidebar rounded-lg p-8 shadow border">
             <h2 className="text-2xl font-bold mb-2">{note.title}</h2>
             <p className="mb-4">{note.content}</p>
             {note.files && note.files.length > 0 && (
@@ -265,7 +286,7 @@ export default function NoteDetail() {
             </div>
             <form
               onSubmit={handleSubmit(onSubmit)}
-              className="dark:bg-muted border rounded-xl p-8 space-y-6 bg-gray-100 shadow-md w-full max-w-5xl"
+              className="bg-sidebar border rounded-xl p-8 space-y-6 shadow-md w-full max-w-5xl"
             >
               <div className="space-y-2">
                 <Label htmlFor="note-title">Title</Label>
@@ -308,7 +329,7 @@ export default function NoteDetail() {
                     <h3 className="mb-1 mt-2">Uploaded Files</h3>
                     <ul className="space-y-2">
                       {currentFiles.map(file => (
-                        <li key={file.id} className="flex items-center justify-between border p-2 rounded-lg">
+                        <li key={file.id} className="flex items-center justify-between border p-2 rounded-lg bg-white dark:bg-black">
                           <div className="flex items-center gap-2 flex-1 min-w-0">
                             <span className="truncate max-w-[120px]">{file.name}</span>
                             <a
@@ -342,7 +363,7 @@ export default function NoteDetail() {
                     <h3 className="mb-1 mt-2">New Files</h3>
                     <ul className="space-y-2">
                       {addedFiles.map(file => (
-                        <li key={file.name + file.lastModified} className="flex items-center justify-between border p-2 rounded-lg">
+                        <li key={file.name + file.lastModified} className="flex items-center justify-between border p-2 rounded-lg bg-white dark:bg-black">
                           <span className="truncate">{file.name}</span>
                           <Button
                             variant="destructive"

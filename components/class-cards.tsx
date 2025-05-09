@@ -33,7 +33,7 @@ export function ClassesCards({ orderOption, filterOption }: { orderOption: strin
   const filteredClasses = classes.filter((card) => {
     for (const key in filterOption) {
       const filterValue = filterOption[key]?.toString().toLowerCase();
-      const cardValue = card[key];
+      const cardValue = (key in card) ? (card as Record<string, any>)[key] : undefined;
 
       // Handle the 'members' field differently
       if (key === "members" && Array.isArray(cardValue)) {
@@ -73,10 +73,16 @@ export function ClassesCards({ orderOption, filterOption }: { orderOption: strin
       // Vymazanie všetkých súborov zo všetkých príspevkov v triede z bucketu
       const classData = classes.find((c) => c.id === id);
 
+      if (!classData) return;
+
       for (const post of classData.content) {
         if (post.files && post.files.length > 0) {
           for (const file of post.files) {
-            await deleteFileFromClassContent(classData?.created_by.id, classData.id, post.id, file.name, user.id);
+            if (user) {
+              await deleteFileFromClassContent(classData?.created_by.id.toString(), classData.id, post.id, file.name, user.id);
+            } else {
+              toast.error('User is not authenticated.');
+            }
           }
         }
       }
@@ -109,9 +115,8 @@ export function ClassesCards({ orderOption, filterOption }: { orderOption: strin
       {sortedClasses.map((card) => (
         <div
           key={card.id}
-          className="relative p-5 border rounded-lg shadow bg-white hover:cursor-pointer hover:scale-105 duration-300"
+          className="relative p-5 border rounded-lg shadow bg-sidebar hover:cursor-pointer hover:scale-105 duration-300"
         >
-
           {/* Action Buttons */}
           {isTeacher(card) && (
             <div className="absolute top-2 right-2 flex gap-1">
@@ -138,8 +143,8 @@ export function ClassesCards({ orderOption, filterOption }: { orderOption: strin
                 unoptimized
               />
               <div className="ml-4 flex flex-col justify-center">
-                <p className="text-sm text-gray-700 font-bold">{card.class_time}</p>
-                <p className="text-sm text-gray-500 mt-2">{card.members.length} {card.members.length > 1 ? "Members" : "Member"}</p>
+                <p className="text-sm text-gray-700 dark:text-gray-400 font-bold">{card.class_time}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-300 mt-2">{card.members.length} {card.members.length > 1 ? "Members" : "Member"}</p>
               </div>
             </div>
           </Link>

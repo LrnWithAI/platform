@@ -25,7 +25,7 @@ const Profile = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const { data } = await getUserProfile(username)
+        const { data } = await getUserProfile(typeof username === "string" ? username : "")
         if (data) {
           setUser(data)
           toast.success("User fetched successfully")
@@ -55,7 +55,7 @@ const Profile = () => {
   }
 
   return (
-    <div className="space-y-8 p-6 shadow-md rounded-lg bg-gray-50 w-3/4 mx-auto mt-10">
+    <div className="space-y-8 p-6 shadow-md rounded-lg bg-sidebar w-3/4 mx-auto mt-10">
       <div className="flex items-center gap-6">
         <Avatar className="w-24 h-24">
           <AvatarImage
@@ -77,7 +77,7 @@ const Profile = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="p-4 bg-gray-100 rounded-lg">
+        <div className="p-4 bg-gray-100 dark:bg-secondary rounded-lg">
           <h2 className="text-lg font-semibold mb-2">Contact Information</h2>
 
           <div className="flex justify-between items-center gap-2">
@@ -123,7 +123,7 @@ const Profile = () => {
           </div>
         </div>
 
-        <div className="p-4 bg-gray-100 rounded-lg max-h-60 overflow-y-auto">
+        <div className="p-4 bg-gray-100 dark:bg-secondary rounded-lg max-h-60 overflow-y-auto">
           <h2 className="text-lg font-semibold mb-2">About Me</h2>
           <p className="whitespace-pre-line">
             {user?.bio || "No information available"}
@@ -144,32 +144,32 @@ const Profile = () => {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="whatido" className="p-4 bg-gray-50 rounded-md">
+        <TabsContent value="whatido" className="p-4 bg-gray-50 dark:bg-secondary rounded-md">
           <p className="whitespace-pre-line">
             {user?.whatIDo || "No information available"}
           </p>
         </TabsContent>
 
-        <TabsContent value="announcements" className="p-4 bg-gray-50 rounded-md">
+        <TabsContent value="announcements" className="p-4 bg-gray-50 dark:bg-secondary rounded-md">
           <p className="whitespace-pre-line">
             {user?.announcements || "No information available"}
           </p>
         </TabsContent>
 
-        <TabsContent value="files" className="p-4 bg-gray-50 rounded-md">
+        <TabsContent value="files" className="p-4 bg-gray-50 dark:bg-secondary rounded-md">
           {user?.files && user.files.length > 0 ? (
             <ul className="space-y-2">
               {user.files.map((file: UploadedFile) => (
                 <li
                   key={file.id}
-                  className="flex items-center justify-between border p-2 rounded-md"
+                  className="flex items-center justify-between border bg-sidebar p-2 rounded-md"
                 >
                   <span className="truncate">{file.name}</span>
                   <button
                     className="text-blue-600 hover:underline"
                     onClick={() => handleDownloadFile(file.url, file.name)}
                   >
-                    <Download className="h-4 w-4 text-purple" />
+                    <Download className="h-4 w-4 text-purple hover:text-violet-500" />
                   </button>
                 </li>
               ))}

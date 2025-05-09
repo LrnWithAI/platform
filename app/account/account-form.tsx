@@ -56,11 +56,12 @@ export default function AccountForm({ user }: { user: User }) {
   // Pôvodné existujúce súbory 
   const [initialFiles, setInitialFiles] = useState<UploadedFile[]>([]);
   // Stav pre súbory – nový aj existujúce
-  const [files, setFiles] = useState<File[]>([]);
+  const [files, setFiles] = useState<(File | UploadedFile)[]>([]);
 
   const fetchUserData = async () => {
     setLoading(true);
-    const response = await getUserProfile(user?.username);
+    const response = await getUserProfile(user?.username ?? "");
+
     if (response.success) {
       const data = response.data;
       setValue("firstName", data?.first_name || "");
@@ -103,7 +104,13 @@ export default function AccountForm({ user }: { user: User }) {
       announcements: data.announcements,
     };
 
-    const response = await updateUserProfile(user?.id, updateData);
+    if (!user?.id) {
+      toast.error("User ID is missing.");
+      setLoading(false);
+      return;
+    }
+
+    const response = await updateUserProfile(user.id, updateData);
     if (!response.success) {
       toast.error("Error updating profile.");
       setLoading(false);
@@ -159,7 +166,7 @@ export default function AccountForm({ user }: { user: User }) {
           toast.success("Files uploaded and saved successfully!");
           // Aktualizácia stavu – nová verzia súborov sa uloží do stavu
           setInitialFiles(updatedFiles);
-          setFiles(updatedFiles);
+          setFiles(updatedFiles as (File | UploadedFile)[]);
         } else {
           toast.error("Failed to update file attachments");
         }
@@ -177,7 +184,7 @@ export default function AccountForm({ user }: { user: User }) {
       if (fileUpdateRes?.success) {
         toast.success("Profile updated with remaining files successfully!");
         setInitialFiles(remainingFiles as UploadedFile[]);
-        setFiles(remainingFiles);
+        setFiles(remainingFiles as (File | UploadedFile)[]);
       } else {
         toast.error("Failed to update file attachments");
       }
@@ -197,13 +204,13 @@ export default function AccountForm({ user }: { user: User }) {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="space-y-8 p-6 shadow-md rounded-lg bg-gray-50 w-3/4 mx-auto mt-10"
+      className="space-y-8 p-6 shadow-xl rounded-lg bg-sidebar 0 w-3/4 mx-auto mt-10"
     >
       <div>
         <Label className="text-md">Avatar</Label>
         <div className="flex flex-row mt-2">
           <Avatar
-            uid={user?.id}
+            uid={user?.id ?? null}
             url={avatarUrl}
             size={100}
             onUpload={(url) => setAvatarUrl(url)}
@@ -314,7 +321,7 @@ export default function AccountForm({ user }: { user: User }) {
                   ) as UploadedFile[]).map((file) => (
                     <li
                       key={file.id}
-                      className="flex items-center justify-between border p-2 rounded-lg"
+                      className="flex items-center justify-between border p-2 rounded-lg bg-white dark:bg-black"
                     >
                       <span className="truncate">{file.name}</span>
                       <Button

@@ -66,7 +66,7 @@ const Class = () => {
           for (const post of classData.content) {
             if (post.files && post.files.length > 0) {
               for (const file of post.files) {
-                response = await deleteFileFromClassContent(classData?.created_by.id, classData.id, post.id, file.name, user.id);
+                response = await deleteFileFromClassContent(classData?.created_by.id.toString(), classData.id, post.id, file.name, user.id);
               }
             }
           }
@@ -142,7 +142,7 @@ const Class = () => {
 
   return (
     <div className="flex flex-1 flex-col gap-4 p-8">
-      <div className="bg-stone-200 rounded-lg flex justify-between p-4">
+      <div className="bg-sidebar rounded-lg flex justify-between p-4">
         <div>
           <h1 className="text-2xl">{classData?.title}</h1>
           <strong>{classData?.name}</strong>
@@ -190,7 +190,7 @@ const Class = () => {
         </div>
       </div>
 
-      <Tabs defaultValue="dashboard" className="w-full min-h-screen bg-stone-200 rounded-lg p-4">
+      <Tabs defaultValue="dashboard" className="w-full min-h-screen bg-sidebar rounded-lg p-4">
         <TabsList className='mb-3'>
           <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
           <TabsTrigger value="members">Members</TabsTrigger>
@@ -201,7 +201,7 @@ const Class = () => {
           {classData?.content ? (
             <ClassDashboard />
           ) : (
-            <p>Loading dashboard...</p>
+            <p className="text-gray-500">No posts in class yet</p>
           )}
         </TabsContent>
 
@@ -209,12 +209,16 @@ const Class = () => {
           {classData?.members ? (
             <ClassMembers />
           ) : (
-            <p>Loading members...</p>
+            <p className="text-gray-500">No members in class yet</p>
           )}
         </TabsContent>
 
         <TabsContent value="files">
-          <ClassFiles />
+          {classData?.content?.some(post => post.files && post.files.length > 0) ? (
+            <ClassFiles />
+          ) : (
+            <p className="text-gray-500">No files in class yet</p>
+          )}
         </TabsContent>
       </Tabs>
 

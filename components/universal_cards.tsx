@@ -101,7 +101,7 @@ export function Cards({
       {sortedData.map((card) => (
         <div
           key={card.id}
-          className="relative p-5 border rounded-lg shadow bg-white hover:cursor-pointer hover:scale-105 duration-300"
+          className="relative p-5 border rounded-lg shadow bg-sidebar hover:cursor-pointer hover:scale-105 duration-300"
         >
           {/* Tlačidlo pre odstránenie */}
           <div className="absolute top-2 right-2 flex gap-1">
@@ -128,7 +128,7 @@ export function Cards({
                 unoptimized
               />
               <div className="ml-4 flex flex-col justify-center">
-                <p className="text-sm text-gray-700 font-bold">
+                <p className="text-sm text-gray-700 dark:text-gray-400 font-bold">
                   {new Date(card.created_at).toLocaleDateString("en-US", {
                     year: "numeric",
                     month: "long",

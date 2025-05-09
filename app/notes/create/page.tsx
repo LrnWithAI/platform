@@ -118,7 +118,7 @@ export default function CreateNotes() {
       </div>
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="dark:bg-muted border rounded-xl p-8 space-y-6 bg-gray-100 shadow-md w-full max-w-5xl"
+        className="bg-sidebar border rounded-xl p-8 space-y-6 shadow-md w-full max-w-5xl"
       >
         <div className="space-y-2">
           <Label htmlFor="note-title">Title</Label>
@@ -163,7 +163,7 @@ export default function CreateNotes() {
               <h3 className="mb-1 mt-2">Files to Upload</h3>
               <ul className="mt-2 space-y-2">
                 {files.map((file) => (
-                  <li key={file.name + file.lastModified} className="flex items-center justify-between border p-2 rounded-lg">
+                  <li key={file.name + file.lastModified} className="flex items-center justify-between border p-2 rounded-lg bg-white dark:bg-black">
                     <span className="truncate">{file.name}</span>
                     <Button
                       variant="destructive"

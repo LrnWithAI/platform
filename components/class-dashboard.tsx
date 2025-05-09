@@ -283,7 +283,7 @@ const ClassDashboard = () => {
       <div>
         {classData && classData.content?.length > 0 ? (
           classData.content.map((post) => (
-            <div className="mt-5 first:mt-0 bg-white rounded-lg shadow-lg p-6 pe-16 relative">
+            <div className="mt-5 first:mt-0 bg-gray-100 dark:bg-secondary rounded-lg shadow-lg p-6 pe-16 relative">
               <div className='flex items-center gap-4'>
                 <Avatar className="cursor-pointer hover:opacity-75" onClick={() => { router.push(`/profile/${post.created_by.username}`) }}>
                   <AvatarImage
@@ -298,7 +298,7 @@ const ClassDashboard = () => {
                 </div>
               </div>
 
-              <div key={post.id} className="flex items-center justify-between border-b pb-3 last:border-none">
+              <div key={post.id} className="flex items-center justify-between border-b pb-3 last:border-none dark:border-gray-500">
                 <div>
                   <p className="py-5 whitespace-pre-line">{post.content}</p>
                   <p className="text-gray-500">Created at: {formatDate(post.created_at)}</p>
@@ -348,7 +348,7 @@ const ClassDashboard = () => {
             </div>
           ))
         ) : (
-          <p className="text-gray-500">Empty dashboard.</p>
+          <p className="text-gray-500">Empty dashboard</p>
         )}
       </div>
 

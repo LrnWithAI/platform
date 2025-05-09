@@ -15,13 +15,13 @@ const ClassFiles = () => {
       {/* Iterate over all posts in the class */}
       {classData?.content.map((post) => (
         post.files.length > 0 && (
-          <div key={post.id} className="bg-white p-6 rounded-lg shadow-lg space-y-4">
-            <h2 className="text-2xl font-semibold text-gray-800">{post.title}</h2>
+          <div key={post.id} className="bg-gray-100 dark:bg-secondary p-6 rounded-lg shadow-lg space-y-4">
+            <h2 className="text-2xl font-semibold text-gray-800 dark:text-white">{post.title}</h2>
 
             {/* Iterate over all files in the post */}
             <div className="space-y-2">
               {post.files.map((file) => (
-                <div key={file.id} className="flex items-center space-x-4 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200">
+                <div key={file.id} className="flex items-center space-x-4 p-3 rounded-lg bg-white dark:bg-sidebar hover:bg-gray-50 dark:hover:bg-black transition-colors duration-200">
                   <ExternalLink className="text-gray-600" size={20} />
                   <a
                     href={file.url}

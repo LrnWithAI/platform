@@ -185,7 +185,7 @@ const ClassMembers = () => {
         }
       </div>
 
-      <div className="bg-white p-6 rounded-lg shadow-lg">
+      <div className="bg-gray-100 dark:bg-secondary p-6 rounded-lg shadow-lg">
         <h2 className="text-2xl font-bold mb-4">Students</h2>
         {students.length > 0 ? (
           <div className="space-y-4">
