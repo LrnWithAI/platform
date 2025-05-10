@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { FlashcardsSet } from "@/types/flashcards";
 import FlashcardsCard from "@/components/flashcards-card";
 import { Button } from "@/components/ui/button";
+import { insertOrUpdateStarredFlashcards } from "@/actions/flashcardsActions";
 
 type Props = {
   flashcardsSet: FlashcardsSet;
@@ -11,6 +12,8 @@ type Props = {
 
 export default function FlashcardsCardsStack({ flashcardsSet }: Props) {
   const flashcards = flashcardsSet?.flashcards || [];
+  const flashcardsId = flashcardsSet?.id;
+  const userId = flashcardsSet?.created_by;
   const [currentIndex, setCurrentIndex] = useState(0);
   const [starredCards, setStarredCards] = useState<Set<number>>(new Set());
   const [showBack, setShowBack] = useState(false);
@@ -40,7 +43,7 @@ export default function FlashcardsCardsStack({ flashcardsSet }: Props) {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [currentIndex]);
+  }, [currentIndex, starredCards]);
 
   const handleNext = () => {
     if (currentIndex < flashcards.length - 1) {
@@ -54,14 +57,42 @@ export default function FlashcardsCardsStack({ flashcardsSet }: Props) {
     }
   };
 
-  const toggleStar = (index: number) => {
+  const toggleStar = async (index: number) => {
     const updatedStarredCards = new Set(starredCards);
+
     if (updatedStarredCards.has(index)) {
       updatedStarredCards.delete(index);
     } else {
       updatedStarredCards.add(index);
     }
+
     setStarredCards(updatedStarredCards);
+
+    // Construct the JSONB array in the desired format
+    const starredJsonb = flashcards.map((flashcard, idx) => ({
+      question_id: flashcard.id,
+      is_starred: updatedStarredCards.has(idx),
+    }));
+
+    // Call the API to insert or update the starred flashcards
+    if (flashcardsId && userId) {
+      try {
+        const response = await insertOrUpdateStarredFlashcards(
+          flashcardsId,
+          userId,
+          starredJsonb
+        );
+
+        if (!response.success) {
+          console.error("Error syncing starred flashcards:", response.message);
+        }
+      } catch (error) {
+        console.error(
+          "Unexpected error while syncing starred flashcards:",
+          error
+        );
+      }
+    }
   };
 
   const flip = () => {

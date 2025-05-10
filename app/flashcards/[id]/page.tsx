@@ -71,6 +71,8 @@ const FlashcardsPage = () => {
     }
   }
 
+  // TODO: add fetchStarredFlashcards and utilize them
+
   const {
     register: registerEdit,
     handleSubmit: handleSubmitEdit,
