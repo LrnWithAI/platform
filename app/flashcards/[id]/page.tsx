@@ -23,7 +23,7 @@ import {
   getFlashcardsSetById,
   deleteFlashcardsSet,
   updateFlashcardsSet,
-  createFlashcardsSubmission,
+  getStarredFlashcardsBySetId,
 } from "@/actions/flashcardsActions";
 import { FlashcardsSet } from "@/types/flashcards";
 import { useUserStore } from "@/stores/userStore";
@@ -32,7 +32,7 @@ import { flashcardsSchema } from "@/schema/flashcards";
 
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { FlashcardsSubmission } from "@/types/flashcards";
+import { StarredFlashcards } from "@/types/flashcards";
 import { uploadFileToFlashcardsBucket } from "@/actions/storageActions";
 import FlashcardsCardsStack from "@/components/flashcards-cards-stack";
 
@@ -46,6 +46,9 @@ const FlashcardsPage = () => {
   const [flashcardsSet, setFlashcardsSet] = useState<FlashcardsSet | null>(
     null
   );
+  const [starredFlashcards, setStarredFlashcards] = useState<
+    StarredFlashcards[]
+  >([]);
   const [isEditMode, setIsEditMode] = useState(false);
   const [isFlashcardsLoaded, setIsFlashcardsLoaded] = useState(false);
 
@@ -68,6 +71,29 @@ const FlashcardsPage = () => {
       }
     } catch (error) {
       toast.error("An error occurred while fetching flashcards.");
+    }
+  }
+
+  // TODO: add fetchStarredFlashcards and utilize them
+  async function fetchStarredFlashcards() {
+    const userId = user?.id;
+
+    if (!userId) return; // Wait until userId is available
+
+    try {
+      const response = await getStarredFlashcardsBySetId(
+        flashcardsId,
+        userId as string
+      );
+
+      if (response.success) {
+        setStarredFlashcards(response.data?.flashcards_starred);
+        console.log("starred flashcards", response.data?.flashcards_starred);
+      } else {
+        toast.error(response.message || "Failed to fetch starred flashcards.");
+      }
+    } catch (error) {
+      toast.error("An error occurred while fetching starred flashcards.");
     }
   }
 
@@ -132,8 +158,11 @@ const FlashcardsPage = () => {
   };
 
   useEffect(() => {
-    fetchFlashcardsSetById();
-  }, [params]);
+    if (user?.id) {
+      fetchFlashcardsSetById();
+      fetchStarredFlashcards();
+    }
+  }, [params, user]);
 
   useEffect(() => {
     if (flashcardsSet && !isFlashcardsLoaded) {
@@ -298,7 +327,10 @@ const FlashcardsPage = () => {
           </div>
 
           {flashcardsSet && (
-            <FlashcardsCardsStack flashcardsSet={flashcardsSet} />
+            <FlashcardsCardsStack
+              flashcardsSet={flashcardsSet}
+              starredFlashcards={starredFlashcards}
+            />
           )}
         </div>
       ) : (

@@ -23,3 +23,8 @@ export type FlashcardsSubmission = {
   starred_card_ids: number[]; // Array of card IDs the user starred
   submitted_at?: string;
 };
+
+export type StarredFlashcards = {
+  is_starred: boolean;
+  question_id: number;
+};

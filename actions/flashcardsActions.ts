@@ -126,95 +126,105 @@ export async function deleteFlashcardsSet(
   return { success: true, message: "Flashcards set deleted" };
 }
 
-/* --- FLASHCARDS SUBMISSIONS --- */
+/* FLASHCARDS starred */
 
-/* GET Submissions by Flashcards Set ID */
-export async function getFlashcardsSubmissionsBySetId(flashcardsId: number) {
+/* POST insert starred flashcards to table flashcards-starred */
+/* Table looks like this:
+ * id , flashcards_id, created_at, created_by, flashcards_starred,
+ * flashcards_starred is jsonb that cound store question id and starred option true/false
+ * */
+export async function insertOrUpdateStarredFlashcards(
+  flashcardsId: number,
+  userId: string,
+  starredFlashcards: any
+) {
   const supabase = await createClient();
 
-  const { data, error } = await supabase
-    .from("flashcards-submissions")
-    .select(`*`)
-    .eq("flashcards_id", flashcardsId);
+  try {
+    // Fetch existing entry
+    const { data: existingEntry, error: fetchError } = await supabase
+      .from("flashcards-starred")
+      .select("id")
+      .eq("flashcards_id", flashcardsId)
+      .eq("created_by", userId)
+      .single();
 
-  if (error) {
-    console.error("Error fetching flashcards submissions:", error.message);
-    return { success: false, message: error.message, data: [] };
+    if (fetchError && fetchError.code !== "PGRST116") {
+      // If the error is not "Row not found", log it and return
+      console.error("Error fetching starred flashcards:", fetchError.message);
+      return { success: false, message: fetchError.message };
+    }
+
+    let data, error;
+
+    if (existingEntry) {
+      // Update existing entry
+      ({ data, error } = await supabase
+        .from("flashcards-starred")
+        .update({
+          flashcards_starred: starredFlashcards,
+        })
+        .eq("id", existingEntry.id)
+        .select("id")
+        .single());
+    } else {
+      // Insert new entry
+      ({ data, error } = await supabase
+        .from("flashcards-starred")
+        .insert([
+          {
+            flashcards_id: flashcardsId,
+            created_by: userId,
+            flashcards_starred: starredFlashcards,
+          },
+        ])
+        .select("id")
+        .single());
+    }
+
+    if (error) {
+      console.error(
+        "Error inserting/updating starred flashcards:",
+        error.message
+      );
+      return { success: false, message: error.message };
+    }
+
+    return {
+      success: true,
+      message: existingEntry
+        ? "Starred flashcards updated"
+        : "Starred flashcards inserted",
+      data,
+    };
+  } catch (err) {
+    console.error("Unexpected error:", err);
+    return { success: false, message: "Unexpected error occurred" };
   }
-
-  return {
-    success: true,
-    message: "Flashcards submissions fetched",
-    data,
-  };
 }
 
-/* CREATE Flashcards Submission */
-export async function createFlashcardsSubmission(
-  submission: FlashcardsSubmission
+/* GET starred flashcards by flashcards set id*/
+export async function getStarredFlashcardsBySetId(
+  flashcardsId: number,
+  userId: string
 ) {
   const supabase = await createClient();
 
   const { data, error } = await supabase
-    .from("flashcards-submissions")
-    .insert([submission])
-    .select("id")
-    .single();
-
-  if (error) {
-    console.error("Error creating flashcards submission:", error.message);
-    return { success: false, message: error.message, submissionId: null };
-  }
-
-  return {
-    success: true,
-    message: "Flashcards submission created",
-    submissionId: data?.id || null,
-  };
-}
-
-/* GET Flashcards Submission by ID */
-export async function getFlashcardsSubmissionById(submissionId: number) {
-  const supabase = await createClient();
-
-  const { data, error } = await supabase
-    .from("flashcards-submissions")
+    .from("flashcards-starred")
     .select("*")
-    .eq("id", submissionId)
+    .eq("flashcards_id", flashcardsId)
+    .eq("created_by", userId)
     .single();
 
   if (error) {
-    console.error("Error fetching flashcards submission:", error.message);
-    return null;
+    console.error("Error fetching starred flashcards:", error.message);
+    return { success: false, message: error.message, data: null };
   }
 
   return {
     success: true,
-    message: "Flashcards submission fetched",
-    data,
-  };
-}
-
-/* GET Submissions by User ID */
-export async function getFlashcardsSubmissionsByUserId(userId: string) {
-  const supabase = await createClient();
-
-  const { data, error } = await supabase
-    .from("flashcards-submissions")
-    .select(`*`)
-    .eq("user_id", userId);
-
-  if (error) {
-    console.error(
-      "Error fetching flashcards submissions by user ID:",
-      error.message
-    );
-    return { success: false, message: error.message, data: [] };
-  }
-
-  return {
-    success: true,
-    message: "User's flashcards submissions fetched",
+    message: "Starred flashcards fetched",
     data,
   };
 }
