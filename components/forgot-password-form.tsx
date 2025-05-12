@@ -4,13 +4,13 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { forgotPasswordSchema } from "@/schema/forgotPassword";
 import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { forgotPassword } from "@/actions/authActions";
 
@@ -57,7 +57,7 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
               <Input
                 id="email"
                 type="email"
-                placeholder="m@example.com"
+                placeholder="mail@example.com"
                 {...register("email")}
               />
               {errors.email && (
@@ -79,10 +79,10 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
           </form>
         </CardContent>
       </Card>
-      <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-primary">
+      {/* <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-primary">
         By clicking send, you agree to our <a href="#">Terms of Service</a> and{" "}
         <a href="#">Privacy Policy</a>.
-      </div>
+      </div> */}
     </div>
   );
 }

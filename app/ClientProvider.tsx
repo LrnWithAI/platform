@@ -1,19 +1,16 @@
 "use client";
 
 import { useEffect } from "react";
+import { toast } from "react-toastify";
+import { LoaderCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/utils/supabase/client";
-import { LoaderCircle } from "lucide-react";
 
 import { type User } from "@supabase/supabase-js";
 import { useUserStore } from "@/stores/userStore";
 import { useLoadingStore } from "@/stores/loadingStore";
-import { toast } from "react-toastify";
 
-export default function ClientProvider({
-  user,
-  children,
-}: {
+export default function ClientProvider({ user, children }: {
   user: User;
   children: React.ReactNode;
 }) {

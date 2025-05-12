@@ -87,13 +87,34 @@
   }
 }
 
-
-
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Skryva prekladovú lištu Google Translate */
+.skiptranslate {
+  display: none !important;
+}
+
+body>.goog-te-banner-frame {
+  display: none !important;
+}
+
+body {
+  top: 0px !important;
+}
+
+/* Skryva vložený iframe prekladovej lišty */
+.goog-te-banner-frame.skiptranslate {
+  display: none !important;
+}
+
+html {
+  margin-top: 0px !important;
 }

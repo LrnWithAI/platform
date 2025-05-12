@@ -10,11 +10,10 @@ import { Button } from "@/components/ui/button";
 
 import { ModeToggle } from "./color-mode-switcher";
 import { UserOptions } from "./user-options";
-import {
-  CreateOptionsLoggedIn,
-  CreateOptionsLoggedOut,
-} from "./create-options";
+import { CreateOptionsLoggedIn, CreateOptionsLoggedOut } from "./create-options";
 import NavLogo from "./nav-logo";
+import GoogleTranslateCustom from "./GoogleTranslateCustom";
+import GoogleTranslateInit from "./GoogleTranslateInit";
 
 export const NavHeaderLoggedIn = () => {
   const pathname = usePathname();
@@ -34,6 +33,8 @@ export const NavHeaderLoggedIn = () => {
       </div>
 
       <div className="flex items-center gap-3 md:pr-4">
+        <GoogleTranslateInit />
+        <GoogleTranslateCustom />
         <ModeToggle />
         <CreateOptionsLoggedIn />
         <UserOptions />
@@ -50,6 +51,8 @@ export const NavHeaderLoggedOut = () => {
       </div>
 
       <div className="flex items-center gap-3 md:pr-4">
+        <GoogleTranslateInit />
+        <GoogleTranslateCustom />
         <ModeToggle />
         <CreateOptionsLoggedOut />
         <Button

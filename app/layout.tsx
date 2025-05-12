@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { ToastContainer } from "react-toastify";
 
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { NavHeaderLoggedIn, NavHeaderLoggedOut } from "@/components/nav-header";
 import { AppSidebar } from "@/components/app-sidebar";
-
-import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { createClient } from "@/utils/supabase/server";
-import { ToastContainer } from "react-toastify";
 import ClientProvider from "./ClientProvider";
+
+import "./globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,19 +26,13 @@ export const metadata: Metadata = {
   description: "Make learning fun & easier with AI",
 };
 
-export default async function RootLayout({
-  children,
-}: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
 
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
