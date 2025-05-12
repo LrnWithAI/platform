@@ -6,7 +6,7 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { Trash2, Eye, EditIcon, CircleAlert, CircleX } from "lucide-react";
+import { Trash2, Eye, EditIcon, CircleAlert, CircleX, Download } from "lucide-react";
 import { toast } from "react-toastify";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -17,6 +17,8 @@ import { uploadFileToNotesBucket, deleteFileFromNotesBucket } from "@/actions/st
 import { noteSchema } from "@/schema/note";
 import { useUserStore } from "@/stores/userStore";
 import { useLoadingStore } from "@/stores/loadingStore";
+import { PDFDownloadLink } from '@react-pdf/renderer';
+import { NotePDFDocument } from '@/components/pdf/NotePDFDocument';
 
 type UploadedFile = {
   id: string;
@@ -215,6 +217,18 @@ export default function NoteDetail() {
           <Button onClick={onDeleteNote} variant="destructive">
             <Trash2 size={16} />
           </Button>
+          {note && user && (
+            <PDFDownloadLink
+              document={<NotePDFDocument note={note} user={user} />}
+              fileName={`note-${id}.pdf`}
+            >
+              {({ loading }) => (
+                <Button variant="outline">
+                  <Download size={16} />
+                </Button>
+              )}
+            </PDFDownloadLink>
+          )}
           <Button onClick={() => setOpenReportDialog(true)} variant="outline">
             <CircleAlert size={16} />
           </Button>
@@ -225,7 +239,7 @@ export default function NoteDetail() {
         !isEditMode && note && (
           <div className="max-w-2xl mt-8 w-full bg-sidebar rounded-lg p-8 shadow border">
             <h2 className="text-2xl font-bold mb-2">{note.title}</h2>
-            <p className="mb-4">{note.content}</p>
+            <p className="mb-4 whitespace-pre-line">{note.content}</p>
             {note.files && note.files.length > 0 && (
               <div>
                 <h3 className="font-semibold mb-2">Attachments:</h3>
