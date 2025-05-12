@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { flashcardsSchema } from "@/schema/flashcards";
 import { useForm, useFieldArray } from "react-hook-form";
 import { useState } from "react";
-import CreateTestWithAIForm from "@/components/test-create-with-ai";
+import CreateFlashcardsWithAIForm from "@/components/flashcards-create-with-ai";
 
 import { useSearchParams } from "next/navigation";
 import { Label } from "@/components/ui/label";
@@ -231,7 +231,7 @@ export default function CreateFlashcards() {
           </div>
         </form>
       ) : option === "withAI" ? (
-        <CreateTestWithAIForm />
+        <CreateFlashcardsWithAIForm />
       ) : (
         <p>Bad option provided</p>
       )}
