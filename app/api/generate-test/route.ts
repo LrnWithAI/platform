@@ -41,7 +41,7 @@ Return the questions in JSON format using the following structure:
   }
 ]
 
-Questions should be relevant to the text and should be in the same language as the text is so if the text is in Slovak the questions should be in Slovak too.
+Questions should be relevant to the text and should be in the same language as the text is so if the text is in Slovak the questions should be in Slovak too. Don't include "based on the text" in the questions e.g. "Based on the text, what is the capital of France?" should be "What is the capital of France?".
 
 # Text:
 
