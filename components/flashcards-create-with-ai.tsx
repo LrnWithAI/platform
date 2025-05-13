@@ -27,7 +27,7 @@ import { toast } from "react-toastify";
 
 import { createFlashcards } from "@/actions/flashcardsActions";
 import { useUserStore } from "@/stores/userStore";
-import { uploadFileToFlashcardsBucket } from "@/actions/storageActions";
+import { uploadFileToFlashcardsFilesBucket } from "@/actions/storageActions";
 
 type FileUploadFormValues = {
   uploadedFile: File[];
@@ -71,11 +71,10 @@ const CreateFlashcardsWithAIForm = () => {
     const uploadedFile = files[0]; // Only support single file upload
 
     try {
-      const publicUrl = await uploadFileToFlashcardsBucket(
+      const publicUrl = await uploadFileToFlashcardsFilesBucket(
         uploadedFile,
         user?.id as string,
-        createdFlashcardsId as number,
-        69420
+        createdFlashcardsId as number
       );
       if (publicUrl) {
         setFileValue("uploadedFile", files, { shouldValidate: true });
