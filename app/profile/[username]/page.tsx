@@ -25,7 +25,11 @@ const Profile = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const { data } = await getUserProfile(typeof username === "string" ? username : "")
+        if (!user?.id) {
+          toast.error("User ID is missing.");
+          return;
+        }
+        const { data } = await getUserProfile(user.id)
         if (data) {
           setUser(data)
           toast.success("User fetched successfully")

@@ -4,22 +4,20 @@ import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 import { addStudentToClass } from "./classActions";
 
-/* Register */
-export async function register(formData: FormData) {
+/* Insert Profile into public schema */
+export async function createProfile(user: any) {
   const supabase = await createClient();
 
-  try {
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
+  const { error } = await supabase.from("profiles").insert({
+    id: user.id,
+    email: user.email,
+    first_name: user.user_metadata.first_name,
+    last_name: user.user_metadata.last_name,
+    full_name: user.user_metadata.full_name,
+  });
 
-    const { error } = await supabase.auth.signUp({ email, password });
-
-    if (error) throw new Error(error.message);
-
-    return { success: true, message: "Registration successful!" };
-  } catch (error) {
-    console.error("Error registering user:", error);
-    return { success: false, message: (error as Error).message };
+  if (error) {
+    console.error("Error creating profile:", error.message);
   }
 }
 

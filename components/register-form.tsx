@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
-import { register } from "@/actions/authActions";
+import { register } from "@/actions/authActionsClient";
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
@@ -40,7 +40,7 @@ export function RegisterForm({ className, ...props }: React.ComponentPropsWithou
 
       if (res.success) {
         toast.success(res.message);
-        router.push("/account");
+        toast.info("Please check your email to verify your account.");
       } else {
         toast.error(res.message);
       }

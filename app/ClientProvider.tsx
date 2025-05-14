@@ -9,39 +9,59 @@ import { createClient } from "@/utils/supabase/client";
 import { type User } from "@supabase/supabase-js";
 import { useUserStore } from "@/stores/userStore";
 import { useLoadingStore } from "@/stores/loadingStore";
+import { createProfile } from "@/actions/authActions";
 
 export default function ClientProvider({ user, children }: {
-  user: User;
+  user: User | null;
   children: React.ReactNode;
 }) {
   const supabase = createClient();
   const setUser = useUserStore((state) => state.setUser);
   const loading = useLoadingStore((state) => state.loading);
 
-  const getProfile = async () => {
+  const getOrCreateProfile = async (user: User) => {
     try {
       const { data, error, status } = await supabase
         .from("profiles")
-        .select(`*`)
+        .select("*")
         .eq("id", user?.id)
         .single();
 
-      if (error && status !== 406) {
+      if (error && status !== 406 && status !== 400) {
         toast.error(error.message);
         throw error;
       }
 
-      if (data) {
+      if (!data) {
+        await createProfile(user);
+
+        const { data: insertedProfile, error: readError } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", user.id)
+          .single();
+
+        if (readError || !insertedProfile) {
+          toast.error("Profile was created but cannot be read.");
+          return;
+        }
+
+        setUser(insertedProfile);
+      } else {
         setUser(data);
       }
+
     } catch (error) {
-      alert("Error loading user data!");
+      console.error("Error loading or creating user profile:", error);
+      toast.error("Error loading user profile.");
     }
   };
 
   useEffect(() => {
-    getProfile();
-  }, [user, setUser]);
+    if (user && user.id) {
+      getOrCreateProfile(user);
+    }
+  }, [user]);
 
   return (
     <>

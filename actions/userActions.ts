@@ -3,11 +3,11 @@
 import { createClient } from "@/utils/supabase/server";
 
 /* GET User */
-export const getUserProfile = async (username: string) => {
+export const getUserProfile = async (id: string) => {
   const supabase = await createClient();
 
   try {
-    const { data, error } = await supabase.from("profiles").select("*").eq("username", username).single();
+    const { data, error } = await supabase.from("profiles").select("*").eq("id", id).single();
 
     if (error) throw new Error(error.message);
 

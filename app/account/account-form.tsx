@@ -60,7 +60,13 @@ export default function AccountForm({ user }: { user: User }) {
 
   const fetchUserData = async () => {
     setLoading(true);
-    const response = await getUserProfile(user?.username ?? "");
+
+    if (!user?.id) {
+      toast.error("User ID is missing.");
+      setLoading(false);
+      return;
+    }
+    const response = await getUserProfile(user.id);
 
     if (response.success) {
       const data = response.data;
