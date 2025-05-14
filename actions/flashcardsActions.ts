@@ -29,7 +29,7 @@ export async function getFlashcardsSetById(id: number) {
     .from("flashcards")
     .select(`*`)
     .eq("id", id)
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.error("Error fetching flashcards set by ID:", error.message);
