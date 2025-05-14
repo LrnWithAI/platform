@@ -11,12 +11,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Check } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify";
 import {
@@ -27,11 +25,10 @@ import {
 } from "@/actions/flashcardsActions";
 import { FlashcardsSet } from "@/types/flashcards";
 import { useUserStore } from "@/stores/userStore";
-import { useForm, Controller, useFieldArray } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { flashcardsSchema } from "@/schema/flashcards";
 
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { StarredFlashcards } from "@/types/flashcards";
 import { uploadFileToFlashcardsBucket } from "@/actions/storageActions";
 import FlashcardsCardsStack from "@/components/flashcards-cards-stack";
