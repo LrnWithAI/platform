@@ -35,7 +35,6 @@ export default function Home() {
       setPopularClass([res.data]);
     }
 
-    console.log("popular class, ", popularClass);
     setLoading(false);
   };
 
