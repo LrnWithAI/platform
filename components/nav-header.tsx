@@ -10,7 +10,10 @@ import { Button } from "@/components/ui/button";
 
 import { ModeToggle } from "./color-mode-switcher";
 import { UserOptions } from "./user-options";
-import { CreateOptionsLoggedIn, CreateOptionsLoggedOut } from "./create-options";
+import {
+  CreateOptionsLoggedIn,
+  CreateOptionsLoggedOut,
+} from "./create-options";
 import NavLogo from "./nav-logo";
 import GoogleTranslateCustom from "./GoogleTranslateCustom";
 import GoogleTranslateInit from "./GoogleTranslateInit";
@@ -45,7 +48,7 @@ export const NavHeaderLoggedIn = () => {
 
 export const NavHeaderLoggedOut = () => {
   return (
-    <header className="flex justify-between h-16 shrink-0 items-center gap-2 border-b px-4 sticky top-0 dark:bg-sidebar bg-sidebar">
+    <header className="flex justify-between h-16 shrink-0 items-center gap-2 border-b px-4 sticky top-0 dark:bg-sidebar bg-sidebar z-20">
       <div className="flex gap-2 items-center">
         <NavLogo />
       </div>

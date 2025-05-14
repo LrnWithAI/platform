@@ -26,13 +26,19 @@ export const metadata: Metadata = {
   description: "Make learning fun & easier with AI",
 };
 
-export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+    <html lang="en" suppressHydrationWarning>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -50,7 +56,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
               </SidebarProvider>
             </ClientProvider>
           ) : (
-            <SidebarProvider>
+            <SidebarProvider className="flex w-full justify-center">
               <main className="w-full">
                 <NavHeaderLoggedOut />
                 {children}
