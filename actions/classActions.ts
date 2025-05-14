@@ -26,7 +26,11 @@ export async function getClassById(id: number) {
   const supabase = await createClient();
 
   try {
-    const { data, error } = await supabase.from("class").select("*").eq("id", id).single();
+    const { data, error } = await supabase
+      .from("class")
+      .select("*")
+      .eq("id", id)
+      .single();
 
     if (error) throw new Error(error.message);
 
@@ -42,11 +46,18 @@ export async function createClass(data: any) {
   const supabase = await createClient();
 
   try {
-    const { data: result, error } = await supabase.from("class").insert([data]).select("*");
+    const { data: result, error } = await supabase
+      .from("class")
+      .insert([data])
+      .select("*");
 
     if (error) throw new Error(error.message);
 
-    return { success: true, message: "Class created successfully", data: result };
+    return {
+      success: true,
+      message: "Class created successfully",
+      data: result,
+    };
   } catch (error) {
     console.error("Error creating class:", error);
     return { success: false, message: (error as Error).message };
@@ -105,4 +116,44 @@ export async function addStudentToClass(classId: number, user: object) {
     .eq("id", classId);
 
   if (updateError) throw new Error(updateError.message);
+}
+
+export async function getClassWithMostMembers() {
+  const supabase = await createClient();
+
+  try {
+    // Step 1: Fetch all classes
+    const { data: classes, error } = await supabase.from("class").select("*");
+
+    if (error || !classes) {
+      throw new Error(error?.message || "Failed to fetch classes");
+    }
+
+    // Step 2: Count members
+    const sortedByMembers = classes
+      .map((cls) => ({
+        ...cls,
+        memberCount: Array.isArray(cls.members) ? cls.members.length : 0,
+      }))
+      .sort((a, b) => b.memberCount - a.memberCount);
+
+    const mostPopular = sortedByMembers[0];
+
+    if (!mostPopular) {
+      return { success: false, message: "No classes found", data: null };
+    }
+
+    return {
+      success: true,
+      message: "Most popular class fetched successfully",
+      data: mostPopular,
+    };
+  } catch (error) {
+    console.error("Error fetching class with most members:", error);
+    return {
+      success: false,
+      message: (error as Error).message,
+      data: null,
+    };
+  }
 }
