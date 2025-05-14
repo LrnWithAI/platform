@@ -1,20 +1,18 @@
 "use client";
 
 import React from "react";
-
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Headset, LogOut, Settings, User } from "lucide-react";
-import { Separator } from "./ui/separator";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { LogOut, User } from "lucide-react";
+
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Separator } from "./ui/separator";
 import { useUserStore } from "@/stores/userStore";
 
 export function UserOptions() {
+  const router = useRouter();
+
   const user = useUserStore((state) => state.user);
 
   return (
@@ -32,7 +30,7 @@ export function UserOptions() {
         <div className="px-2 py-2">
           <div className="flex flex-col">
             <span className="text-sm font-semibold">{user?.full_name}</span>
-            <span className="text-xs text-gray-500">{user?.username}</span>
+            <span className="text-xs text-gray-5000 cursor-pointer hover:underline" onClick={() => { router.push(`/profile/${user?.username}`) }}>{user?.username}</span>
           </div>
         </div>
         <Separator className="mb-1" />
@@ -41,12 +39,6 @@ export function UserOptions() {
             <Link className="w-full flex gap-2 items-center" href="/account">
               <User /> Profile
             </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem className="cursor-pointer">
-            <Settings /> Settings
-          </DropdownMenuItem>
-          <DropdownMenuItem className="cursor-pointer">
-            <Headset /> Support
           </DropdownMenuItem>
           <Separator />
           <DropdownMenuItem asChild className="cursor-pointer">

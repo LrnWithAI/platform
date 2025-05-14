@@ -1,13 +1,13 @@
 'use client'
 
 import React, { useState } from 'react';
+import { useParams, useRouter } from 'next/navigation';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { addMemberToClassSchema } from '@/schema/addMemberToClass';
 import { useForm } from 'react-hook-form';
 
 import { Trash2, Mail, CirclePlus, SquareArrowOutUpRight } from 'lucide-react';
-import { useParams, useRouter } from 'next/navigation';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from './ui/button';
 import { Label } from './ui/label';
