@@ -9,13 +9,11 @@ export type Note = {
     role: string;
     email: string;
   };
-  files: [
-    {
-      id: string;
-      name: string;
-      size: number;
-      type: string;
-      url: string;
-    }
-  ];
+  files: {
+    id: string;
+    name: string;
+    size: number;
+    type: string;
+    url: string;
+  }[];
 }

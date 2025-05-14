@@ -237,7 +237,6 @@ export async function deleteFileFromUser(imageName: string, userId: string) {
 
 /* TESTS */
 /* POST File into tests bucket */
-
 export async function uploadFileToTestFilesBucket(
   file: File,
   userId: string,
@@ -389,4 +388,29 @@ export async function deleteFileFromNotesBucket(
   }
 
   return { success: true, message: "File deleted successfully!" };
+}
+
+export async function uploadAiFileToNotesBucket(
+  file: File,
+  userId: string,
+  noteId: number
+) {
+  const supabase = createClient();
+
+  const filePath = `/${userId}/${noteId}/ai/${file.name}`;
+  const { data, error } = await supabase.storage
+    .from("notes-files")
+    .upload(filePath, file);
+
+  if (error) {
+    toast.error("Failed to upload AI file");
+    console.error("Failed to upload AI file", error);
+    return null;
+  }
+
+  const { data: publicUrlData } = supabase.storage
+    .from("notes-files")
+    .getPublicUrl(filePath);
+
+  return publicUrlData.publicUrl;
 }
