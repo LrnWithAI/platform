@@ -12,8 +12,8 @@ import { deleteNote } from "@/actions/notesActions";
 import { deleteFlashcardsSet } from "@/actions/flashcardsActions";
 
 interface CardsProps {
-  orderOption: string;
-  filterOption: Record<string, string>;
+  orderOption?: string;
+  filterOption?: Record<string, string>;
   data: any[];
   type: string;
   refreshData: () => void;
@@ -32,7 +32,7 @@ export function Cards({
   // Filtering len pre 'title'
   const filteredData = data.filter((card) => {
     // Ak je nastavený filter pre title, porovnáme len tento atribút
-    if (filterOption["title"]) {
+    if (filterOption && filterOption["title"]) {
       return card.title
         ?.toLowerCase()
         .includes(filterOption["title"].toLowerCase());
@@ -93,6 +93,7 @@ export function Cards({
     if (type === "tests") return `/test/${id}`;
     if (type === "notes") return `/notes/${id}`;
     if (type === "flashcards") return `/flashcards/${id}`;
+    if (type === "classes") return `/classes/${id}`;
     return "/";
   };
 

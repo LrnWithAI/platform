@@ -217,3 +217,62 @@ export async function getTestSubmissionsByUserId(userId: string) {
     };
   }
 }
+
+/* GET Most submitted test */
+export async function getMostSubmittedTest() {
+  const supabase = await createClient();
+
+  // Step 1: Get all test_ids (with optional filter in future)
+  const { data: submissions, error } = await supabase
+    .from("test-submissions")
+    .select("test_id");
+
+  if (error || !submissions) {
+    console.error("Error fetching submissions:", error?.message);
+    return {
+      success: false,
+      message: "Could not fetch submissions",
+      data: null,
+    };
+  }
+
+  // Step 2: Count occurrences of each test_id
+  const countMap: Record<number, number> = {};
+
+  for (const sub of submissions) {
+    const testId = sub.test_id;
+    if (testId in countMap) {
+      countMap[testId]++;
+    } else {
+      countMap[testId] = 1;
+    }
+  }
+
+  const sorted = Object.entries(countMap)
+    .sort(([, a], [, b]) => b - a)
+    .map(([id]) => Number(id));
+
+  if (sorted.length === 0) {
+    return { success: false, message: "No test submissions found", data: null };
+  }
+
+  const mostSubmittedTestId = sorted[0];
+
+  // Step 3: Fetch the actual test
+  const { data: test, error: testError } = await supabase
+    .from("tests")
+    .select("*")
+    .eq("id", mostSubmittedTestId)
+    .single();
+
+  if (testError) {
+    console.error("Error fetching test:", testError.message);
+    return { success: false, message: testError.message, data: null };
+  }
+
+  return {
+    success: true,
+    message: "Most submitted test successfully fetched",
+    data: test,
+  };
+}
