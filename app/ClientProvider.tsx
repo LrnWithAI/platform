@@ -53,6 +53,7 @@ export default function ClientProvider({ user, children }: {
         // Ak nemá rolu, po vytvorení profilu presmerovanie na /account
         if (!insertedProfile.role || insertedProfile.role === "") {
           router.push("/account");
+          toast.warn("You must set your role!");
         }
 
       } else {
@@ -61,6 +62,7 @@ export default function ClientProvider({ user, children }: {
         // Ak je existujúci profil ale stále bez role presmerovanie na /account
         if (!data.role || data.role === "") {
           router.push("/account");
+          toast.warn("You must set your role!");
         }
       }
 
