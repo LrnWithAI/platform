@@ -44,7 +44,7 @@ export default function CustomLanguageSwitcher() {
   return (
     <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="flex gap-2 items-center w-[70px] justify-center">
+        <Button variant="outline" className="md:flex gap-2 items-center w-[70px] justify-center hidden">
           {isTranslating ? (
             <Loader2 className="animate-spin w-4 h-4 text-muted-foreground" />
           ) : (

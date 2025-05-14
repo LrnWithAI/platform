@@ -42,7 +42,7 @@ export const TeamSection = () => {
     },
     {
       imageUrl:
-        "https://jqzyiqnsulcfvylzxrbp.supabase.co/storage/v1/object/public/avatars//8c80fb36-c0cf-4c51-a448-0f3166423174-0.44669281598439836.jpg",
+        "https://jqzyiqnsulcfvylzxrbp.supabase.co/storage/v1/object/public/avatars//mirek_fotka.JPEG",
       firstName: "Miroslav",
       lastName: "Hanisko",
       positions: ["Full Stack Web Developer", "System Architecture Lead"],
@@ -111,9 +111,8 @@ export const TeamSection = () => {
                 {positions.map((position, index) => (
                   <CardContent
                     key={index}
-                    className={`pb-0 text-muted-foreground ${
-                      index === positions.length - 1 && "pb-6"
-                    }`}
+                    className={`pb-0 text-muted-foreground ${index === positions.length - 1 && "pb-6"
+                      }`}
                   >
                     {position}
                     {index < positions.length - 1 && <span>,</span>}
