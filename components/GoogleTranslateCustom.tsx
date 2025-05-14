@@ -56,7 +56,7 @@ export default function CustomLanguageSwitcher() {
 
       <DropdownMenuContent className="w-56 p-0">
         <Command>
-          <CommandInput placeholder="Vyhľadaj jazyk..." className="h-9" />
+          <CommandInput placeholder="Search language..." className="h-9" />
           <CommandList className="max-h-64 overflow-y-auto">
             <CommandEmpty>Jazyk nenájdený.</CommandEmpty>
             <CommandGroup>
