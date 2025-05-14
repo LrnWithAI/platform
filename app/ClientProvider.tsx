@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { LoaderCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -15,6 +16,7 @@ export default function ClientProvider({ user, children }: {
   user: User | null;
   children: React.ReactNode;
 }) {
+  const router = useRouter();
   const supabase = createClient();
   const setUser = useUserStore((state) => state.setUser);
   const loading = useLoadingStore((state) => state.loading);
@@ -47,8 +49,19 @@ export default function ClientProvider({ user, children }: {
         }
 
         setUser(insertedProfile);
+
+        // Ak nemá rolu, po vytvorení profilu presmerovanie na /account
+        if (!insertedProfile.role || insertedProfile.role === "") {
+          router.push("/account");
+        }
+
       } else {
         setUser(data);
+
+        // Ak je existujúci profil ale stále bez role presmerovanie na /account
+        if (!data.role || data.role === "") {
+          router.push("/account");
+        }
       }
 
     } catch (error) {

@@ -32,6 +32,7 @@ export default function AccountForm({ user }: { user: User }) {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const setLoading = useLoadingStore((state) => state.setLoading);
   const loading = useLoadingStore((state) => state.loading);
+  const isStudent = user?.role === "student";
 
   const {
     register,
@@ -50,6 +51,7 @@ export default function AccountForm({ user }: { user: User }) {
       bio: "",
       whatIDo: "",
       announcements: "",
+      role: undefined
     },
   });
 
@@ -79,6 +81,7 @@ export default function AccountForm({ user }: { user: User }) {
       setValue("bio", data?.bio || "");
       setValue("whatIDo", data?.whatIDo || "");
       setValue("announcements", data?.announcements || "");
+      setValue("role", data?.role || "");
       setAvatarUrl(data?.avatar_url || null);
 
       if (data?.files) {
@@ -108,6 +111,7 @@ export default function AccountForm({ user }: { user: User }) {
       avatar_url: avatarUrl,
       whatIDo: data.whatIDo,
       announcements: data.announcements,
+      role: data.role,
     };
 
     if (!user?.id) {
@@ -118,7 +122,7 @@ export default function AccountForm({ user }: { user: User }) {
 
     const response = await updateUserProfile(user.id, updateData);
     if (!response.success) {
-      toast.error("Error updating profile.");
+      toast.error(response.message);
       setLoading(false);
       return;
     }
@@ -242,6 +246,21 @@ export default function AccountForm({ user }: { user: User }) {
           </div>
         </div>
 
+        <div className="space-y-2">
+          <Label>Role</Label>
+          <select
+            {...register("role")}
+            className="w-full px-3 py-2 border rounded-md bg-white text-black"
+            disabled={isStudent} // znemožní zmenu
+          >
+            <option value="">Select role</option>
+            <option value="student">Student</option>
+            <option value="teacher">Teacher</option>
+          </select>
+          {errors.role && (
+            <p className="text-sm text-red-500">{errors.role.message}</p>
+          )}
+        </div>
         <div className="space-y-2">
           <Label>Username</Label>
           <Input {...register("username")} placeholder="Username" />

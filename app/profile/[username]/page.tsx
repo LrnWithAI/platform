@@ -8,7 +8,7 @@ import { BriefcaseBusiness, Download, Globe, Mail, Phone } from 'lucide-react'
 import { User } from '@/types/user'
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { getUserProfile } from '@/actions/userActions'
+import { getUserByUsername } from '@/actions/userActions'
 
 type UploadedFile = {
   id: string;
@@ -25,11 +25,7 @@ const Profile = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        if (!user?.id) {
-          toast.error("User ID is missing.");
-          return;
-        }
-        const { data } = await getUserProfile(user.id)
+        const { data } = await getUserByUsername(username as string);
         if (data) {
           setUser(data)
           toast.success("User fetched successfully")
