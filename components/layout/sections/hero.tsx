@@ -27,7 +27,7 @@ export const HeroSection = () => {
             <h1>
               Learn smarter with
               <span className="text-transparent px-2 bg-gradient-to-r from-purple to-primary bg-clip-text">
-                AI-generated tests
+                AI-generated tests, notes
               </span>
               and flashcards
             </h1>

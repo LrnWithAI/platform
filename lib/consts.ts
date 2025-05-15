@@ -99,4 +99,8 @@ export const languages = [
   { label: "Turkmen", code: "tk", short: "TK" },
   { label: "Uyghur", code: "ug", short: "UG" },
   { label: "Uzbek", code: "uz", short: "UZ" },
+  { label: "Xhosa", code: "xh", short: "XH" },
+  { label: "Yoruba", code: "yo", short: "YO" },
+  { label: "Zulu", code: "zu", short: "ZU" },
+  { label: "Akan", code: "ak", short: "AK" }
 ];
