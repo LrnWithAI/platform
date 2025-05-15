@@ -97,26 +97,6 @@ export default function Home() {
         )}
       </div>
 
-      {/* Latest public notes */}
-      <div className="bg-sidebar border rounded-xl p-6 shadow-md">
-        <h2 className="text-xl font-semibold mb-4">Latest Public Notes</h2>
-        {publicNotes.length > 0 ? (
-          <Cards data={publicNotes} type="notes" refreshData={fetchPublicNotes} />
-        ) : (
-          <p className="text-muted-foreground">No public notes available.</p>
-        )}
-      </div>
-
-      {/* Class with most members */}
-      <div className="bg-sidebar border rounded-xl p-6 shadow-md">
-        <h2 className="text-xl font-semibold mb-4">Class with Most Members</h2>
-        {popularClass ? (
-          <Cards data={popularClass} type="classes" refreshData={fetchPopularClass} />
-        ) : (
-          <p className="text-muted-foreground">No class data available.</p>
-        )}
-      </div>
-
       {/* Top note creators */}
       <div className="bg-sidebar border rounded-xl p-6 shadow-md">
         <h2 className="text-xl font-semibold mb-4">Top Note Creators</h2>
@@ -146,6 +126,27 @@ export default function Home() {
           <p className="text-muted-foreground">No top creators yet.</p>
         )}
       </div>
+
+      {/* Latest public notes */}
+      <div className="bg-sidebar border rounded-xl p-6 shadow-md">
+        <h2 className="text-xl font-semibold mb-4">Latest Public Notes</h2>
+        {publicNotes.length > 0 ? (
+          <Cards data={publicNotes} type="notes" refreshData={fetchPublicNotes} />
+        ) : (
+          <p className="text-muted-foreground">No public notes available.</p>
+        )}
+      </div>
+
+      {/* Class with most members */}
+      <div className="bg-sidebar border rounded-xl p-6 shadow-md">
+        <h2 className="text-xl font-semibold mb-4">Class with Most Members</h2>
+        {popularClass ? (
+          <Cards data={popularClass} type="classes" refreshData={fetchPopularClass} />
+        ) : (
+          <p className="text-muted-foreground">No class data available.</p>
+        )}
+      </div>
+
     </div>
   );
 }
