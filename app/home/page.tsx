@@ -74,7 +74,7 @@ export default function Home() {
       {user && (
         <div className="bg-card border p-4 rounded-xl shadow-sm flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold">Welcome back, <span className="text-purple-600">{user.username}</span></h1>
+            <h1 className="text-2xl font-bold">Welcome back, <span className="text-purple-600 cursor-pointer hover:text-purple-500 hover:underline" onClick={() => router.push(`/profile/${user.username}`)}>{user.username}</span></h1>
             <p className="text-muted-foreground">
               {new Date().toLocaleDateString("en-US", {
                 weekday: "long",

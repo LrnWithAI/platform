@@ -138,6 +138,20 @@ export function Cards({
                     day: "numeric",
                   })}
                 </p>
+
+                {/* Počet otázok pre testy */}
+                {type === "tests" && card.questions && (
+                  <p className="text-muted-foreground">
+                    {card.questions.length} {card.questions.length === 1 ? "question" : "questions"}
+                  </p>
+                )}
+
+                {/* Počet členov pre triedy */}
+                {type === "classes" && card.members && (
+                  <p className="text text-muted-foreground">
+                    {card.members.length} {card.members.length === 1 ? "member" : "members"}
+                  </p>
+                )}
               </div>
             </div>
           </Link>
