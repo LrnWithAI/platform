@@ -145,7 +145,12 @@ export function Cards({
                     {card.questions.length} {card.questions.length === 1 ? "question" : "questions"}
                   </p>
                 )}
-
+                {/* Počet kartičiek pre flashcards */}
+                {type === "flashcards" && Array.isArray(card.flashcards) && (
+                  <p className="text-sm text-muted-foreground">
+                    {card.flashcards.length} {card.flashcards.length === 1 ? "card" : "cards"}
+                  </p>
+                )}
                 {/* Počet členov pre triedy */}
                 {type === "classes" && card.members && (
                   <p className="text text-muted-foreground">
