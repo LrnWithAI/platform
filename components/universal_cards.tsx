@@ -105,17 +105,19 @@ export function Cards({
           className="relative p-5 border rounded-lg shadow bg-sidebar hover:cursor-pointer hover:scale-105 duration-300"
         >
           {/* Tlačidlo pre odstránenie */}
-          <div className="absolute top-2 right-2 flex gap-1">
-            <Button
-              className="bg-red-500 rounded-sm text-sm hover:bg-red-600 h-7 w-7"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleDelete(card.id);
-              }}
-            >
-              <Trash2 size={16} />
-            </Button>
-          </div>
+          {card?.created_by?.id === user?.id && (
+            <div className="absolute top-2 right-2 flex gap-1">
+              <Button
+                className="bg-red-500 rounded-sm text-sm hover:bg-red-600 h-7 w-7"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDelete(card.id);
+                }}
+              >
+                <Trash2 size={16} />
+              </Button>
+            </div>
+          )}
 
           {/* Navigácia podľa typu */}
           <Link href={getLinkPath(card.id)}>

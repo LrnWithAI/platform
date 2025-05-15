@@ -8,6 +8,7 @@ export type Note = {
     name: string;
     role: string;
     email: string;
+    username: string;
   };
   files: {
     id: string;
@@ -16,4 +17,5 @@ export type Note = {
     type: string;
     url: string;
   }[];
+  public: boolean;
 }

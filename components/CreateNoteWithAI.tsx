@@ -26,6 +26,7 @@ export default function CreateNoteWithAI() {
 
   const [inputType, setInputType] = useState<"prompt" | "pdf">("prompt");
   const [title, setTitle] = useState("");
+  const [isPublic, setIsPublic] = useState(false);
   const [length, setLength] = useState("medium");
   const [style, setStyle] = useState("summary");
   const [selectedLanguage, setSelectedLanguage] = useState("en");
@@ -69,12 +70,14 @@ export default function CreateNoteWithAI() {
     const baseNote = {
       title: title,
       content: "",
+      public: isPublic,
       created_at: new Date().toISOString(),
       created_by: {
         id: String(user.id),
         name: user.full_name,
         role: user.role,
         email: user.email,
+        username: user.username,
       },
       files: [],
     };
@@ -244,6 +247,17 @@ export default function CreateNoteWithAI() {
               </Command>
             </DropdownMenuContent>
           </DropdownMenu>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <input
+            id="public"
+            type="checkbox"
+            checked={isPublic}
+            onChange={(e) => setIsPublic(e.target.checked)}
+            className="w-5 h-5 cursor-pointer"
+          />
+          <Label htmlFor="public" className="cursor-pointer">Make this note public</Label>
         </div>
 
         <div className="flex justify-end mt-4">

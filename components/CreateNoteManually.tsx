@@ -56,6 +56,7 @@ export default function CreateNoteManually() {
         name: user?.full_name || "",
         role: user?.role || "",
         email: user?.email || "",
+        username: user?.username || "",
       },
       files: [{}] as [{ id: string; name: string; size: number; type: string; url: string }],
     };
@@ -139,6 +140,17 @@ export default function CreateNoteManually() {
           {errors.content && (
             <p className="text-sm text-red-600">{errors.content.message}</p>
           )}
+        </div>
+        <div className="flex items-center gap-2">
+          <Label htmlFor="public" className="cursor-pointer">
+            Make this note public
+          </Label>
+          <input
+            id="public"
+            type="checkbox"
+            {...register("public")}
+            className="accent-purple-600 w-5 h-5"
+          />
         </div>
         <div className="space-y-2">
           <Label htmlFor="note-file">Attachments</Label>

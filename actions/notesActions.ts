@@ -74,3 +74,54 @@ export async function updateNote(note: Note) {
 
   return { success: true, message: "Note updated successfully", data: data[0] as Note };
 }
+
+/* GET Latest created notes */
+export async function getLatestPublicNotes(limit = 3) {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("notes")
+    .select("*")
+    .eq("public", true)
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    return { success: false, message: error.message, data: [] };
+  }
+
+  return { success: true, message: "Latest public notes fetched", data };
+}
+
+/* GET Notes top creators */
+export async function getTopNoteCreators(limit = 3) {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("notes")
+    .select("created_by")
+    .neq("created_by", null);
+
+  if (error || !data) {
+    return { success: false, message: error?.message || "No data", data: [] };
+  }
+
+  // Count notes by user
+  const creatorMap: { [key: string]: { user: any; count: number } } = {};
+
+  data.forEach((note: any) => {
+    const user = note.created_by;
+    const id = user.id;
+    if (!creatorMap[id]) {
+      creatorMap[id] = { user, count: 1 };
+    } else {
+      creatorMap[id].count++;
+    }
+  });
+
+  const sorted = Object.values(creatorMap)
+    .sort((a, b) => b.count - a.count)
+    .slice(0, limit);
+
+  return { success: true, data: sorted };
+}

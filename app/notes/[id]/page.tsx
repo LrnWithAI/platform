@@ -38,8 +38,10 @@ export default function NoteDetail() {
   const router = useRouter();
 
   const loading = useLoadingStore((state) => state.loading);
-  const setLoading = useLoadingStore((state) => state.setLoading); const [note, setNote] = useState<any>(null);
+  const setLoading = useLoadingStore((state) => state.setLoading);
+  const [note, setNote] = useState<any>(null);
   const [isEditMode, setIsEditMode] = useState(false);
+  const isAuthor = note?.created_by?.id === user?.id;
 
   const [currentFiles, setCurrentFiles] = useState<UploadedFile[]>([]); // existujúce, ešte v poznámke
   const [addedFiles, setAddedFiles] = useState<File[]>([]); // nové, neuploadnuté
@@ -75,6 +77,7 @@ export default function NoteDetail() {
           if (note) {
             setValue("title", note.title);
             setValue("content", note.content);
+            setValue("public", note.public ?? false);
             setCurrentFiles(note.files || []);
           }
 
@@ -174,6 +177,7 @@ export default function NoteDetail() {
         name: user?.full_name || "",
         role: user?.role || "",
         email: user?.email || "",
+        username: user?.username || "",
       },
       files: allFiles,
     };
@@ -198,6 +202,7 @@ export default function NoteDetail() {
         setCurrentFiles(fresh.data?.files);
         setValue("title", fresh.data.title);
         setValue("content", fresh.data.content);
+        setValue("public", fresh.data.public ?? false);
       }
     } else {
       toast.error(res.message || "Failed to update note.");
@@ -224,7 +229,7 @@ export default function NoteDetail() {
     <div className="flex flex-col items-center min-h-[60vh] justify-center py-10 mx-4 mb-20">
       <div className="max-w-4xl mx-auto w-full">
         <div className="flex flex-row justify-end space-x-2">
-          {!isEditMode && (
+          {isAuthor && !isEditMode && (
             <Button onClick={() => setIsEditMode(true)} variant="outline">
               <EditIcon size={16} />
             </Button>
@@ -234,9 +239,11 @@ export default function NoteDetail() {
               <CircleX size={16} />
             </Button>
           )}
-          <Button onClick={onDeleteNote} variant="destructive">
-            <Trash2 size={16} />
-          </Button>
+          {isAuthor && (
+            <Button onClick={onDeleteNote} variant="destructive">
+              <Trash2 size={16} />
+            </Button>
+          )}
           {note && user && (
             <PDFDownloadLink
               document={<NotePDFDocument note={note} user={user} />}
@@ -357,6 +364,16 @@ export default function NoteDetail() {
                 <p className="text-sm text-red-600">{errors.content.message}</p>
               )}
             </div>
+            <div className="flex items-center gap-2">
+              <input
+                id="public"
+                type="checkbox"
+                {...register("public")}
+                className="w-5 h-5 cursor-pointer"
+                disabled={loading}
+              />
+              <Label htmlFor="public" className="cursor-pointer">Make public</Label>
+            </div>
             <div className="space-y-2">
               <Label htmlFor="note-file">Attachments</Label>
               <Input
@@ -422,11 +439,13 @@ export default function NoteDetail() {
               )}
             </div>
 
-            <div className="flex justify-end mt-4">
-              <Button type="submit" disabled={loading}>
-                {loading ? "Saving..." : "Update Note"}
-              </Button>
-            </div>
+            {isAuthor && (
+              <div className="flex justify-end mt-4">
+                <Button type="submit" disabled={loading}>
+                  {loading ? "Saving..." : "Update Note"}
+                </Button>
+              </div>
+            )}
           </form>
         </>
       )}
