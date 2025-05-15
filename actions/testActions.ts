@@ -219,10 +219,10 @@ export async function getTestSubmissionsByUserId(userId: string) {
 }
 
 /* GET Most submitted test */
-export async function getMostSubmittedTest() {
+export async function getTopSubmittedTests(limit = 3) {
   const supabase = await createClient();
 
-  // Step 1: Get all test_ids (with optional filter in future)
+  // Step 1: Get all submissions
   const { data: submissions, error } = await supabase
     .from("test-submissions")
     .select("test_id");
@@ -232,11 +232,11 @@ export async function getMostSubmittedTest() {
     return {
       success: false,
       message: "Could not fetch submissions",
-      data: null,
+      data: [],
     };
   }
 
-  // Step 2: Count occurrences of each test_id
+  // Step 2: Count occurrences
   const countMap: Record<number, number> = {};
 
   for (const sub of submissions) {
@@ -248,31 +248,40 @@ export async function getMostSubmittedTest() {
     }
   }
 
-  const sorted = Object.entries(countMap)
+  // Step 3: Sort by most submissions and get top N ids
+  const topTestIds = Object.entries(countMap)
     .sort(([, a], [, b]) => b - a)
+    .slice(0, limit)
     .map(([id]) => Number(id));
 
-  if (sorted.length === 0) {
-    return { success: false, message: "No test submissions found", data: null };
+  if (topTestIds.length === 0) {
+    return {
+      success: false,
+      message: "No top tests found",
+      data: [],
+    };
   }
 
-  const mostSubmittedTestId = sorted[0];
-
-  // Step 3: Fetch the actual test
-  const { data: test, error: testError } = await supabase
+  // Step 4: Fetch all corresponding tests
+  const { data: tests, error: fetchError } = await supabase
     .from("tests")
     .select("*")
-    .eq("id", mostSubmittedTestId)
-    .single();
+    .in("id", topTestIds);
 
-  if (testError) {
-    console.error("Error fetching test:", testError.message);
-    return { success: false, message: testError.message, data: null };
+  if (fetchError || !tests) {
+    return {
+      success: false,
+      message: fetchError?.message || "Failed to fetch tests",
+      data: [],
+    };
   }
+
+  // Optional: Zoradiť podľa pôvodného poradia topTestIds
+  const sortedTests = topTestIds.map((id) => tests.find((t) => t.id === id)).filter(Boolean);
 
   return {
     success: true,
-    message: "Most submitted test successfully fetched",
-    data: test,
+    message: "Top submitted tests fetched",
+    data: sortedTests,
   };
 }

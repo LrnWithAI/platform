@@ -151,6 +151,22 @@ export function Cards({
                     {card.flashcards.length} {card.flashcards.length === 1 ? "card" : "cards"}
                   </p>
                 )}
+                {/* Autor poznámky pre typ "notes" */}
+                {type === "notes" && card.created_by && (
+                  <p className="text-sm text-muted-foreground mt-1">
+                    by{" "}
+                    <span
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        window.location.href = `/profile/${card.created_by.username}`;
+                      }}
+                      className="text-purple-600 hover:underline cursor-pointer"
+                    >
+                      {card.created_by.name}
+                    </span>
+                  </p>
+                )}
                 {/* Počet členov pre triedy */}
                 {type === "classes" && card.members && (
                   <p className="text text-muted-foreground">

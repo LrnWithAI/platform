@@ -7,7 +7,7 @@ import { useUserStore } from "@/stores/userStore";
 import { useLoadingStore } from "@/stores/loadingStore";
 import { Cards } from "@/components/universal_cards";
 
-import { getMostSubmittedTest } from "@/actions/testActions";
+import { getTopSubmittedTests } from "@/actions/testActions";
 import { getClassWithMostMembers } from "@/actions/classActions";
 import { getLatestPublicNotes, getTopNoteCreators } from "@/actions/notesActions";
 
@@ -21,14 +21,10 @@ export default function Home() {
   const [popularClass, setPopularClass] = useState<any[] | null>([]);
   const [topCreators, setTopCreators] = useState<any[]>([]);
 
-  const fetchTests = async () => {
+  const fetchPopularTests = async () => {
     setLoading(true);
-    const result = await getMostSubmittedTest();
-
-    if (result.success && result.data) {
-      setTests([result.data]);
-    }
-
+    const res = await getTopSubmittedTests(4);
+    setTests(res.data);
     setLoading(false);
   };
 
@@ -61,7 +57,7 @@ export default function Home() {
   };
 
   useEffect(() => {
-    fetchTests();
+    fetchPopularTests();
     fetchPopularClass();
     fetchPublicNotes();
     fetchTopCreators();
@@ -91,7 +87,7 @@ export default function Home() {
       <div className="bg-sidebar border rounded-xl p-6 shadow-md">
         <h2 className="text-xl font-semibold mb-4">Most Studied Test</h2>
         {tests.length > 0 ? (
-          <Cards data={tests} type="tests" refreshData={fetchTests} />
+          <Cards data={tests} type="tests" refreshData={fetchPopularTests} />
         ) : (
           <p className="text-muted-foreground">No data available.</p>
         )}
