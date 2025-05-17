@@ -181,6 +181,7 @@ export default function AccountForm({ user }: { user: User }) {
           toast.error("Failed to update file attachments");
         }
       } catch (error) {
+        console.error("Error uploading files:", error);
         toast.error("An error occurred while uploading files.");
       }
     } else if (deletedFiles.length > 0) {
@@ -209,7 +210,7 @@ export default function AccountForm({ user }: { user: User }) {
     if (user) {
       fetchUserData();
     }
-  }, [user]);
+  }, [user, fetchUserData]);
 
   return (
     <form
