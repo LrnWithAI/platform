@@ -47,7 +47,6 @@ type CreateFlashcardsFormValues = z.infer<typeof flashcardsSchemaForBasicInfo>;
 const CreateFlashcardsWithAIForm = () => {
   const router = useRouter();
   const { user } = useUserStore();
-  const [uploading, setUploading] = useState(false);
   const [fileUrl, setFileUrl] = useState<string | null>(null);
   const [basicFlashcardsInfoSubmitted, setBasicFlashcardsInfoSubmitted] =
     useState(false);
@@ -61,9 +60,9 @@ const CreateFlashcardsWithAIForm = () => {
 
   const [numFlashcards, setNumFlashcards] = useState(5);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [generatedFlashcards, setGeneratedFlashcards] = useState<any[] | null>(
-    null
-  );
+  const [generatedFlashcards, setGeneratedFlashcards] = useState<
+    unknown[] | null
+  >(null);
   const [errorGenerating, setErrorGenerating] = useState<string | null>(null);
 
   const handleGenerateFlashcards = async () => {
@@ -114,6 +113,7 @@ const CreateFlashcardsWithAIForm = () => {
     } catch (err) {
       console.error("Error generating flashcards:", err);
       toast.error("Failed to generate flashcards.");
+      setErrorGenerating("Failed to generate flashcards. Please try again.");
     } finally {
       setIsGenerating(false);
     }
@@ -128,7 +128,6 @@ const CreateFlashcardsWithAIForm = () => {
 
   const handleFileUpload = async (files: File[]) => {
     if (!files.length) return;
-    setUploading(true);
 
     const uploadedFile = files[0]; // Only support single file upload
 
@@ -143,12 +142,14 @@ const CreateFlashcardsWithAIForm = () => {
         setFileUrl(publicUrl);
         toast.success("File uploaded successfully!");
       }
-    } catch (error: any) {
-      toast.error(`Error uploading file: ${error.message}`);
-      console.error(error);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(`Error uploading file: ${error.message}`);
+        console.error(error);
+      } else {
+        toast.error("Error uploading file: Unknown error");
+      }
     }
-
-    setUploading(false);
   };
 
   const onSubmitFileUPloadForm = (data: FileUploadFormValues) => {

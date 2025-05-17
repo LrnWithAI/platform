@@ -154,7 +154,7 @@ const FlashcardsPage = () => {
       fetchFlashcardsSetById();
       fetchStarredFlashcards();
     }
-  }, [params, user]);
+  }, [params, user, fetchFlashcardsSetById, fetchStarredFlashcards]);
 
   useEffect(() => {
     if (flashcardsSet && !isFlashcardsLoaded) {
@@ -179,7 +179,7 @@ const FlashcardsPage = () => {
         setIsFlashcardsLoaded(true);
       }
     }
-  }, [flashcardsSet]);
+  }, [flashcardsSet, isFlashcardsLoaded, setValueEdit]);
 
   // 🔁 For editing an existing flashcard set
   const onSubmitEditFlashcards = async (data: CreateFlashcardsFormValues) => {
@@ -425,6 +425,7 @@ const FlashcardsPage = () => {
                   />
                   {getValuesEdit(`flashcards.${index}.image_url`) && (
                     <img
+                      // eslint-disable-next-line @next/next/no-img-element
                       src={getValuesEdit(`flashcards.${index}.image_url`) || ""}
                       alt="Uploaded"
                       className="mt-2 w-full h-96 object-cover border"

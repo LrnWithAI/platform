@@ -51,7 +51,7 @@ const TestSubmitPageWithId = () => {
 
   useEffect(() => {
     fetchTestByIdAndSubmission();
-  }, [params]);
+  }, [params, fetchTestByIdAndSubmission]);
 
   return (
     <div className="mx-4 mb-20 mt-0 md:mt-6">
@@ -115,6 +115,7 @@ const TestSubmitPageWithId = () => {
 
               {question.image_url && (
                 <img
+                  // eslint-disable-next-line @next/next/no-img-element
                   src={question.image_url}
                   alt="Uploaded question image"
                   className="mt-2 w-full h-96 object-cover border"

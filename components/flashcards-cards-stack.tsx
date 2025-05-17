@@ -33,33 +33,6 @@ export default function FlashcardsCardsStack({
     setStarredCards(initialStarred);
   }, [starredFlashcards]);
 
-  // Handle keydown events for navigation, star toggle, and flip
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "ArrowLeft") {
-        // Handle previous card navigation
-        handlePrevious();
-      } else if (event.key === "ArrowRight") {
-        // Handle next card navigation
-        handleNext();
-      } else if (event.key.toLowerCase() === "s") {
-        // Handle star toggle
-        toggleStar(currentIndex);
-      } else if (event.key === " " || event.key === "Spacebar") {
-        // Handle card flip
-        flip();
-      }
-    };
-
-    // Attach the event listener
-    window.addEventListener("keydown", handleKeyDown);
-
-    // Cleanup on component unmount
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [currentIndex, starredCards]);
-
   const handleNext = () => {
     if (currentIndex < flashcards.length - 1) {
       setCurrentIndex(currentIndex + 1);
@@ -114,6 +87,33 @@ export default function FlashcardsCardsStack({
       }
     }
   };
+
+  // Handle keydown events for navigation, star toggle, and flip
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "ArrowLeft") {
+        // Handle previous card navigation
+        handlePrevious();
+      } else if (event.key === "ArrowRight") {
+        // Handle next card navigation
+        handleNext();
+      } else if (event.key.toLowerCase() === "s") {
+        // Handle star toggle
+        toggleStar(currentIndex);
+      } else if (event.key === " " || event.key === "Spacebar") {
+        // Handle card flip
+        flip();
+      }
+    };
+
+    // Attach the event listener
+    window.addEventListener("keydown", handleKeyDown);
+
+    // Cleanup on component unmount
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [currentIndex, starredCards, handleNext, handlePrevious, toggleStar]);
 
   const flip = () => {
     setShowBack((prev) => !prev);

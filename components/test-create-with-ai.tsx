@@ -44,7 +44,6 @@ type CreateTestFormValues = z.infer<typeof testSchemaForBasicInfo>;
 const CreateTestWithAIForm = () => {
   const router = useRouter();
   const { user } = useUserStore();
-  const [uploading, setUploading] = useState(false);
   const [fileUrl, setFileUrl] = useState<string | null>(null);
   const [basicTestInfoSubmitted, setBasicTestInfoSubmitted] = useState(false);
   const [createdTestId, setCreatedTestId] = useState<number | null>(null);
@@ -54,9 +53,9 @@ const CreateTestWithAIForm = () => {
     useState(false);
   const [numQuestions, setNumQuestions] = useState(5);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [generatedQuestions, setGeneratedQuestions] = useState<any[] | null>(
-    null
-  );
+  const [generatedQuestions, setGeneratedQuestions] = useState<
+    unknown[] | null
+  >(null);
   const [errorGenerating, setErrorGenerating] = useState<string | null>(null);
 
   const handleGenerateQuestions = async () => {
@@ -107,6 +106,7 @@ const CreateTestWithAIForm = () => {
     } catch (err) {
       console.error("Error generating questions:", err);
       toast.error("Failed to generate questions.");
+      setErrorGenerating("Failed to generate questions. Please try again.");
     } finally {
       setIsGenerating(false);
     }
@@ -121,7 +121,6 @@ const CreateTestWithAIForm = () => {
 
   const handleFileUpload = async (files: File[]) => {
     if (!files.length) return;
-    setUploading(true);
 
     const uploadedFile = files[0]; // Only support single file upload
 
@@ -136,12 +135,13 @@ const CreateTestWithAIForm = () => {
         setFileUrl(publicUrl);
         toast.success("File uploaded successfully!");
       }
-    } catch (error: any) {
-      toast.error(`Error uploading file: ${error.message}`);
-      console.error(error);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("An unknown error occurred.");
+      }
     }
-
-    setUploading(false);
   };
 
   const onSubmitFileUPloadForm = (data: FileUploadFormValues) => {

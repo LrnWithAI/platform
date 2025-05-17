@@ -131,48 +131,7 @@ const TestPage = () => {
 
   useEffect(() => {
     fetchTestById();
-  }, [params]);
-
-  useEffect(() => {
-    if (test) {
-      // Set basic test details
-      setValueEdit("title", test.title || "");
-      setValueEdit("description", test.description || "");
-      setValueEdit("category", test.category || "");
-      setValueEdit("visibility", test.visibility || "everyone");
-
-      // Ensure the questions field is set correctly
-      if (test.questions && test.questions.length > 0) {
-        setValueEdit(
-          "questions",
-          test.questions.map((q, index) => ({
-            id: q.id ?? index + 1,
-            question: q.question || "",
-            answers: q.answers || ["", "", "", ""],
-            correct: q.correct ?? 0,
-            image_url: q.image_url || undefined,
-          }))
-        );
-
-        // Update selected correct answers for UI
-        setSelectedCorrectAnswers(
-          test.questions.reduce((acc, q, index) => {
-            acc[index] = q.correct ?? 0;
-            return acc;
-          }, {} as Record<number, number>)
-        );
-
-        // Add questions to the form state if not loaded yet
-        if (!isQuestionsLoaded) {
-          // Trigger addQuestion() for each question
-          test.questions.forEach(() => {
-            addQuestion();
-          });
-          setIsQuestionsLoaded(true); // Set flag to avoid redundant addition
-        }
-      }
-    }
-  }, [test]); // Runs when `test` is loaded
+  }, [params, fetchTestById]);
 
   const onSubmitTestAnswers = async (data: any) => {
     if (!test) return;
@@ -281,6 +240,47 @@ const TestPage = () => {
     }, 0);
   };
 
+  useEffect(() => {
+    if (test) {
+      // Set basic test details
+      setValueEdit("title", test.title || "");
+      setValueEdit("description", test.description || "");
+      setValueEdit("category", test.category || "");
+      setValueEdit("visibility", test.visibility || "everyone");
+
+      // Ensure the questions field is set correctly
+      if (test.questions && test.questions.length > 0) {
+        setValueEdit(
+          "questions",
+          test.questions.map((q, index) => ({
+            id: q.id ?? index + 1,
+            question: q.question || "",
+            answers: q.answers || ["", "", "", ""],
+            correct: q.correct ?? 0,
+            image_url: q.image_url || undefined,
+          }))
+        );
+
+        // Update selected correct answers for UI
+        setSelectedCorrectAnswers(
+          test.questions.reduce((acc, q, index) => {
+            acc[index] = q.correct ?? 0;
+            return acc;
+          }, {} as Record<number, number>)
+        );
+
+        // Add questions to the form state if not loaded yet
+        if (!isQuestionsLoaded) {
+          // Trigger addQuestion() for each question
+          test.questions.forEach(() => {
+            addQuestion();
+          });
+          setIsQuestionsLoaded(true); // Set flag to avoid redundant addition
+        }
+      }
+    }
+  }, [test, addQuestion, isQuestionsLoaded, setValueEdit]); // Runs when `test` is loaded
+
   const onSubmitEditTest = async (data: CreateTestFormValues) => {
     data.created_by = user?.id;
     data.id = test?.id;
@@ -376,6 +376,7 @@ const TestPage = () => {
 
               {question.image_url && (
                 <img
+                  // eslint-disable-next-line @next/next/no-img-element
                   src={question.image_url}
                   alt="Uploaded question image"
                   className="mt-2 w-full h-96 object-cover border"
@@ -530,6 +531,7 @@ const TestPage = () => {
                     />
                     {getValuesEdit(`questions.${questionIndex}.image_url`) && (
                       <img
+                        // eslint-disable-next-line @next/next/no-img-element
                         src={
                           getValuesEdit(
                             `questions.${questionIndex}.image_url`
