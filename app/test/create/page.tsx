@@ -52,7 +52,6 @@ export default function CreateTest() {
     Record<number, number>
   >({});
 
-  console.log("user", user);
   const {
     register,
     handleSubmit,
@@ -111,8 +110,6 @@ export default function CreateTest() {
       });
     }, 0);
   };
-
-  console.log("Form errors ", errors);
 
   const onSubmit = async (data: CreateTestFormValues) => {
     console.log("Submitted data", data);
