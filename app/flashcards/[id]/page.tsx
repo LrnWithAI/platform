@@ -424,8 +424,8 @@ const FlashcardsPage = () => {
                     onChange={(e) => handleImageUpload(index, e.target.files)}
                   />
                   {getValuesEdit(`flashcards.${index}.image_url`) && (
+                    // eslint-disable-next-line @next/next/no-img-element
                     <img
-                      // eslint-disable-next-line @next/next/no-img-element
                       src={getValuesEdit(`flashcards.${index}.image_url`) || ""}
                       alt="Uploaded"
                       className="mt-2 w-full h-96 object-cover border"
