@@ -12,7 +12,10 @@ import { useUserStore } from "@/stores/userStore";
 import { useLoadingStore } from "@/stores/loadingStore";
 import { createProfile } from "@/actions/authActions";
 
-export default function ClientProvider({ user, children }: {
+export default function ClientProvider({
+  user,
+  children,
+}: {
   user: User | null;
   children: React.ReactNode;
 }) {
@@ -21,62 +24,58 @@ export default function ClientProvider({ user, children }: {
   const setUser = useUserStore((state) => state.setUser);
   const loading = useLoadingStore((state) => state.loading);
 
-  const getOrCreateProfile = async (user: User) => {
-    try {
-      const { data, error, status } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user?.id)
-        .single();
-
-      if (error && status !== 406 && status !== 400) {
-        toast.error(error.message);
-        throw error;
-      }
-
-      if (!data) {
-        await createProfile(user);
-
-        const { data: insertedProfile, error: readError } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", user.id)
-          .single();
-
-        if (readError || !insertedProfile) {
-          toast.error("Profile was created but cannot be read.");
-          return;
-        }
-
-        setUser(insertedProfile);
-
-        // Ak nemá rolu, po vytvorení profilu presmerovanie na /account
-        if (!insertedProfile.role || insertedProfile.role === "") {
-          router.push("/account");
-          toast.warn("You must set your role!");
-        }
-
-      } else {
-        setUser(data);
-
-        // Ak je existujúci profil ale stále bez role presmerovanie na /account
-        if (!data.role || data.role === "") {
-          router.push("/account");
-          toast.warn("You must set your role!");
-        }
-      }
-
-    } catch (error) {
-      console.error("Error loading or creating user profile:", error);
-      toast.error("Error loading user profile.");
-    }
-  };
-
   useEffect(() => {
     if (user && user.id) {
+      const getOrCreateProfile = async (user: User) => {
+        try {
+          const { data, error, status } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("id", user?.id)
+            .single();
+
+          if (error && status !== 406 && status !== 400) {
+            toast.error(error.message);
+            throw error;
+          }
+
+          if (!data) {
+            await createProfile(user);
+
+            const { data: insertedProfile, error: readError } = await supabase
+              .from("profiles")
+              .select("*")
+              .eq("id", user.id)
+              .single();
+
+            if (readError || !insertedProfile) {
+              toast.error("Profile was created but cannot be read.");
+              return;
+            }
+
+            setUser(insertedProfile);
+
+            if (!insertedProfile.role || insertedProfile.role === "") {
+              router.push("/account");
+              toast.warn("You must set your role!");
+            }
+          } else {
+            setUser(data);
+
+            if (!data.role || data.role === "") {
+              router.push("/account");
+              toast.warn("You must set your role!");
+            }
+          }
+        } catch (error) {
+          console.error("Error loading or creating user profile:", error);
+          toast.error("Error loading user profile.");
+        }
+      };
+
       getOrCreateProfile(user);
     }
-  }, [user]);
+  }, [user, router, supabase, setUser]);
 
   return (
     <>
