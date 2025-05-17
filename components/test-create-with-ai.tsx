@@ -436,28 +436,36 @@ const CreateTestWithAIForm = () => {
                           <h3 className="text-lg font-semibold">
                             Generated Questions
                           </h3>
-                          {generatedQuestions.map((q, idx) => (
-                            <div
-                              key={q.id || idx}
-                              className="p-4 border rounded bg-white"
-                            >
-                              <p className="font-medium">{q.question}</p>
-                              <ul className="mt-2 list-disc ml-6 space-y-1">
-                                {q.answers?.map((ans: string, i: number) => (
-                                  <li
-                                    key={i}
-                                    className={
-                                      i === q.correct
-                                        ? "font-bold text-green-600"
-                                        : ""
-                                    }
-                                  >
-                                    {ans}
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          ))}
+                          {generatedQuestions.map((q, idx) => {
+                            const question = q as {
+                              id?: number;
+                              question: string;
+                              answers?: string[];
+                              correct?: number;
+                            };
+                            return (
+                              <div
+                                key={question.id || idx}
+                                className="p-4 border rounded bg-white"
+                              >
+                                <p className="font-medium">{question.question}</p>
+                                <ul className="mt-2 list-disc ml-6 space-y-1">
+                                  {question.answers?.map((ans: string, i: number) => (
+                                    <li
+                                      key={i}
+                                      className={
+                                        i === question.correct
+                                          ? "font-bold text-green-600"
+                                          : ""
+                                      }
+                                    >
+                                      {ans}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            );
+                          })}
                         </div>
                         <div className="flex justify-center">
                           <Button
