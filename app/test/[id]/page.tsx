@@ -133,6 +133,7 @@ const TestPage = () => {
     fetchTestById();
   }, [params, fetchTestById]);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmitTestAnswers = async (data: any) => {
     if (!test) return;
 

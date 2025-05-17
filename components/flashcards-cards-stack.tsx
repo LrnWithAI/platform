@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { FlashcardsSet, StarredFlashcards } from "@/types/flashcards";
 import FlashcardsCard from "@/components/flashcards-card";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,9 @@ export default function FlashcardsCardsStack({
   flashcardsSet,
   starredFlashcards,
 }: Props) {
-  const flashcards = flashcardsSet?.flashcards || [];
+  const flashcards = useMemo(() => {
+    return flashcardsSet?.flashcards || [];
+  }, [flashcardsSet]);
   const flashcardsId = flashcardsSet?.id;
   const userId = flashcardsSet?.created_by;
   const [currentIndex, setCurrentIndex] = useState(0);
