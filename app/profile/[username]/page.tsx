@@ -31,6 +31,7 @@ const Profile = () => {
           toast.success("User fetched successfully")
         }
       } catch (error) {
+        console.error("Error fetching user data:", error)
         toast.error("Failed to fetch user data")
       }
     }

@@ -71,7 +71,7 @@ export default function CreateNoteManually() {
     const noteId = res.data.id;
 
     // 2. Upload nových súborov
-    let uploadedFiles: UploadedFile[] = [];
+    const uploadedFiles: UploadedFile[] = [];
     try {
       for (const file of files) {
         if (!user) {
@@ -92,6 +92,7 @@ export default function CreateNoteManually() {
         }
       }
     } catch (err) {
+      console.error("Error uploading files:", err);
       toast.error("File upload failed.");
     }
 

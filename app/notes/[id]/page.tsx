@@ -20,6 +20,7 @@ import { useUserStore } from "@/stores/userStore";
 import { useLoadingStore } from "@/stores/loadingStore";
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import { NotePDFDocument } from '@/components/pdf/NotePDFDocument';
+import { Note } from "@/types/note";
 
 type UploadedFile = {
   id: string;
@@ -39,7 +40,7 @@ export default function NoteDetail() {
 
   const loading = useLoadingStore((state) => state.loading);
   const setLoading = useLoadingStore((state) => state.setLoading);
-  const [note, setNote] = useState<any>(null);
+  const [note, setNote] = useState<Note | null>(null);
   const [isEditMode, setIsEditMode] = useState(false);
   const isAuthor = note?.created_by?.id === user?.id;
 
@@ -54,7 +55,6 @@ export default function NoteDetail() {
     handleSubmit,
     setValue,
     formState: { errors },
-    reset,
   } = useForm<NoteFormInputs>({
     resolver: zodResolver(noteSchema),
   });
@@ -87,6 +87,7 @@ export default function NoteDetail() {
           toast.error("Failed to fetch note: " + res.message);
         }
       } catch (err) {
+        console.error("Error fetching note:", err);
         toast.error("Error fetching note");
       } finally {
         setLoading(false);
@@ -139,7 +140,7 @@ export default function NoteDetail() {
     }
 
     // 2. Uploadni nové files a priprav ich do finálneho array
-    let uploadedFiles: UploadedFile[] = [];
+    const uploadedFiles: UploadedFile[] = [];
     try {
       for (const file of addedFiles) {
         if (user?.id) {
@@ -249,7 +250,7 @@ export default function NoteDetail() {
               document={<NotePDFDocument note={note} user={user} />}
               fileName={`note-${id}.pdf`}
             >
-              {({ loading }) => (
+              {() => (
                 <Button variant="outline">
                   <Download size={16} />
                 </Button>
@@ -268,11 +269,11 @@ export default function NoteDetail() {
           <div className="mb-4 space-y-4">
             <ReactMarkdown
               components={{
-                p: ({ node, ...props }) => <p className="text-base leading-relaxed mb-4" {...props} />,
-                h2: ({ node, ...props }) => <h2 className="text-xl font-semibold mt-6 mb-2" {...props} />,
-                li: ({ node, ...props }) => <li className="list-disc ml-6 mb-1" {...props} />,
-                strong: ({ node, ...props }) => <strong className="font-bold text-black dark:text-white" {...props} />,
-                ul: ({ node, ...props }) => <ul className="mb-4" {...props} />,
+                p: (props) => <p className="text-base leading-relaxed mb-4" {...props} />,
+                h2: (props) => <h2 className="text-xl font-semibold mt-6 mb-2" {...props} />,
+                li: (props) => <li className="list-disc ml-6 mb-1" {...props} />,
+                strong: (props) => <strong className="font-bold text-black dark:text-white" {...props} />,
+                ul: (props) => <ul className="mb-4" {...props} />,
               }}
             >
               {note.content}

@@ -3,16 +3,40 @@
 import { useEffect } from "react";
 import { languages } from "@/lib/consts";
 
+declare global {
+  interface Window {
+    google?: {
+      translate: {
+        TranslateElement: {
+          new(
+            options: {
+              pageLanguage: string;
+              includedLanguages: string;
+              layout: unknown;
+            },
+            id: string
+          ): void;
+          InlineLayout: {
+            SIMPLE: unknown;
+            [key: string]: unknown;
+          };
+        };
+      };
+    };
+    googleTranslateElementInit?: () => void;
+  }
+}
+
 export default function GoogleTranslateInit() {
   useEffect(() => {
     const includedLangs = languages.map((l) => l.code).join(",");
 
-    (window as any).googleTranslateElementInit = () => {
-      new (window as any).google.translate.TranslateElement(
+    window.googleTranslateElementInit = () => {
+      new window.google!.translate.TranslateElement(
         {
           pageLanguage: "en",
           includedLanguages: includedLangs,
-          layout: (window as any).google.translate.TranslateElement.InlineLayout.SIMPLE,
+          layout: window.google!.translate.TranslateElement.InlineLayout.SIMPLE,
         },
         "google_translate_element"
       );

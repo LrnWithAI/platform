@@ -4,7 +4,7 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { accountSchema } from "@/schema/account";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { getUserProfile, updateUserProfile } from "@/actions/userActions";
 import { Label } from "@/components/ui/label";
@@ -60,7 +60,7 @@ export default function AccountForm({ user }: { user: User }) {
   // Stav pre súbory – nový aj existujúce
   const [files, setFiles] = useState<(File | UploadedFile)[]>([]);
 
-  const fetchUserData = async () => {
+  const fetchUserData = useCallback(async () => {
     setLoading(true);
 
     if (!user?.id) {
@@ -68,6 +68,7 @@ export default function AccountForm({ user }: { user: User }) {
       setLoading(false);
       return;
     }
+
     const response = await getUserProfile(user.id);
 
     if (response.success) {
@@ -88,12 +89,14 @@ export default function AccountForm({ user }: { user: User }) {
         setInitialFiles(data.files);
         setFiles(data.files);
       }
+
       toast.success("User data fetched successfully.");
     } else {
       toast.error("Error fetching user data.");
     }
+
     setLoading(false);
-  };
+  }, [user?.id, setLoading, setValue]);
 
   const onSubmit = async (data: AccountFormValues) => {
     setLoading(true);

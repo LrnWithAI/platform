@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { Check, ChevronDown, Filter } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -52,7 +52,7 @@ export default function Library() {
   const [flashcards, setFlashcards] = useState([] as FlashcardsSet[]);
   const [notes, setNotes] = useState([] as Note[]);
 
-  async function fetchTests() {
+  const fetchTests = useCallback(async () => {
     try {
       setLoading(true);
       if (!user) return;
@@ -65,14 +65,15 @@ export default function Library() {
       }
       return response.data ?? [];
     } catch (error) {
+      console.error("Error fetching tests:", error);
       toast.error("An error occurred while fetching tests.");
       return [];
     } finally {
       setLoading(false);
     }
-  }
+  }, [user, setLoading]);
 
-  async function fetchNotes() {
+  const fetchNotes = useCallback(async () => {
     try {
       setLoading(true);
       if (!user) return;
@@ -85,14 +86,15 @@ export default function Library() {
       }
       return response.data ?? [];
     } catch (error) {
+      console.error("Error fetching notes:", error);
       toast.error("An error occurred while fetching notes.");
       return [];
     } finally {
       setLoading(false);
     }
-  }
+  }, [user, setLoading]);
 
-  async function fetchFlashcards() {
+  const fetchFlashcards = useCallback(async () => {
     try {
       setLoading(true);
       if (!user) return;
@@ -105,18 +107,19 @@ export default function Library() {
       }
       return response.data ?? [];
     } catch (error) {
+      console.error("Error fetching flashcards:", error);
       toast.error("An error occurred while fetching flashcards.");
       return [];
     } finally {
       setLoading(false);
     }
-  }
+  }, [user, setLoading]);
 
   useEffect(() => {
     fetchTests();
     fetchFlashcards();
     fetchNotes();
-  }, [user]);
+  }, [fetchTests, fetchFlashcards, fetchNotes]);
 
   // Stavy pre sekciu Tests
   const [openOrderOptionTests, setOpenOrderOptionTests] = useState(false);

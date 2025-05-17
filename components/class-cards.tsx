@@ -30,19 +30,18 @@ export function ClassesCards({ orderOption, filterOption }: { orderOption: strin
   };
 
   // Filtering
-  const filteredClasses = classes.filter((card) => {
+  const filteredClasses = classes.filter((card: Class) => {
     for (const key in filterOption) {
       const filterValue = filterOption[key]?.toString().toLowerCase();
-      const cardValue = (key in card) ? (card as Record<string, any>)[key] : undefined;
+      const value = card[key as keyof Class];
 
-      // Handle the 'members' field differently
-      if (key === "members" && Array.isArray(cardValue)) {
-
-        // Compare the length of the 'members' array
-        if (filterValue && !cardValue.length.toString().includes(filterValue)) {
+      if (key === "members" && Array.isArray(value)) {
+        if (filterValue && !value.length.toString().includes(filterValue)) {
           return false;
         }
-      } else if (cardValue && cardValue.toString().toLowerCase && !cardValue.toString().toLowerCase().includes(filterValue)) {
+      } else if (typeof value === "string" && !value.toLowerCase().includes(filterValue)) {
+        return false;
+      } else if (typeof value === "number" && !value.toString().includes(filterValue)) {
         return false;
       }
     }
@@ -104,6 +103,7 @@ export function ClassesCards({ orderOption, filterOption }: { orderOption: strin
         toast.error(response.message || 'Failed to delete card.');
       }
     } catch (error) {
+      console.error('Error deleting class:', error);
       toast.error('An error occurred while deleting the card.');
     } finally {
       setLoading(false);

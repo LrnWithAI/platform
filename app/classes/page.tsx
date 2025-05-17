@@ -56,6 +56,12 @@ export default function Classes() {
     async function fetchClasses() {
       try {
         setLoading(true);
+
+        if (!user) {
+          toast.error("User not found.");
+          return;
+        }
+
         const response = await getClasses(user.id);
 
         if (response) {
@@ -65,6 +71,7 @@ export default function Classes() {
           toast.error("Failed to fetch classes.");
         }
       } catch (error) {
+        console.error("Error fetching classes:", error);
         toast.error("An error occurred while fetching classes.");
       } finally {
         setLoading(false);
@@ -72,7 +79,7 @@ export default function Classes() {
     }
 
     fetchClasses();
-  }, [user]);
+  }, [user, setLoading, setClasses]);
 
   return (
     <div className="flex flex-1 flex-col gap-4 p-8">

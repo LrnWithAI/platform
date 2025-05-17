@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Mail, SquareArrowOutUpRight } from "lucide-react";
 import { useUserStore } from "@/stores/userStore";
@@ -10,27 +10,30 @@ import { Cards } from "@/components/universal_cards";
 import { getTopSubmittedTests } from "@/actions/testActions";
 import { getClassWithMostMembers } from "@/actions/classActions";
 import { getLatestPublicNotes, getTopNoteCreators } from "@/actions/notesActions";
+import { Test } from "@/types/test";
+import { Note } from "@/types/note";
+import { Class } from "@/types/class";
+import { User } from "@/types/user";
 
 export default function Home() {
   const router = useRouter();
   const setLoading = useLoadingStore((state) => state.setLoading);
   const user = useUserStore((state) => state.user);
 
-  const [tests, setTests] = useState<any[]>([]);
-  const [publicNotes, setPublicNotes] = useState<any[]>([]);
-  const [popularClass, setPopularClass] = useState<any[] | null>([]);
-  const [topCreators, setTopCreators] = useState<any[]>([]);
+  const [tests, setTests] = useState<Test[]>([]);
+  const [publicNotes, setPublicNotes] = useState<Note[]>([]);
+  const [popularClass, setPopularClass] = useState<Class[] | null>([]);
+  const [topCreators, setTopCreators] = useState<User[]>([]);
 
-  const fetchPopularTests = async () => {
+  const fetchPopularTests = useCallback(async () => {
     setLoading(true);
     const res = await getTopSubmittedTests(4);
     setTests(res.data);
     setLoading(false);
-  };
+  }, [setLoading]);
 
-  const fetchPopularClass = async () => {
+  const fetchPopularClass = useCallback(async () => {
     setLoading(true);
-
     const res = await getClassWithMostMembers();
 
     if (res.success && res.data) {
@@ -38,30 +41,30 @@ export default function Home() {
     }
 
     setLoading(false);
-  };
+  }, [setLoading]);
 
-  const fetchPublicNotes = async () => {
+  const fetchPublicNotes = useCallback(async () => {
     setLoading(true);
     const res = await getLatestPublicNotes();
     if (res.success) {
       setPublicNotes(res.data);
     }
     setLoading(false);
-  };
+  }, [setLoading]);
 
-  const fetchTopCreators = async () => {
+  const fetchTopCreators = useCallback(async () => {
     setLoading(true);
     const res = await getTopNoteCreators();
     if (res.success) setTopCreators(res.data);
     setLoading(false);
-  };
+  }, [setLoading]);
 
   useEffect(() => {
     fetchPopularTests();
     fetchPopularClass();
     fetchPublicNotes();
     fetchTopCreators();
-  }, []);
+  }, [fetchPopularTests, fetchPopularClass, fetchPublicNotes, fetchTopCreators]);
 
   return (
     <div className="flex flex-1 flex-col gap-6 p-8">

@@ -31,9 +31,7 @@ export default function CreateNoteWithAI() {
   const [style, setStyle] = useState("summary");
   const [selectedLanguage, setSelectedLanguage] = useState("en");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
   const [isGenerating, setIsGenerating] = useState(false);
-  const [generatedContent, setGeneratedContent] = useState<string>("");
 
   async function generateNoteAI({
     prompt,
@@ -115,8 +113,6 @@ export default function CreateNoteWithAI() {
       setIsGenerating(false);
       return;
     }
-
-    setGeneratedContent(aiContent); // ← Naplníme stav (môžeš zobraziť, ak chceš)
 
     await updateNote({
       id: noteId,

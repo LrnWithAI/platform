@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation';
-import { CircleAlert, Copy, EllipsisVertical, FilePenLine, Share2, SquareMinus, Trash2 } from 'lucide-react';
+import { CircleAlert, Copy, EllipsisVertical, FilePenLine, SquareMinus, Trash2 } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command"
