@@ -38,7 +38,9 @@ export default function Avatar({
     }
   }, [url]);
 
-  const uploadAvatar: React.ChangeEventHandler<HTMLInputElement> = async (event) => {
+  const uploadAvatar: React.ChangeEventHandler<HTMLInputElement> = async (
+    event
+  ) => {
     try {
       setUploading(true);
 
@@ -62,12 +64,10 @@ export default function Avatar({
       }
 
       // Získanie verejnej URL pomocou getPublicUrl
-      const { data: publicUrlData, error: publicUrlError } =
-        supabase.storage.from("avatars").getPublicUrl(filePath);
-      if (publicUrlError) {
-        console.error("Error getting public URL:", publicUrlError);
-        throw publicUrlError;
-      }
+      const { data: publicUrlData } = supabase.storage
+        .from("avatars")
+        .getPublicUrl(filePath);
+
       if (!publicUrlData || !publicUrlData.publicUrl) {
         throw new Error("Public URL is undefined");
       }
@@ -110,13 +110,18 @@ export default function Avatar({
           className="rounded-full aspect-square object-cover border"
         />
       ) : (
-        <div className="avatar no-image" style={{ height: size, width: size }} />
+        <div
+          className="avatar no-image"
+          style={{ height: size, width: size }}
+        />
       )}
       <div className="flex flex-col md:flex-row gap-4">
         <Button onClick={handleUploadButtonClick} variant="outline">
           {avatarUrl ? "Change avatar" : "Upload"}
         </Button>
-        {avatarUrl && <Button className="bg-red-500 hover:bg-red-600" >Delete avatar</Button>}
+        {avatarUrl && (
+          <Button className="bg-red-500 hover:bg-red-600">Delete avatar</Button>
+        )}
         <input
           ref={fileInputRef}
           style={{ visibility: "hidden", position: "absolute" }}
