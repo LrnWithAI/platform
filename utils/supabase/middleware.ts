@@ -35,7 +35,7 @@ export async function updateSession(request: NextRequest) {
 
   if (
     !user &&
-    ['/account', '/settings', '/support', '/home', '/library', '/classes'].some((path) =>
+    ['/account', '/home', '/library', '/classes'].some((path) =>
       request.nextUrl.pathname.startsWith(path)
     )
   ) {
