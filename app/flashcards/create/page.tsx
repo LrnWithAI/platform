@@ -5,20 +5,17 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { flashcardsSchema } from "@/schema/flashcards";
 import { useForm, useFieldArray } from "react-hook-form";
-import { useState } from "react";
 import CreateFlashcardsWithAIForm from "@/components/flashcards-create-with-ai";
 
 import { useSearchParams } from "next/navigation";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Check } from "lucide-react";
 import {
   Select,
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";

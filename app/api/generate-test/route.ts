@@ -65,8 +65,13 @@ ${text}`;
     }
 
     return NextResponse.json({ questions });
-  } catch (error: any) {
-    console.error("Unhandled error in POST /generate-questions:", error);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error("Error generating test:", error.message);
+    } else {
+      console.error("Unknown error:", error);
+    }
+
     return NextResponse.json(
       { error: "Error processing PDF and generating questions" },
       { status: 500 }

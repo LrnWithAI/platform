@@ -50,16 +50,12 @@ const FlashcardsPage = () => {
   const [isFlashcardsLoaded, setIsFlashcardsLoaded] = useState(false);
 
   const {
-    register,
-    control,
-    handleSubmit,
     formState: { errors },
   } = useForm();
 
   async function fetchFlashcardsSetById() {
     try {
       const response = await getFlashcardsSetById(flashcardsId);
-      console.log("response", response);
 
       if (response.success) {
         setFlashcardsSet(() => response.data);
@@ -67,11 +63,11 @@ const FlashcardsPage = () => {
         toast.error(response.message || "Failed to fetch flashcards.");
       }
     } catch (error) {
+      console.error("Error fetching flashcards:", error);
       toast.error("An error occurred while fetching flashcards.");
     }
   }
 
-  // TODO: add fetchStarredFlashcards and utilize them
   async function fetchStarredFlashcards() {
     const userId = user?.id;
 
@@ -85,11 +81,11 @@ const FlashcardsPage = () => {
 
       if (response.success) {
         setStarredFlashcards(response.data?.flashcards_starred);
-        console.log("starred flashcards", response.data?.flashcards_starred);
       } else {
         toast.error(response.message || "Failed to fetch starred flashcards.");
       }
     } catch (error) {
+      console.error("Error fetching starred flashcards:", error);
       toast.error("An error occurred while fetching starred flashcards.");
     }
   }
@@ -100,7 +96,6 @@ const FlashcardsPage = () => {
     setValue: setValueEdit,
     getValues: getValuesEdit,
     control: controlEdit,
-    formState: { errors: errorsEdit },
   } = useForm<CreateFlashcardsFormValues>({
     resolver: zodResolver(flashcardsSchema),
     defaultValues: {
@@ -149,8 +144,8 @@ const FlashcardsPage = () => {
         toast.success("Image uploaded successfully!");
       }
     } catch (error) {
+      console.error("Error uploading image:", error);
       toast.error("Upload failed!");
-      console.error(error);
     }
   };
 
