@@ -75,8 +75,11 @@ export default function Avatar({
       // Spusti callback, ak je potrebné (napr. pre lokálne uloženie filePath)
       onUpload(publicUrlData.publicUrl);
 
-      // Aktualizácia profilu používateľa s verejnou URL
-      const responseUpdate = await updateUserProfile(user?.id, {
+      if (!user?.id) {
+        throw new Error("User ID is missing");
+      }
+
+      const responseUpdate = await updateUserProfile(user.id, {
         avatar_url: publicUrlData.publicUrl,
       });
       if (responseUpdate.success) {
