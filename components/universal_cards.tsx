@@ -24,11 +24,16 @@ interface CardsProps {
 }
 
 // Type guards
-const isNote = (card: any): card is Note =>
+const isNote = (card: Class | Test | FlashcardsSet | Note): card is Note =>
   "content" in card && "created_by" in card;
-const isTest = (card: any): card is Test => "questions" in card;
-const isFlashcards = (card: any): card is FlashcardsSet => "flashcards" in card;
-const isClass = (card: any): card is Class =>
+
+const isTest = (card: Class | Test | FlashcardsSet | Note): card is Test =>
+  "questions" in card;
+
+const isFlashcards = (card: Class | Test | FlashcardsSet | Note): card is FlashcardsSet =>
+  "flashcards" in card;
+
+const isClass = (card: Class | Test | FlashcardsSet | Note): card is Class =>
   "members" in card && "image" in card;
 
 export function Cards({

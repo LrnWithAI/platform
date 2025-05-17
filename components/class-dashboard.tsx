@@ -43,7 +43,7 @@ const ClassDashboard = () => {
     { label: 'Report', value: 'report', icon: CircleAlert },
     { label: 'Delete', value: 'delete', icon: Trash2 },
   ]
-  // @ts-expect-error
+  // @ts-expect-error complex structure with mixed content types in updatedContent
   const handleUpdateClass = async (updatedContent) => {
     if (!classData) return;
 
@@ -74,7 +74,7 @@ const ClassDashboard = () => {
   const handlePostSettings = (action: string, post: Class["content"][number]) => {
     switch (action) {
       case 'edit':
-        // @ts-expect-error
+        // @ts-expect-error setting state with post containing Supabase file metadata
         setPostData(post);
         setIsEditing(true);
         setOpenPostDialog(true);
@@ -98,10 +98,11 @@ const ClassDashboard = () => {
     const generatedId = isEditing ? postData.id : Date.now();
 
     // Oddelenie existujúcich a nových súborov
-    // Type guard to check if file has a 'url' property
-    const isExistingFile = (file: any): file is { url: string } => !!file.url;
+    const isExistingFile = (file: File | { url: string }): file is { url: string } => {
+      return 'url' in file;
+    };
     const existingFiles = postData.files.filter(isExistingFile);  // Existujúce súbory (majú URL)
-    const newFiles = postData.files.filter(file => !isExistingFile(file));      // Nové súbory (inštancie File)
+    const newFiles = postData.files.filter(file => !isExistingFile(file));  // Nové súbory (inštancie File)
 
     const preparedPostData = {
       ...postData,
@@ -252,7 +253,7 @@ const ClassDashboard = () => {
                 <div>
                   <h3 className="mb-1 mt-2">Existing Files</h3>
                   <ul className="mt-2 space-y-2">
-                    { /*@ts-expect-error */}
+                    {/* @ts-expect-error file object from Supabase contains 'url' not typed in File */}
                     {postData.files.filter(file => file.url).map((file) => (
                       <li key={file.name} className="flex items-center justify-between border p-2 rounded-lg">
                         <span className="truncate">{file.name}</span>
@@ -262,7 +263,7 @@ const ClassDashboard = () => {
                           onClick={() => {
                             setPostData({
                               ...postData,
-                              files: postData.files.filter(f => f !== file), // Porovnáva sa objekt, nie index
+                              files: postData.files.filter(f => f !== file),
                             });
                           }}
                         >
@@ -274,7 +275,7 @@ const ClassDashboard = () => {
 
                   <h3 className="mb-1 mt-2">New Files</h3>
                   <ul className="mt-2 space-y-2">
-                    { /*@ts-expect-error */}
+                    {/* @ts-expect-error filtering for new uploaded files without 'url' property */}
                     {postData.files.filter(file => !file.url).map((file) => (
                       <li key={file.name} className="flex items-center justify-between border p-2 rounded-lg">
                         <span className="truncate">{file.name}</span>
@@ -284,7 +285,7 @@ const ClassDashboard = () => {
                           onClick={() => {
                             setPostData({
                               ...postData,
-                              files: postData.files.filter(f => f !== file), // Odstráni sa presne daný objekt
+                              files: postData.files.filter(f => f !== file),
                             });
                           }}
                         >
