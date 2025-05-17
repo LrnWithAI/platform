@@ -3,23 +3,19 @@
 import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { useState } from "react";
 import Link from "next/link";
 
-import { useSearchParams } from "next/navigation";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-import { Check } from "lucide-react";
 import { FileUpload } from "@/components/ui/file-upload";
 import {
   Select,
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -117,7 +113,6 @@ const CreateTestWithAIForm = () => {
   };
 
   const {
-    register: registerFileUpload,
     handleSubmit: onSubmitFileUpload,
     setValue: setFileValue,
     watch: watchFileUpload,

@@ -6,22 +6,18 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { testSchema } from "@/schema/test";
 import { useForm, useFieldArray } from "react-hook-form";
 import { useState } from "react";
-import Link from "next/link";
 import CreateTestWithAIForm from "@/components/test-create-with-ai";
 
 import { useSearchParams } from "next/navigation";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { Check } from "lucide-react";
-import { FileUpload } from "@/components/ui/file-upload";
 import {
   Select,
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -30,16 +26,8 @@ import { toast } from "react-toastify";
 
 import { createTest } from "@/actions/testActions";
 import { useUserStore } from "@/stores/userStore";
-import {
-  uploadFileToTestFilesBucket,
-  uploadFileToTestQuestionsBucket,
-} from "@/actions/storageActions";
 
 type CreateTestFormValues = z.infer<typeof testSchema>;
-
-type FileUploadFormValues = {
-  uploadedFile: File[];
-};
 
 export default function CreateTest() {
   const params = useSearchParams();
@@ -112,7 +100,6 @@ export default function CreateTest() {
   };
 
   const onSubmit = async (data: CreateTestFormValues) => {
-    console.log("Submitted data", data);
     data.created_by = user?.id;
 
     const test = await createTest(data);

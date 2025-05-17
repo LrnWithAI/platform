@@ -44,6 +44,7 @@ const TestSubmitPageWithId = () => {
         );
       }
     } catch (error) {
+      console.error("Error fetching test or submission:", error);
       toast.error("An error occurred while fetching tests.");
     }
   }

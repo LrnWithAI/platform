@@ -16,7 +16,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify";
 import {
@@ -32,7 +31,7 @@ import { testSchema } from "@/schema/test";
 
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { TestSubmission, TestSubmissionAnswers } from "@/types/test";
+import { TestSubmission } from "@/types/test";
 import { uploadFileToTestQuestionsBucket } from "@/actions/storageActions";
 
 type CreateTestFormValues = z.infer<typeof testSchema>;
@@ -51,7 +50,6 @@ const TestPage = () => {
   >({});
 
   const {
-    register,
     control,
     handleSubmit,
     formState: { errors },
@@ -67,6 +65,7 @@ const TestPage = () => {
         toast.error(response.message || "Failed to fetch tests.");
       }
     } catch (error) {
+      console.error("Error fetching test:", error);
       toast.error("An error occurred while fetching tests.");
     }
   }
@@ -76,8 +75,6 @@ const TestPage = () => {
     handleSubmit: handleSubmitEdit,
     setValue: setValueEdit,
     getValues: getValuesEdit,
-    control: controlEdit,
-    formState: { errors: errorsEdit },
   } = useForm<CreateTestFormValues>({
     resolver: zodResolver(testSchema),
     defaultValues: {
@@ -127,8 +124,8 @@ const TestPage = () => {
         toast.success("Image uploaded successfully!");
       }
     } catch (error) {
+      console.error("Error uploading image:", error);
       toast.error("Upload failed!");
-      console.error(error);
     }
   };
 
@@ -230,8 +227,6 @@ const TestPage = () => {
   };
 
   const onDeleteTest = async () => {
-    console.log("testId for delete", testId);
-
     toast
       .promise(deleteTest(testId, user?.id as string), {
         pending: "Deleting test...",
@@ -289,8 +284,6 @@ const TestPage = () => {
   const onSubmitEditTest = async (data: CreateTestFormValues) => {
     data.created_by = user?.id;
     data.id = test?.id;
-
-    console.log("new editted data", data);
 
     await updateTest(data);
     toast.success("Test edited successfully!");
