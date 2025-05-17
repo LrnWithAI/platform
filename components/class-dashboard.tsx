@@ -43,7 +43,7 @@ const ClassDashboard = () => {
     { label: 'Report', value: 'report', icon: CircleAlert },
     { label: 'Delete', value: 'delete', icon: Trash2 },
   ]
-  // @ts-ignore
+  // @ts-expect-error
   const handleUpdateClass = async (updatedContent) => {
     if (!classData) return;
 
@@ -74,7 +74,7 @@ const ClassDashboard = () => {
   const handlePostSettings = (action: string, post: Class["content"][number]) => {
     switch (action) {
       case 'edit':
-        // @ts-ignore
+        // @ts-expect-error
         setPostData(post);
         setIsEditing(true);
         setOpenPostDialog(true);
@@ -252,6 +252,7 @@ const ClassDashboard = () => {
                 <div>
                   <h3 className="mb-1 mt-2">Existing Files</h3>
                   <ul className="mt-2 space-y-2">
+                    { /*@ts-expect-error */}
                     {postData.files.filter(file => file.url).map((file) => (
                       <li key={file.name} className="flex items-center justify-between border p-2 rounded-lg">
                         <span className="truncate">{file.name}</span>
@@ -273,6 +274,7 @@ const ClassDashboard = () => {
 
                   <h3 className="mb-1 mt-2">New Files</h3>
                   <ul className="mt-2 space-y-2">
+                    { /*@ts-expect-error */}
                     {postData.files.filter(file => !file.url).map((file) => (
                       <li key={file.name} className="flex items-center justify-between border p-2 rounded-lg">
                         <span className="truncate">{file.name}</span>

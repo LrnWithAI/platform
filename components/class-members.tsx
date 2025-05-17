@@ -93,18 +93,26 @@ const ClassMembers = () => {
   };
 
   const handleInviteStudent = async (email: string) => {
-    const response = await inviteToClass(email, classData?.id);
+    if (classData?.id === undefined) {
+      toast.error("Class ID is not available.");
+      return;
+    }
+    const response = await inviteToClass(email, classData.id);
 
     if (response?.success) {
       toast.success(response.message);
       // Fetch the updated list after editing
-      const updatedClasses = await getClasses(user.id);
-      if (updatedClasses) {
-        setClasses(updatedClasses.data);
-        toast.success('Updated classes loaded successfully!');
-        setOpen(false);
+      if (user && user.id) {
+        const updatedClasses = await getClasses(user.id);
+        if (updatedClasses) {
+          setClasses(updatedClasses.data);
+          toast.success('Updated classes loaded successfully!');
+          setOpen(false);
+        } else {
+          toast.error(response.message || "Failed to update class.");
+        }
       } else {
-        toast.error(response.message || "Failed to update class.");
+        toast.error("User information is not available.");
       }
     } else {
       toast.error(response?.message || "Failed to invite member.");

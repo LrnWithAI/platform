@@ -69,7 +69,8 @@ const ReportDialog: React.FC<ReportDialogProps> = ({ isOpen, content_id, onClose
 
       return response.success;
     } catch (error) {
-      toast.error(`Failed to send report. ${error.message}`);
+      const errorMessage = (error instanceof Error) ? error.message : String(error);
+      toast.error(`Failed to send report. ${errorMessage}`);
       return false;
     } finally {
       setValue("title", "");

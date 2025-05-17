@@ -23,6 +23,14 @@ interface CardsProps {
   refreshData: () => void;
 }
 
+// Type guards
+const isNote = (card: any): card is Note =>
+  "content" in card && "created_by" in card;
+const isTest = (card: any): card is Test => "questions" in card;
+const isFlashcards = (card: any): card is FlashcardsSet => "flashcards" in card;
+const isClass = (card: any): card is Class =>
+  "members" in card && "image" in card;
+
 export function Cards({
   orderOption,
   filterOption,
@@ -33,9 +41,7 @@ export function Cards({
   const setLoading = useLoadingStore((state) => state.setLoading);
   const user = useUserStore((state) => state.user);
 
-  // Filtering len pre 'title'
   const filteredData = data.filter((card) => {
-    // Ak je nastavený filter pre title, porovnáme len tento atribút
     if (filterOption && filterOption["title"]) {
       return card.title
         ?.toLowerCase()
@@ -44,16 +50,17 @@ export function Cards({
     return true;
   });
 
-  // Sorting – triedime len podľa created_at a title
   const sortedData = filteredData.sort((a, b) => {
     if (orderOption === "newest") {
       return (
-        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        new Date(b.created_at ?? "").getTime() -
+        new Date(a.created_at ?? "").getTime()
       );
     }
     if (orderOption === "older") {
       return (
-        new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+        new Date(a.created_at ?? "").getTime() -
+        new Date(b.created_at ?? "").getTime()
       );
     }
     if (orderOption === "a-z") {
@@ -65,23 +72,16 @@ export function Cards({
     return 0;
   });
 
-  // Funkcia pre odstránenie podľa typu
   const handleDelete = async (id: number) => {
     try {
       setLoading(true);
-
       if (!user?.id) {
         toast.error("User ID is missing. Cannot delete the card.");
         return;
       }
-
-      if (type === "tests") {
-        await deleteTest(id, user.id);
-      } else if (type === "flashcards") {
-        await deleteFlashcardsSet(id, user.id);
-      } else if (type === "notes") {
-        await deleteNote(id, user.id);
-      }
+      if (type === "tests") await deleteTest(id, user.id);
+      else if (type === "flashcards") await deleteFlashcardsSet(id, user.id);
+      else if (type === "notes") await deleteNote(id, user.id);
 
       refreshData();
       toast.success(`${type} deleted successfully!`);
@@ -93,7 +93,6 @@ export function Cards({
     }
   };
 
-  // Určenie cesty pre Link podľa typu
   const getLinkPath = (id: number) => {
     if (type === "tests") return `/test/${id}`;
     if (type === "notes") return `/notes/${id}`;
@@ -109,23 +108,24 @@ export function Cards({
           key={card.id}
           className="relative p-5 border rounded-lg shadow bg-sidebar hover:cursor-pointer hover:scale-105 duration-300"
         >
-          {/* Tlačidlo pre odstránenie */}
-          {card?.created_by?.id === user?.id && (
-            <div className="absolute top-2 right-2 flex gap-1">
-              <Button
-                className="bg-red-500 rounded-sm text-sm hover:bg-red-600 h-7 w-7"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDelete(card.id);
-                }}
-              >
-                <Trash2 size={16} />
-              </Button>
-            </div>
-          )}
+          {"created_by" in card &&
+            typeof card.created_by === "object" &&
+            "id" in card.created_by &&
+            card.created_by?.id === user?.id && (
+              <div className="absolute top-2 right-2 flex gap-1">
+                <Button
+                  className="bg-red-500 rounded-sm text-sm hover:bg-red-600 h-7 w-7"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (card.id !== undefined) handleDelete(card.id);
+                  }}
+                >
+                  <Trash2 size={16} />
+                </Button>
+              </div>
+            )}
 
-          {/* Navigácia podľa typu */}
-          <Link href={getLinkPath(card.id)}>
+          <Link href={card.id !== undefined ? getLinkPath(card.id) : "/"}>
             <h2 className="text-lg font-bold mb-2">{card.title}</h2>
             <div className="flex">
               <Image
@@ -136,28 +136,32 @@ export function Cards({
                 unoptimized
               />
               <div className="ml-4 flex flex-col justify-center">
-                <p className="text-sm text-gray-700 dark:text-gray-400 font-bold">
-                  {new Date(card.created_at).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </p>
+                {card.created_at && (
+                  <p className="text-sm text-gray-700 dark:text-gray-400 font-bold">
+                    {new Date(card.created_at).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </p>
+                )}
 
-                {/* Počet otázok pre testy */}
-                {type === "tests" && card.questions && (
+                {isTest(card) && card.questions?.length !== undefined && (
                   <p className="text-muted-foreground">
-                    {card.questions.length} {card.questions.length === 1 ? "question" : "questions"}
+                    {card.questions.length}{" "}
+                    {card.questions.length === 1 ? "question" : "questions"}
                   </p>
                 )}
-                {/* Počet kartičiek pre flashcards */}
-                {type === "flashcards" && Array.isArray(card.flashcards) && (
-                  <p className="text-sm text-muted-foreground">
-                    {card.flashcards.length} {card.flashcards.length === 1 ? "card" : "cards"}
-                  </p>
-                )}
-                {/* Autor poznámky pre typ "notes" */}
-                {type === "notes" && card.created_by && (
+
+                {isFlashcards(card) &&
+                  card.flashcards?.length !== undefined && (
+                    <p className="text-sm text-muted-foreground">
+                      {card.flashcards.length}{" "}
+                      {card.flashcards.length === 1 ? "card" : "cards"}
+                    </p>
+                  )}
+
+                {isNote(card) && card.created_by && (
                   <p className="text-sm text-muted-foreground mt-1">
                     by{" "}
                     <span
@@ -172,10 +176,11 @@ export function Cards({
                     </span>
                   </p>
                 )}
-                {/* Počet členov pre triedy */}
-                {type === "classes" && card.members && (
+
+                {isClass(card) && card.members && (
                   <p className="text text-muted-foreground">
-                    {card.members.length} {card.members.length === 1 ? "member" : "members"}
+                    {card.members.length}{" "}
+                    {card.members.length === 1 ? "member" : "members"}
                   </p>
                 )}
               </div>
