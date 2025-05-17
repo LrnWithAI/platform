@@ -42,6 +42,7 @@ export function UpdatePasswordForm({ className, ...props }: React.ComponentProps
         toast.error(res.message);
       }
     } catch (error) {
+      console.error("Error updating password:", error);
       toast.error("An unexpected error occurred.");
     }
   };

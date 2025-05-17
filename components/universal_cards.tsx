@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Trash2 } from "lucide-react";
 
 import Image from "next/image";
@@ -10,11 +10,15 @@ import { Button } from "./ui/button";
 import { deleteTest } from "@/actions/testActions";
 import { deleteNote } from "@/actions/notesActions";
 import { deleteFlashcardsSet } from "@/actions/flashcardsActions";
+import { Class } from "@/types/class";
+import { Test } from "@/types/test";
+import { Note } from "@/types/note";
+import { FlashcardsSet } from "@/types/flashcards";
 
 interface CardsProps {
   orderOption?: string;
   filterOption?: Record<string, string>;
-  data: any[];
+  data: (Class | Test | FlashcardsSet | Note)[];
   type: string;
   refreshData: () => void;
 }

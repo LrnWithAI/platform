@@ -19,6 +19,7 @@ import ReportDialog from './report_dialog';
 import { formatDate } from '@/utils/supabase/utils';
 import { getClasses, editClass } from '@/actions/classActions';
 import { updateClassContent, uploadFilesToClassContent, deleteFileFromClassContent } from '@/actions/storageActions';
+import { Class } from '@/types/class';
 
 const ClassDashboard = () => {
   const router = useRouter();
@@ -59,13 +60,14 @@ const ClassDashboard = () => {
         toast.error(response.message || 'Failed to update class.');
       }
     } catch (error) {
+      console.error('Error updating class:', error);
       toast.error('An error occurred while updating the class.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handlePostSettings = (action: string, post: any) => {
+  const handlePostSettings = (action: string, post: Class["content"][number]) => {
     switch (action) {
       case 'edit':
         setPostData(post);
@@ -142,6 +144,7 @@ const ClassDashboard = () => {
           }
         }
       } catch (error) {
+        console.error("Error uploading files:", error);
         toast.error("An error occurred while uploading files.");
       }
     }
@@ -283,7 +286,7 @@ const ClassDashboard = () => {
       <div>
         {classData && classData.content?.length > 0 ? (
           classData.content.map((post) => (
-            <div className="mt-5 first:mt-0 bg-gray-100 dark:bg-secondary rounded-lg shadow-lg p-6 pe-16 relative">
+            <div key={post.id} className="mt-5 first:mt-0 bg-gray-100 dark:bg-secondary rounded-lg shadow-lg p-6 pe-16 relative">
               <div className='flex items-center gap-4'>
                 <Avatar className="cursor-pointer hover:opacity-75" onClick={() => { router.push(`/profile/${post.created_by.username}`) }}>
                   <AvatarImage

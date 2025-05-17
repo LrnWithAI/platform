@@ -83,6 +83,7 @@ const ClassMembers = () => {
         toast.error(response.message || "Failed to update class.");
       }
     } catch (error) {
+      console.error("Error updating class:", error);
       toast.error("An error occurred while updating the class.");
     } finally {
       setLoading(false);
@@ -130,7 +131,7 @@ const ClassMembers = () => {
           <form onSubmit={handleSubmit(onSubmit)}>
             <DialogDescription className="border rounded-xl text-left p-3 flex flex-col gap-5 mb-4">
               <div>
-                <Label htmlFor="email">Student's e-mail address</Label>
+                <Label htmlFor="email">Student&apos;s e-mail address</Label>
                 <Input
                   id="email"
                   placeholder="example@email.com"

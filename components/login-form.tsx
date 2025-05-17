@@ -42,6 +42,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
         toast.error(res.message);
       }
     } catch (error) {
+      console.error("Error during login:", error);
       toast.error("An unexpected error occurred.");
     }
   };

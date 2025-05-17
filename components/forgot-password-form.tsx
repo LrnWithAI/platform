@@ -40,6 +40,7 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
         toast.error(res.message);
       }
     } catch (error) {
+      console.error("Error during password reset:", error);
       toast.error("An unexpected error occurred.");
     }
   };

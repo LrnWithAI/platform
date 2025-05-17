@@ -13,7 +13,7 @@ import { createClass, editClass, getClasses } from '@/actions/classActions';
 import { useLoadingStore } from '@/stores/loadingStore';
 import { useClassStore } from '@/stores/classStore';
 import { Button } from './ui/button';
-import { ClassDialogProps } from '@/types/class';
+import { Class, ClassDialogProps } from '@/types/class';
 import { ClassSchema } from '@/schema/class';
 import { deleteFileFromClassCoverPhoto, uploadFileToClassCoverPhoto } from '@/actions/storageActions';
 
@@ -41,7 +41,7 @@ const ClassDialog: React.FC<ClassDialogProps> = ({ type, onClose, isOpen, initia
     },
   });
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: Class) => {
     try {
       onClose();
       setLoading(true);
@@ -107,7 +107,7 @@ const ClassDialog: React.FC<ClassDialogProps> = ({ type, onClose, isOpen, initia
       }
 
       // Teraz zaktualizujeme triedu s novými údajmi súboru ak sa nahral nový obrázok
-      const updateResponse = await editClass(classId, { ...data, image: { name: imageName, url: imageUrl } });
+      const updateResponse = await editClass(Number(classId), { ...data, image: { name: imageName, url: imageUrl } });
 
       if (!updateResponse.success) {
         toast.error("Failed to update class.");
@@ -122,6 +122,7 @@ const ClassDialog: React.FC<ClassDialogProps> = ({ type, onClose, isOpen, initia
         setClasses(updatedClasses.data);
       }
     } catch (error) {
+      console.error("Error:", error);
       toast.error(`An error occurred while ${type === "create" ? "creating" : "updating"} the class.`);
     } finally {
       setValue("title", "");

@@ -45,6 +45,7 @@ export function RegisterForm({ className, ...props }: React.ComponentPropsWithou
         toast.error(res.message);
       }
     } catch (error) {
+      console.error("Error during registration:", error);
       toast.error("An unexpected error occurred.");
     }
   };
