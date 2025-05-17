@@ -158,12 +158,8 @@ export const NotePDFDocument = ({ note, user }: { note: Note; user: User }) => {
             {(note.files ?? [])
               .filter((f) => f.type.startsWith("image/"))
               .map((file) => (
-                <Image
-                  key={file.id}
-                  style={styles.image}
-                  src={file.url}
-                  // eslint-disable-next-line jsx-a11y/alt-text
-                />
+                // eslint-disable-next-line jsx-a11y/alt-text
+                <Image key={file.id} style={styles.image} src={file.url} />
               ))}
           </View>
         )}

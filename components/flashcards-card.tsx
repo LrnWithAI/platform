@@ -67,8 +67,8 @@ export default function FlashcardsCard({
 
                   {/* Centered image on right */}
                   <div className="flex items-center justify-center">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      // eslint-disable-next-line @next/next/no-img-element
                       src={image_url}
                       alt="Uploaded flashcard image"
                       className="max-h-96 max-w-auto object-contain border rounded-lg"

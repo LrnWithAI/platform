@@ -7,19 +7,29 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import ReactMarkdown from "react-markdown";
 
-import { Trash2, Eye, EditIcon, CircleAlert, CircleX, Download } from "lucide-react";
+import {
+  Trash2,
+  Eye,
+  EditIcon,
+  CircleAlert,
+  CircleX,
+  Download,
+} from "lucide-react";
 import { toast } from "react-toastify";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import ReportDialog from "@/components/report_dialog";
 import { deleteNote, getNoteById, updateNote } from "@/actions/notesActions";
-import { uploadFileToNotesBucket, deleteFileFromNotesBucket } from "@/actions/storageActions";
+import {
+  uploadFileToNotesBucket,
+  deleteFileFromNotesBucket,
+} from "@/actions/storageActions";
 import { noteSchema } from "@/schema/note";
 import { useUserStore } from "@/stores/userStore";
 import { useLoadingStore } from "@/stores/loadingStore";
-import { PDFDownloadLink } from '@react-pdf/renderer';
-import { NotePDFDocument } from '@/components/pdf/NotePDFDocument';
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import { NotePDFDocument } from "@/components/pdf/NotePDFDocument";
 import { Note } from "@/types/note";
 
 type UploadedFile = {
@@ -34,7 +44,8 @@ type NoteFormInputs = z.infer<typeof noteSchema>;
 
 export default function NoteDetail() {
   const params = useParams();
-  const id = typeof params.id === "string" ? parseInt(params.id, 10) : undefined;
+  const id =
+    typeof params.id === "string" ? parseInt(params.id, 10) : undefined;
   const user = useUserStore((state) => state.user);
   const router = useRouter();
 
@@ -100,20 +111,20 @@ export default function NoteDetail() {
   // Pridať nové súbory
   const handleFilesAdd = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(event.target.files || []);
-    setAddedFiles(prev => [...prev, ...selectedFiles]);
+    setAddedFiles((prev) => [...prev, ...selectedFiles]);
   };
 
   // Odstrániť existujúci (uploaded) súbor – presunieš ho do deletedFiles a odstrániš z currentFiles
   const handleRemoveCurrentFile = (file: UploadedFile) => {
-    setCurrentFiles(prev => prev.filter(f => f.id !== file.id));
-    setDeletedFiles(prev => [...prev, file]);
+    setCurrentFiles((prev) => prev.filter((f) => f.id !== file.id));
+    setDeletedFiles((prev) => [...prev, file]);
   };
 
   // Odstrániť nový (neuložený) súbor
   const handleRemoveAddedFile = (file: File) => {
-    setAddedFiles(prev =>
+    setAddedFiles((prev) =>
       prev.filter(
-        f => f.name + f.lastModified !== file.name + file.lastModified
+        (f) => f.name + f.lastModified !== file.name + file.lastModified
       )
     );
   };
@@ -269,10 +280,21 @@ export default function NoteDetail() {
           <div className="mb-4 space-y-4">
             <ReactMarkdown
               components={{
-                p: (props) => <p className="text-base leading-relaxed mb-4" {...props} />,
-                h2: (props) => <h2 className="text-xl font-semibold mt-6 mb-2" {...props} />,
-                li: (props) => <li className="list-disc ml-6 mb-1" {...props} />,
-                strong: (props) => <strong className="font-bold text-black dark:text-white" {...props} />,
+                p: (props) => (
+                  <p className="text-base leading-relaxed mb-4" {...props} />
+                ),
+                h2: (props) => (
+                  <h2 className="text-xl font-semibold mt-6 mb-2" {...props} />
+                ),
+                li: (props) => (
+                  <li className="list-disc ml-6 mb-1" {...props} />
+                ),
+                strong: (props) => (
+                  <strong
+                    className="font-bold text-black dark:text-white"
+                    {...props}
+                  />
+                ),
                 ul: (props) => <ul className="mb-4" {...props} />,
               }}
             >
@@ -284,15 +306,21 @@ export default function NoteDetail() {
               <h3 className="font-semibold mb-2">Attachments:</h3>
               <ul className="space-y-4">
                 {note.files.map((file: UploadedFile) => (
-                  <li key={file.id} className="flex flex-col gap-2 border-b pb-3">
+                  <li
+                    key={file.id}
+                    className="flex flex-col gap-2 border-b pb-3"
+                  >
                     <div className="flex items-center gap-2">
-                      <span className="truncate max-w-[160px] font-medium">{file.name}</span>
+                      <span className="truncate max-w-[160px] font-medium">
+                        {file.name}
+                      </span>
                       <span className="text-xs text-gray-400 ml-2">
                         ({(file.size / 1024).toFixed(1)} KB)
                       </span>
                     </div>
                     {/* Inline preview obrázka */}
                     {file.type.startsWith("image/") && (
+                      // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={file.url}
                         alt={file.name}
@@ -309,11 +337,12 @@ export default function NoteDetail() {
                       />
                     )}
                     {/* Pre iné typy */}
-                    {!file.type.startsWith("image/") && file.type !== "application/pdf" && (
-                      <span className="italic text-gray-500 text-xs">
-                        (Preview not supported)
-                      </span>
-                    )}
+                    {!file.type.startsWith("image/") &&
+                      file.type !== "application/pdf" && (
+                        <span className="italic text-gray-500 text-xs">
+                          (Preview not supported)
+                        </span>
+                      )}
                   </li>
                 ))}
               </ul>
@@ -331,9 +360,7 @@ export default function NoteDetail() {
       {isEditMode && (
         <>
           <div className="mb-8 max-w-2xl w-full">
-            <h2 className="text-2xl font-bold text-center mb-2">
-              Edit Note
-            </h2>
+            <h2 className="text-2xl font-bold text-center mb-2">Edit Note</h2>
           </div>
           <form
             onSubmit={handleSubmit(onSubmit)}
@@ -373,7 +400,9 @@ export default function NoteDetail() {
                 className="w-5 h-5 cursor-pointer"
                 disabled={loading}
               />
-              <Label htmlFor="public" className="cursor-pointer">Make public</Label>
+              <Label htmlFor="public" className="cursor-pointer">
+                Make public
+              </Label>
             </div>
             <div className="space-y-2">
               <Label htmlFor="note-file">Attachments</Label>
@@ -389,10 +418,15 @@ export default function NoteDetail() {
                 <>
                   <h3 className="mb-1 mt-2">Uploaded Files</h3>
                   <ul className="space-y-2">
-                    {currentFiles.map(file => (
-                      <li key={file.id} className="flex items-center justify-between border p-2 rounded-lg bg-white dark:bg-black">
+                    {currentFiles.map((file) => (
+                      <li
+                        key={file.id}
+                        className="flex items-center justify-between border p-2 rounded-lg bg-white dark:bg-black"
+                      >
                         <div className="flex items-center gap-2 flex-1 min-w-0">
-                          <span className="truncate max-w-[120px]">{file.name}</span>
+                          <span className="truncate max-w-[120px]">
+                            {file.name}
+                          </span>
                           <a
                             href={file.url}
                             target="_blank"
@@ -423,8 +457,11 @@ export default function NoteDetail() {
                 <>
                   <h3 className="mb-1 mt-2">New Files</h3>
                   <ul className="space-y-2">
-                    {addedFiles.map(file => (
-                      <li key={file.name + file.lastModified} className="flex items-center justify-between border p-2 rounded-lg bg-white dark:bg-black">
+                    {addedFiles.map((file) => (
+                      <li
+                        key={file.name + file.lastModified}
+                        className="flex items-center justify-between border p-2 rounded-lg bg-white dark:bg-black"
+                      >
                         <span className="truncate">{file.name}</span>
                         <Button
                           variant="destructive"
@@ -458,6 +495,6 @@ export default function NoteDetail() {
         isOpen={openReportDialog}
         onClose={() => setOpenReportDialog(false)}
       />
-    </div >
+    </div>
   );
 }

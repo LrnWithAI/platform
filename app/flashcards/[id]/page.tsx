@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   Select,
   SelectContent,
@@ -53,7 +53,7 @@ const FlashcardsPage = () => {
     formState: { errors },
   } = useForm();
 
-  async function fetchFlashcardsSetById() {
+  const fetchFlashcardsSetById = useCallback(async () => {
     try {
       const response = await getFlashcardsSetById(flashcardsId);
 
@@ -66,18 +66,14 @@ const FlashcardsPage = () => {
       console.error("Error fetching flashcards:", error);
       toast.error("An error occurred while fetching flashcards.");
     }
-  }
+  }, [flashcardsId]);
 
-  async function fetchStarredFlashcards() {
+  const fetchStarredFlashcards = useCallback(async () => {
     const userId = user?.id;
-
-    if (!userId) return; // Wait until userId is available
+    if (!userId) return;
 
     try {
-      const response = await getStarredFlashcardsBySetId(
-        flashcardsId,
-        userId as string
-      );
+      const response = await getStarredFlashcardsBySetId(flashcardsId, userId);
 
       if (response.success) {
         setStarredFlashcards(response.data?.flashcards_starred);
@@ -88,7 +84,7 @@ const FlashcardsPage = () => {
       console.error("Error fetching starred flashcards:", error);
       toast.error("An error occurred while fetching starred flashcards.");
     }
-  }
+  }, [flashcardsId, user?.id]);
 
   const {
     register: registerEdit,
@@ -154,7 +150,7 @@ const FlashcardsPage = () => {
       fetchFlashcardsSetById();
       fetchStarredFlashcards();
     }
-  }, [params, user, fetchFlashcardsSetById, fetchStarredFlashcards]);
+  }, [user?.id, fetchFlashcardsSetById, fetchStarredFlashcards]);
 
   useEffect(() => {
     if (flashcardsSet && !isFlashcardsLoaded) {

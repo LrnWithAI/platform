@@ -2,7 +2,7 @@
 
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify";
 import { getTestById, getTestSubmissionById } from "@/actions/testActions";
@@ -25,10 +25,11 @@ const TestSubmitPageWithId = () => {
     null
   );
 
-  async function fetchTestByIdAndSubmission() {
+  const fetchTestByIdAndSubmission = useCallback(async () => {
     try {
       const response = await getTestById(testId);
       const submissionResponse = await getTestSubmissionById(submitId);
+
       if (response.success) {
         setTest(() => response.data[0]);
       } else {
@@ -37,7 +38,7 @@ const TestSubmitPageWithId = () => {
 
       if (submissionResponse?.success) {
         setTestSubmission(() => submissionResponse.data);
-        console.log("testSubmission", testSubmission);
+        console.log("testSubmission", submissionResponse.data);
       } else {
         toast.error(
           submissionResponse?.message || "Failed to fetch submission."
@@ -47,7 +48,7 @@ const TestSubmitPageWithId = () => {
       console.error("Error fetching test or submission:", error);
       toast.error("An error occurred while fetching tests.");
     }
-  }
+  }, [testId, submitId]);
 
   useEffect(() => {
     fetchTestByIdAndSubmission();
@@ -114,8 +115,8 @@ const TestSubmitPageWithId = () => {
               </p>
 
               {question.image_url && (
+                // eslint-disable-next-line @next/next/no-img-element
                 <img
-                  // eslint-disable-next-line @next/next/no-img-element
                   src={question.image_url}
                   alt="Uploaded question image"
                   className="mt-2 w-full h-96 object-cover border"

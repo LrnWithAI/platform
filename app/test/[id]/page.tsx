@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   Select,
   SelectContent,
@@ -55,7 +55,7 @@ const TestPage = () => {
     formState: { errors },
   } = useForm();
 
-  async function fetchTestById() {
+  const fetchTestById = useCallback(async () => {
     try {
       const response = await getTestById(testId);
 
@@ -68,7 +68,7 @@ const TestPage = () => {
       console.error("Error fetching test:", error);
       toast.error("An error occurred while fetching tests.");
     }
-  }
+  }, [testId]);
 
   const {
     register: registerEdit,
@@ -212,10 +212,9 @@ const TestPage = () => {
     }));
   };
 
-  const addQuestion = () => {
+  const addQuestion = useCallback(() => {
     const existingQuestions = getValuesEdit("questions") || [];
 
-    // Ensure we only use valid numbers for max calculation
     const ids = existingQuestions
       .map((q) => q.id)
       .filter((id): id is number => id !== undefined);
@@ -223,7 +222,7 @@ const TestPage = () => {
     const nextId = ids.length > 0 ? Math.max(...ids) + 1 : 1;
 
     append({ id: nextId, question: "", answers: ["", "", "", ""], correct: 0 });
-  };
+  }, [getValuesEdit, append]);
 
   const removeQuestion = (index: number) => {
     remove(index);
@@ -375,8 +374,8 @@ const TestPage = () => {
               </p>
 
               {question.image_url && (
+                // eslint-disable-next-line @next/next/no-img-element
                 <img
-                  // eslint-disable-next-line @next/next/no-img-element
                   src={question.image_url}
                   alt="Uploaded question image"
                   className="mt-2 w-full h-96 object-cover border"
@@ -530,8 +529,8 @@ const TestPage = () => {
                       }
                     />
                     {getValuesEdit(`questions.${questionIndex}.image_url`) && (
+                      // eslint-disable-next-line @next/next/no-img-element
                       <img
-                        // eslint-disable-next-line @next/next/no-img-element
                         src={
                           getValuesEdit(
                             `questions.${questionIndex}.image_url`

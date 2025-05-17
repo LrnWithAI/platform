@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { FlashcardsSet, StarredFlashcards } from "@/types/flashcards";
 import FlashcardsCard from "@/components/flashcards-card";
 import { Button } from "@/components/ui/button";
@@ -33,60 +33,64 @@ export default function FlashcardsCardsStack({
     setStarredCards(initialStarred);
   }, [starredFlashcards]);
 
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     if (currentIndex < flashcards.length - 1) {
       setCurrentIndex(currentIndex + 1);
     }
-  };
+  }, [currentIndex, flashcards.length]);
 
-  const handlePrevious = () => {
+  const handlePrevious = useCallback(() => {
     if (currentIndex > 0) {
       setCurrentIndex(currentIndex - 1);
     }
-  };
+  }, [currentIndex]);
 
-  const toggleStar = async (index: number) => {
-    const cardId = flashcards[index]?.id;
+  const toggleStar = useCallback(
+    async (index: number) => {
+      const cardId = flashcards[index]?.id;
 
-    if (cardId === undefined) return;
+      if (cardId === undefined) return;
 
-    const updatedStarredCards = new Set(starredCards);
+      const updatedStarredCards = new Set(starredCards);
 
-    if (updatedStarredCards.has(cardId)) {
-      updatedStarredCards.delete(cardId);
-    } else {
-      updatedStarredCards.add(cardId);
-    }
-
-    setStarredCards(updatedStarredCards);
-
-    // Construct the JSONB array in the desired format
-    const starredJsonb = flashcards.map((flashcard) => ({
-      question_id: flashcard.id,
-      is_starred:
-        flashcard.id !== undefined && updatedStarredCards.has(flashcard.id),
-    }));
-
-    // Call the API to insert or update the starred flashcards
-    if (flashcardsId && userId) {
-      try {
-        const response = await insertOrUpdateStarredFlashcards(
-          flashcardsId,
-          userId,
-          starredJsonb
-        );
-
-        if (!response.success) {
-          console.error("Error syncing starred flashcards:", response.message);
-        }
-      } catch (error) {
-        console.error(
-          "Unexpected error while syncing starred flashcards:",
-          error
-        );
+      if (updatedStarredCards.has(cardId)) {
+        updatedStarredCards.delete(cardId);
+      } else {
+        updatedStarredCards.add(cardId);
       }
-    }
-  };
+
+      setStarredCards(updatedStarredCards);
+
+      const starredJsonb = flashcards.map((flashcard) => ({
+        question_id: flashcard.id,
+        is_starred:
+          flashcard.id !== undefined && updatedStarredCards.has(flashcard.id),
+      }));
+
+      if (flashcardsId && userId) {
+        try {
+          const response = await insertOrUpdateStarredFlashcards(
+            flashcardsId,
+            userId,
+            starredJsonb
+          );
+
+          if (!response.success) {
+            console.error(
+              "Error syncing starred flashcards:",
+              response.message
+            );
+          }
+        } catch (error) {
+          console.error(
+            "Unexpected error while syncing starred flashcards:",
+            error
+          );
+        }
+      }
+    },
+    [flashcards, flashcardsId, starredCards, userId]
+  );
 
   // Handle keydown events for navigation, star toggle, and flip
   useEffect(() => {
