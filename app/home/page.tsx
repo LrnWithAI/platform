@@ -23,7 +23,7 @@ export default function Home() {
   const [tests, setTests] = useState<Test[]>([]);
   const [publicNotes, setPublicNotes] = useState<Note[]>([]);
   const [popularClass, setPopularClass] = useState<Class[] | null>([]);
-  const [topCreators, setTopCreators] = useState<User[]>([]);
+  const [topCreators, setTopCreators] = useState<{ user: User; count: number }[]>([]);
 
   const fetchPopularTests = useCallback(async () => {
     setLoading(true);
@@ -101,25 +101,28 @@ export default function Home() {
         <h2 className="text-xl font-semibold mb-4">Top Note Creators</h2>
         {topCreators.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {topCreators.map(({ user, count }) => (
-              <div key={user.id} className="border rounded-lg p-4 shadow-sm bg-background hover:bg-muted transition">
-                <div
-                  onClick={() => router.push(`/profile/${user.username}`)}
-                  className="flex items-center gap-2 cursor-pointer hover:text-purple-500"
-                >
-                  <p className="font-bold text-lg">{user.name}</p>
-                  <SquareArrowOutUpRight size={16} />
+            {topCreators.map(({ user, count }) =>
+              user ? (
+                <div key={user.id} className="border rounded-lg p-4 shadow-sm bg-background hover:bg-muted transition">
+                  <div
+                    onClick={() => router.push(`/profile/${user.username}`)}
+                    className="flex items-center gap-2 cursor-pointer hover:text-purple-500"
+                  >
+                    {/* @ts-expect-error different user is comming from fetchTopCreators */}
+                    <p className="font-bold text-lg">{user.name}</p>
+                    <SquareArrowOutUpRight size={16} />
+                  </div>
+                  <a
+                    href={`mailto:${user.email}`}
+                    className="flex items-center text-purple gap-2 mt-1 text-sm hover:underline"
+                  >
+                    <Mail size={16} />
+                    {user.email}
+                  </a>
+                  <p className="text-purple font-semibold mt-2">{count} notes</p>
                 </div>
-                <a
-                  href={`mailto:${user.email}`}
-                  className="flex items-center text-purple gap-2 mt-1 text-sm hover:underline"
-                >
-                  <Mail size={16} />
-                  {user.email}
-                </a>
-                <p className="text-purple font-semibold mt-2">{count} notes</p>
-              </div>
-            ))}
+              ) : null
+            )}
           </div>
         ) : (
           <p className="text-muted-foreground">No top creators yet.</p>
