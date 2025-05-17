@@ -137,7 +137,11 @@ const ClassDashboard = () => {
           const res = await updateClassContent(classData.id, generatedId, [...existingFiles, ...uploadedFiles], user.id); // pošleme existujúce prílohy ale aj nové, ktoré sa práve nahrali aby ich updatlo do triedy 
 
           if (res?.success) {
-            res.data ? setClasses(res.data) : toast.error("Failed to update class content");
+            if (res?.data) {
+              setClasses(res.data);
+            } else {
+              toast.error("Failed to update class content");
+            }
             toast.success("Files uploaded and saved successfully!");
           } else {
             toast.error("Failed to update class content");

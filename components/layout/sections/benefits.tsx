@@ -46,7 +46,7 @@ export const BenefitsSection = () => {
             Your Shortcut to Smarter Learning
           </h2>
           <p className="text-xl text-muted-foreground mb-8">
-            Whether you're a student preparing for exams or a teacher building
+            Whether you&apos;re a student preparing for exams or a teacher building
             resources, our platform helps you learn faster and teach smarter
             using AI.
           </p>

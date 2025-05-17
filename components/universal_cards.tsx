@@ -86,6 +86,7 @@ export function Cards({
       refreshData();
       toast.success(`${type} deleted successfully!`);
     } catch (error) {
+      console.error("Error deleting card:", error);
       toast.error("An error occurred while deleting the card.");
     } finally {
       setLoading(false);
