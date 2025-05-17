@@ -66,7 +66,13 @@ const Class = () => {
           for (const post of classData.content) {
             if (post.files && post.files.length > 0) {
               for (const file of post.files) {
-                response = await deleteFileFromClassContent(classData?.created_by.id.toString(), classData.id, post.id, file.name, user.id);
+                if (user) {
+                  response = await deleteFileFromClassContent(classData?.created_by.id.toString(), classData.id, post.id, file.name, user.id);
+                } else {
+                  toast.error('User not found. Cannot delete files.');
+                  setLoading(false);
+                  return;
+                }
               }
             }
           }
@@ -105,23 +111,33 @@ const Class = () => {
 
         break;
       case "remove_content":
-        // Vymazanie všetkých súborov zo všetkých príspevkov v triede z bucketu
-        for (const post of classData.content) {
-          if (post.files && post.files.length > 0) {
-            for (const file of post.files) {
-              await deleteFileFromClassContent(classData?.created_by.id, classData.id, post.id, file.name, user.id);
+        if (classData) {
+          // Vymazanie všetkých súborov zo všetkých príspevkov v triede z bucketu
+          for (const post of classData.content) {
+            if (post.files && post.files.length > 0) {
+              for (const file of post.files) {
+                if (user) {
+                  await deleteFileFromClassContent(classData.created_by.id.toString(), classData.id, post.id, file.name, user.id);
+                } else {
+                  toast.error('User not found. Cannot delete files.');
+                  setLoading(false);
+                  return;
+                }
+              }
             }
           }
-        }
 
-        const payloadWithoutContent = { ...classData, content: [], };
-        const responseWithoutContent = await editClass(Number(classData?.id), payloadWithoutContent);
+          const payloadWithoutContent = { ...classData, content: [], };
+          const responseWithoutContent = await editClass(Number(classData.id), payloadWithoutContent);
 
-        if (responseWithoutContent.success) {
-          toast.success('All content removed successfully!');
-          getClassById(Number(classData?.id));
+          if (responseWithoutContent.success) {
+            toast.success('All content removed successfully!');
+            getClassById(Number(classData.id));
+          } else {
+            toast.error(responseWithoutContent.message || 'Failed to remove content.');
+          }
         } else {
-          toast.error(responseWithoutContent.message || 'Failed to remove content.');
+          toast.error('Class data not found.');
         }
 
         break;

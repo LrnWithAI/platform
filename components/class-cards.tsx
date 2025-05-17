@@ -92,12 +92,16 @@ export function ClassesCards({ orderOption, filterOption }: { orderOption: strin
         toast.success('Class deleted successfully!');
 
         // Fetch the updated list after deleting
-        const response = await getClasses(user.id);
-        if (response) {
-          setClasses(response.data);
-          toast.success('Updated classes loaded successfully!');
+        if (user) {
+          const response = await getClasses(user.id);
+          if (response) {
+            setClasses(response.data);
+            toast.success('Updated classes loaded successfully!');
+          } else {
+            toast.error('Failed to fetch classes.');
+          }
         } else {
-          toast.error('Failed to fetch classes.');
+          toast.error('User is not authenticated.');
         }
       } else {
         toast.error(response.message || 'Failed to delete card.');

@@ -13,7 +13,7 @@ import { createClass, editClass, getClasses } from '@/actions/classActions';
 import { useLoadingStore } from '@/stores/loadingStore';
 import { useClassStore } from '@/stores/classStore';
 import { Button } from './ui/button';
-import { Class, ClassDialogProps } from '@/types/class';
+import { ClassDialogProps } from '@/types/class';
 import { ClassSchema } from '@/schema/class';
 import { deleteFileFromClassCoverPhoto, uploadFileToClassCoverPhoto } from '@/actions/storageActions';
 
@@ -41,7 +41,7 @@ const ClassDialog: React.FC<ClassDialogProps> = ({ type, onClose, isOpen, initia
     },
   });
 
-  const onSubmit = async (data: Class) => {
+  const onSubmit = async (data: ClassFormData) => {
     try {
       onClose();
       setLoading(true);
@@ -99,10 +99,14 @@ const ClassDialog: React.FC<ClassDialogProps> = ({ type, onClose, isOpen, initia
           }
         }
 
-        const uploadedUrl = await uploadFileToClassCoverPhoto(data.image, user.id, classId);
-        if (uploadedUrl) {
-          imageName = data.image.name;
-          imageUrl = uploadedUrl;
+        if (typeof classId === "number") {
+          const uploadedUrl = await uploadFileToClassCoverPhoto(data.image, user.id, classId);
+          if (uploadedUrl) {
+            imageName = data.image.name;
+            imageUrl = uploadedUrl;
+          }
+        } else {
+          toast.error("Class ID is missing.");
         }
       }
 

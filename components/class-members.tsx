@@ -74,10 +74,12 @@ const ClassMembers = () => {
         toast.success("User removed successfully!");
 
         // Fetch the updated list after editing
-        const updatedClasses = await getClasses(user.id);
-        if (updatedClasses) {
-          setClasses(updatedClasses.data);
-          toast.success('Updated classes loaded successfully!');
+        if (user && user.id) {
+          const updatedClasses = await getClasses(user.id);
+          if (updatedClasses) {
+            setClasses(updatedClasses.data);
+            toast.success('Updated classes loaded successfully!');
+          }
         }
       } else {
         toast.error(response.message || "Failed to update class.");
@@ -160,7 +162,7 @@ const ClassMembers = () => {
       </Dialog>
 
       <div className="bg-gradient-to-r from-indigo-500 via-purple to-pink-500 text-white p-4 rounded-lg shadow-lg">
-        <h2 className="text-2xl font-bold mb-1">{teachers.length > 1 ? "Teachers" : "Teacher"} </h2>
+        <h2 className="text-2xl font-bold mb-1">{(teachers?.length ?? 0) > 1 ? "Teachers" : "Teacher"} </h2>
         {teachers?.map((teacher) => (
           <>
             <div className="flex items-center justify-between pb-3">
