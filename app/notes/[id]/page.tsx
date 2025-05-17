@@ -228,6 +228,10 @@ export default function NoteDetail() {
       toast.error("User ID is missing. Cannot delete note.");
       return;
     }
+    if (!note || typeof note.id !== "number") {
+      toast.error("Note is missing or has invalid ID. Cannot delete note.");
+      return;
+    }
     const res = await deleteNote(note.id, user.id);
     if (res.success) {
       toast.success("Note deleted successfully!");
