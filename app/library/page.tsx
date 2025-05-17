@@ -125,7 +125,7 @@ export default function Library() {
   const [openOrderOptionTests, setOpenOrderOptionTests] = useState(false);
   const [openFilterOptionTests, setOpenFilterOptionTests] = useState(false);
   const [orderOptionForTests, setOrderOptionForTests] = useState("");
-  const [filterOptionForTests, setFilterOptionForTests] = useState({});
+  const [filterOptionForTests, setFilterOptionForTests] = useState<Record<string, string>>({});
 
   // Stavy pre sekciu FlashCards
   const [openOrderOptionFlashcards, setOpenOrderOptionFlashcards] =
@@ -133,7 +133,7 @@ export default function Library() {
   const [openFilterOptionFlashcards, setOpenFilterOptionFlashcards] =
     useState(false);
   const [orderOptionForFlashcards, setOrderOptionForFlashcards] = useState("");
-  const [filterOptionForFlashcards, setFilterOptionForFlashcards] = useState(
+  const [filterOptionForFlashcards, setFilterOptionForFlashcards] = useState<Record<string, string>>(
     {}
   );
 
@@ -141,7 +141,7 @@ export default function Library() {
   const [openOrderOptionNotes, setOpenOrderOptionNotes] = useState(false);
   const [openFilterOptionNotes, setOpenFilterOptionNotes] = useState(false);
   const [orderOptionForNotes, setOrderOptionForNotes] = useState("");
-  const [filterOptionForNotes, setFilterOptionForNotes] = useState({});
+  const [filterOptionForNotes, setFilterOptionForNotes] = useState<Record<string, string>>({});
 
   const updateFilterOptionForTests = (key: string, value: string) => {
     setFilterOptionForTests((prev) => ({

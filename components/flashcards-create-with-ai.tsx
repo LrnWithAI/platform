@@ -444,19 +444,22 @@ const CreateFlashcardsWithAIForm = () => {
                           <h3 className="text-lg font-semibold">
                             Generated Flashcards
                           </h3>
-                          {generatedFlashcards.map((f, idx) => (
-                            <div
-                              key={f.id || idx}
-                              className="p-4 border rounded bg-white"
-                            >
-                              <Label className="font-semibold">Term:</Label>
-                              <p className="mb-2">{f.term}</p>
-                              <Label className="font-semibold">
-                                Definition:
-                              </Label>
-                              <p>{f.definition}</p>
-                            </div>
-                          ))}
+                          {generatedFlashcards.map((f, idx) => {
+                            const flashcard = f as { id?: string | number; term: string; definition: string };
+                            return (
+                              <div
+                                key={flashcard.id || idx}
+                                className="p-4 border rounded bg-white"
+                              >
+                                <Label className="font-semibold">Term:</Label>
+                                <p className="mb-2">{flashcard.term}</p>
+                                <Label className="font-semibold">
+                                  Definition:
+                                </Label>
+                                <p>{flashcard.definition}</p>
+                              </div>
+                            );
+                          })}
                         </div>
                         <div className="flex justify-center">
                           <Button
