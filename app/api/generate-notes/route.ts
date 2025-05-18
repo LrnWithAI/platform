@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { OpenAI } from "openai";
-import pdfParse from "pdf-parse";
+import { extractTextFromPdf } from "@/utils/pdfTextExtract";
 
 export async function POST(req: NextRequest) {
   try {
@@ -18,8 +18,8 @@ export async function POST(req: NextRequest) {
       const arrayBuffer = await response.arrayBuffer();
       const dataBuffer = Buffer.from(arrayBuffer);
 
-      const pdfData = await pdfParse(dataBuffer);
-      inputText = pdfData.text.slice(0, 15000); // truncate to avoid token overflow
+      const pdfData = await extractTextFromPdf(dataBuffer);
+      inputText = pdfData.slice(0, 15000);
     } else if (prompt) {
       inputText = prompt;
     } else {
