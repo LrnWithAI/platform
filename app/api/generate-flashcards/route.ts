@@ -1,14 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { OpenAI } from "openai";
-import { pdfjs } from "react-pdf";
 
-pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
+// Use the legacy build (important for Node.js)
+import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.js";
 
 export async function POST(req: NextRequest) {
   try {
     const { pdfUrl, numFlashcards = 5 } = await req.json();
-    console.log("Received request with PDF URL:", pdfUrl);
-
     if (!pdfUrl) {
       return NextResponse.json({ error: "Missing PDF URL" }, { status: 400 });
     }
@@ -19,23 +17,22 @@ export async function POST(req: NextRequest) {
     }
 
     const arrayBuffer = await response.arrayBuffer();
-    const dataBuffer = new Uint8Array(arrayBuffer);
+    const dataBuffer = Buffer.from(arrayBuffer);
 
-    const loadingTask = pdfjs.getDocument({ data: dataBuffer });
+    const loadingTask = pdfjsLib.getDocument({ data: dataBuffer });
     const pdf = await loadingTask.promise;
 
-    let fullText = "";
+    let textContent = "";
 
-    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-      const page = await pdf.getPage(pageNum);
-      const content = await page.getTextContent();
-
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const text = await page.getTextContent();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const pageText = content.items.map((item: any) => item.str).join(" ");
-      fullText += pageText + "\n";
+      const pageText = text.items.map((item: any) => item.str).join(" ");
+      textContent += pageText + "\n";
     }
 
-    const trimmedText = fullText.slice(0, 10000); // Limit for prompt
+    const trimmedText = textContent.slice(0, 10000);
 
     const prompt = `You are an AI assistant. Your task is to generate ${numFlashcards} flashcards based on the provided text content.
 
@@ -55,8 +52,7 @@ Flashcards should be relevant to the text and in the same language as the input.
 # Text:
 ${trimmedText}`;
 
-    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
     const chatResponse = await openai.chat.completions.create({
       model: "gpt-4",
       messages: [{ role: "user", content: prompt }],
@@ -68,7 +64,6 @@ ${trimmedText}`;
     try {
       flashcards = JSON.parse(raw);
     } catch {
-      console.error("Failed to parse OpenAI response:", raw);
       flashcards = [{ error: "Failed to parse JSON response from OpenAI" }];
     }
 

@@ -1,9 +1,8 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { OpenAI } from "openai";
-import { pdfjs } from "react-pdf";
 
-pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
+// ✅ Import legacy build for Node.js environments
+import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.js";
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,9 +18,9 @@ export async function POST(req: NextRequest) {
     }
 
     const arrayBuffer = await response.arrayBuffer();
-    const pdfData = new Uint8Array(arrayBuffer);
+    const dataBuffer = Buffer.from(arrayBuffer);
 
-    const loadingTask = pdfjs.getDocument({ data: pdfData });
+    const loadingTask = pdfjsLib.getDocument({ data: dataBuffer });
     const pdf = await loadingTask.promise;
 
     let fullText = "";
@@ -34,7 +33,7 @@ export async function POST(req: NextRequest) {
       fullText += pageText + "\n";
     }
 
-    const trimmedText = fullText.slice(0, 10000); // Limit input for GPT
+    const trimmedText = fullText.slice(0, 10000); // Trim for token limits
 
     const prompt = `You are an AI assistant. Your task is to generate ${numQuestions} multiple-choice questions based on the provided text content.
 
@@ -51,13 +50,13 @@ Return the questions in JSON format using the following structure:
   }
 ]
 
-Use the same language as the source text. Don't say "Based on the text". Keep the questions direct.
+Use the same language as the source text. Do not include phrases like "Based on the text".
 
 # Text:
 
 ${trimmedText}`;
 
-    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
     const chatResponse = await openai.chat.completions.create({
       model: "gpt-4",
       messages: [{ role: "user", content: prompt }],
@@ -70,15 +69,15 @@ ${trimmedText}`;
       questions = JSON.parse(raw);
     } catch {
       console.error("Failed to parse OpenAI response:", raw);
-      questions = [{ error: "Invalid response format from OpenAI" }];
+      questions = [{ error: "Invalid JSON format from OpenAI" }];
     }
 
     return NextResponse.json({ questions });
   } catch (error: unknown) {
-    console.error(
-      "Error generating test:",
-      error instanceof Error ? error.message : error
-    );
+    const message =
+      error instanceof Error ? error.message : "Unknown error occurred";
+    console.error("Error generating test:", message);
+
     return NextResponse.json(
       { error: "Failed to process PDF and generate questions" },
       { status: 500 }
