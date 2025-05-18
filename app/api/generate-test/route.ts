@@ -1,7 +1,6 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { OpenAI } from "openai";
-import pdf from "pdf-parse";
+import { getDocument } from "pdfjs-dist";
 
 export async function POST(req: NextRequest) {
   try {
@@ -16,11 +15,23 @@ export async function POST(req: NextRequest) {
       throw new Error(`Failed to download PDF: ${response.statusText}`);
     }
 
-    const arrayBuffer = await response.arrayBuffer();
-    const dataBuffer = new Uint8Array(arrayBuffer);
+    const buffer = await response.arrayBuffer();
+    const data = new Uint8Array(buffer);
 
-    const pdfData = await pdf(dataBuffer);
-    const trimmedText = pdfData.text.slice(0, 10000);
+    const loadingTask = getDocument({ data });
+    const pdf = await loadingTask.promise;
+
+    let fullText = "";
+    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+      const page = await pdf.getPage(pageNum);
+      const content = await page.getTextContent();
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const pageText = content.items.map((item: any) => item.str).join(" ");
+      fullText += pageText + "\n";
+    }
+
+    const trimmedText = fullText.slice(0, 10000); // For OpenAI context limit
 
     const prompt = `You are an AI assistant. Your task is to generate ${numQuestions} multiple-choice questions based on the provided text content.
 
@@ -37,13 +48,13 @@ Return the questions in JSON format using the following structure:
   }
 ]
 
-Use the same language as the source text. Don't say "Based on the text". Keep the questions direct.
+Use the same language as the source text. Do not say "Based on the text". Keep questions clear and direct.
 
 # Text:
 
 ${trimmedText}`;
 
-    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 
     const chatResponse = await openai.chat.completions.create({
       model: "gpt-4",
@@ -51,6 +62,7 @@ ${trimmedText}`;
     });
 
     const raw = chatResponse.choices[0]?.message?.content || "[]";
+
     let questions;
     try {
       questions = JSON.parse(raw);
