@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
     const arrayBuffer = await response.arrayBuffer();
     const dataBuffer = Buffer.from(arrayBuffer);
 
-    const pdfjsLib = await import("pdfjs-dist/legacy/build/pdf.js");
+    const pdfjsLib = await import("pdfjs-dist");
     const loadingTask = pdfjsLib.getDocument({ data: dataBuffer });
     const pdf = await loadingTask.promise;
 
