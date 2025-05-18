@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { OpenAI } from "openai";
-import pdf from "pdf-parse";
+import { extractTextFromPdf } from "@/utils/pdfTextExtract";
 
 export async function POST(req: NextRequest) {
   try {
@@ -16,14 +16,10 @@ export async function POST(req: NextRequest) {
     }
 
     const arrayBuffer = await response.arrayBuffer();
+    const dataBuffer = Buffer.from(arrayBuffer);
 
-    // ✅ Ensure you're passing a valid Uint8Array
-    const uint8Array = new Uint8Array(arrayBuffer);
-
-    // ✅ Use pdf-parse directly with buffer data
-    const pdfData = await pdf(uint8Array);
-
-    const trimmedText = pdfData.text.slice(0, 10000);
+    const pdfData = await extractTextFromPdf(dataBuffer);
+    const trimmedText = pdfData.slice(0, 10000);
 
     const prompt = `You are an AI assistant. Your task is to generate ${numQuestions} multiple-choice questions based on the provided text content.
 
