@@ -1,15 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { OpenAI } from "openai";
-
-import { getDocument } from "pdfjs-dist";
+import pdf from "pdf-parse";
 
 export async function POST(req: NextRequest) {
   try {
     const { pdfUrl, numFlashcards = 5 } = await req.json();
+
     if (!pdfUrl) {
       return NextResponse.json({ error: "Missing PDF URL" }, { status: 400 });
     }
 
+    // Fetch the PDF from the URL
     const response = await fetch(pdfUrl);
     if (!response.ok) {
       throw new Error(`Failed to download PDF: ${response.statusText}`);
@@ -18,21 +19,11 @@ export async function POST(req: NextRequest) {
     const arrayBuffer = await response.arrayBuffer();
     const dataBuffer = new Uint8Array(arrayBuffer);
 
-    const loadingTask = getDocument({ data: dataBuffer });
-    const pdf = await loadingTask.promise;
+    // Parse the PDF text content
+    const pdfData = await pdf(dataBuffer);
+    const trimmedText = pdfData.text.slice(0, 10000);
 
-    let textContent = "";
-
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
-      const text = await page.getTextContent();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const pageText = text.items.map((item: any) => item.str).join(" ");
-      textContent += pageText + "\n";
-    }
-
-    const trimmedText = textContent.slice(0, 10000);
-
+    // Prompt for OpenAI
     const prompt = `You are an AI assistant. Your task is to generate ${numFlashcards} flashcards based on the provided text content.
 
 Each flashcard should have term and definition: front side is term and back side is definition.
@@ -52,6 +43,7 @@ Flashcards should be relevant to the text and in the same language as the input.
 ${trimmedText}`;
 
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
+
     const chatResponse = await openai.chat.completions.create({
       model: "gpt-4",
       messages: [{ role: "user", content: prompt }],
