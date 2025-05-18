@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { OpenAI } from "openai";
 
+import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.js";
+
 export async function POST(req: NextRequest) {
   try {
     const { pdfUrl, numQuestions = 5 } = await req.json();
@@ -21,27 +23,35 @@ export async function POST(req: NextRequest) {
     const arrayBuffer = await response.arrayBuffer();
     const dataBuffer = Buffer.from(arrayBuffer);
 
-    const pdf = (await import("pdf-parse")).default;
-    const pdfData = await pdf(dataBuffer);
-    console.log("Extracted text from PDF");
+    const loadingTask = pdfjsLib.getDocument({ data: dataBuffer });
+    const pdf = await loadingTask.promise;
 
-    const text = pdfData.text.slice(0, 10000); // Trim for GPT
+    let extractedText = "";
+
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const textContent = await page.getTextContent();
+      const pageText = textContent.items.map((item: any) => item.str).join(" ");
+      extractedText += pageText + "\n";
+    }
+
+    const text = extractedText.slice(0, 10000); // Optional: limit input size
 
     const prompt = `You are an AI assistant. Your task is to generate ${numQuestions} multiple-choice questions based on the provided text content.
 
-Each question should have four answer options: one correct and three incorrect. Correct answer should be on position anywhere from 0 to 3 (don't stick to 0 as there is the example in the json below). 
-Return the questions in JSON format using the following structure:
+Each question should have four answer options: one correct and three incorrect. The correct answer should be randomly placed (not always index 0).
+Return the questions in JSON format using this structure:
 
 [
   {
     "id": 1,
     "question": "Your question here",
-    "answers": ["Incorrect 0", "Correct 1", "Incorrect 2", "Incorrect 3"],
-    "correct": index of correct answer (0-3)
+    "answers": ["Incorrect 1", "Correct", "Incorrect 2", "Incorrect 3"],
+    "correct": 1
   }
 ]
 
-Questions should be relevant to the text and should be in the same language as the text is so if the text is in Slovak the questions should be in Slovak too. Don't include "based on the text" in the questions e.g. "Based on the text, what is the capital of France?" should be "What is the capital of France?".
+Ensure questions are relevant and match the language of the input. Avoid phrases like "Based on the text".
 
 # Text:
 
@@ -57,6 +67,7 @@ ${text}`;
 
     const raw = chatResponse.choices[0]?.message?.content || "[]";
     let questions;
+
     try {
       questions = JSON.parse(raw);
     } catch {
