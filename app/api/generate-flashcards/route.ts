@@ -29,6 +29,7 @@ export async function POST(req: NextRequest) {
     for (let i = 1; i <= pdf.numPages; i++) {
       const page = await pdf.getPage(i);
       const text = await page.getTextContent();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const pageText = text.items.map((item: any) => item.str).join(" ");
       textContent += pageText + "\n";
     }
