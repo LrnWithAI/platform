@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
     }
 
     const arrayBuffer = await response.arrayBuffer();
-    const dataBuffer = Buffer.from(arrayBuffer);
+    const dataBuffer = new Uint8Array(arrayBuffer);
 
     const loadingTask = getDocument({ data: dataBuffer });
     const pdf = await loadingTask.promise;
