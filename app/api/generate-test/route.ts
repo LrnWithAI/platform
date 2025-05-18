@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { OpenAI } from "openai";
-import { getDocument } from "pdfjs-dist";
+import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf";
 
 export async function POST(req: NextRequest) {
   try {
@@ -16,9 +16,9 @@ export async function POST(req: NextRequest) {
     }
 
     const buffer = await response.arrayBuffer();
-    const data = new Uint8Array(buffer);
+    const data = new Uint8Array(buffer); // ✅ Must use Uint8Array
 
-    const loadingTask = getDocument({ data });
+    const loadingTask = pdfjsLib.getDocument({ data });
     const pdf = await loadingTask.promise;
 
     let fullText = "";
@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
       fullText += pageText + "\n";
     }
 
-    const trimmedText = fullText.slice(0, 10000); // For OpenAI context limit
+    const trimmedText = fullText.slice(0, 10000);
 
     const prompt = `You are an AI assistant. Your task is to generate ${numQuestions} multiple-choice questions based on the provided text content.
 
