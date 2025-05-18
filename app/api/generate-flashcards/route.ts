@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { OpenAI } from "openai";
+import { pdfjs } from "react-pdf";
+
+pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
 
 export async function POST(req: NextRequest) {
   try {
@@ -11,32 +14,28 @@ export async function POST(req: NextRequest) {
     }
 
     const response = await fetch(pdfUrl);
-    console.log("Fetched PDF from URL, response status:", response.status);
-
     if (!response.ok) {
       throw new Error(`Failed to download PDF: ${response.statusText}`);
     }
 
     const arrayBuffer = await response.arrayBuffer();
-    const dataBuffer = Buffer.from(arrayBuffer);
+    const dataBuffer = new Uint8Array(arrayBuffer);
 
-    const pdfjsLib = await import("pdfjs-dist");
-    const loadingTask = pdfjsLib.getDocument({ data: dataBuffer });
+    const loadingTask = pdfjs.getDocument({ data: dataBuffer });
     const pdf = await loadingTask.promise;
 
-    let textContent = "";
+    let fullText = "";
 
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
-      const text = await page.getTextContent();
+    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+      const page = await pdf.getPage(pageNum);
+      const content = await page.getTextContent();
+
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const pageText = text.items.map((item: any) => item.str).join(" ");
-      textContent += pageText + "\n";
+      const pageText = content.items.map((item: any) => item.str).join(" ");
+      fullText += pageText + "\n";
     }
 
-    console.log("Extracted text from PDF");
-
-    const trimmedText = textContent.slice(0, 10000); // Safe limit for prompt
+    const trimmedText = fullText.slice(0, 10000); // Limit for prompt
 
     const prompt = `You are an AI assistant. Your task is to generate ${numFlashcards} flashcards based on the provided text content.
 
@@ -63,9 +62,8 @@ ${trimmedText}`;
       messages: [{ role: "user", content: prompt }],
     });
 
-    console.log("OpenAI response received");
-
     const raw = chatResponse.choices[0]?.message?.content || "[]";
+
     let flashcards;
     try {
       flashcards = JSON.parse(raw);
