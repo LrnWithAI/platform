@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { OpenAI } from "openai";
 
-// Use the legacy build (important for Node.js)
-import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.js";
+import { getDocument } from "pdfjs-dist";
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,7 +18,7 @@ export async function POST(req: NextRequest) {
     const arrayBuffer = await response.arrayBuffer();
     const dataBuffer = Buffer.from(arrayBuffer);
 
-    const loadingTask = pdfjsLib.getDocument({ data: dataBuffer });
+    const loadingTask = getDocument({ data: dataBuffer });
     const pdf = await loadingTask.promise;
 
     let textContent = "";
