@@ -90,7 +90,7 @@ export default function AccountForm({ user }: { user: User }) {
         setFiles(data.files);
       }
 
-      toast.success("User data fetched successfully.");
+      //toast.success("User data fetched successfully.");
     } else {
       toast.error("Error fetching user data.");
     }
@@ -218,7 +218,7 @@ export default function AccountForm({ user }: { user: User }) {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="space-y-8 p-6 shadow-xl rounded-lg bg-sidebar 0 w-3/4 mx-auto mt-10"
+      className="space-y-8 p-4 md:p-6 shadow-xl rounded-lg bg-sidebar 0 md:w-3/4 md:mx-auto m-3 md:m-0 md:mt-10"
     >
       <div>
         <Label className="text-md">Avatar</Label>

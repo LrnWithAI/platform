@@ -66,7 +66,7 @@ export default function Classes() {
 
         if (response) {
           setClasses(response.data);
-          toast.success("Classes loaded successfully!");
+          //toast.success("Classes loaded successfully!");
         } else {
           toast.error("Failed to fetch classes.");
         }

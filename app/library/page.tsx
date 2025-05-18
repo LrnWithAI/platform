@@ -59,7 +59,7 @@ export default function Library() {
       const response = await getTestsByUserId(user?.id);
       if (response.success) {
         setTests(response.data);
-        toast.success("Tests fetched successfully!");
+        //toast.success("Tests fetched successfully!");
       } else {
         toast.error(response.message || "Failed to fetch tests.");
       }
@@ -80,7 +80,7 @@ export default function Library() {
       const response = await getNotesByUserId(user?.id);
       if (response.success) {
         setNotes(response.data);
-        toast.success("Notes fetched successfully!");
+        //toast.success("Notes fetched successfully!");
       } else {
         toast.error(response.message || "Failed to fetch notes.");
       }
@@ -101,7 +101,7 @@ export default function Library() {
       const response = await getFlashcardsSetsByUserId(user?.id);
       if (response.success) {
         setFlashcards(response.data);
-        toast.success("Flashcards fetched successfully!");
+        //toast.success("Flashcards fetched successfully!");
       } else {
         toast.error(response.message || "Failed to fetch flashcards.");
       }

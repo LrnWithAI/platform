@@ -28,7 +28,7 @@ const Profile = () => {
         const { data } = await getUserByUsername(username as string);
         if (data) {
           setUser(data)
-          toast.success("User fetched successfully")
+          //toast.success("User fetched successfully")
         }
       } catch (error) {
         console.error("Error fetching user data:", error)

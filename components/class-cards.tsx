@@ -96,7 +96,7 @@ export function ClassesCards({ orderOption, filterOption }: { orderOption: strin
           const response = await getClasses(user.id);
           if (response) {
             setClasses(response.data);
-            toast.success('Updated classes loaded successfully!');
+            //toast.success('Updated classes loaded successfully!');
           } else {
             toast.error('Failed to fetch classes.');
           }
