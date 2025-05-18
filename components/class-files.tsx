@@ -21,16 +21,18 @@ const ClassFiles = () => {
             {/* Iterate over all files in the post */}
             <div className="space-y-2">
               {post.files.map((file) => (
-                <div key={file.id} className="flex items-center space-x-4 p-3 rounded-lg bg-white dark:bg-sidebar hover:bg-gray-50 dark:hover:bg-black transition-colors duration-200">
-                  <ExternalLink className="text-gray-600" size={20} />
-                  <a
-                    href={file.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-purple hover:underline text-lg font-medium"
-                  >
-                    {file.name}
-                  </a>
+                <div key={file.id} className="md:flex items-center md:space-x-4 p-3 rounded-lg bg-white dark:bg-sidebar hover:bg-gray-50 dark:hover:bg-black transition-colors duration-200">
+                  <div className='flex items-center gap-2'>
+                    <ExternalLink className="text-gray-600" size={20} />
+                    <a
+                      href={file.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-purple hover:underline text-lg font-medium"
+                    >
+                      {file.name}
+                    </a>
+                  </div>
                   <span className="text-sm text-gray-500">{(file.size / 1024).toFixed(2)} KB</span>
                 </div>
               ))}

@@ -67,7 +67,7 @@ export default function Home() {
   }, [fetchPopularTests, fetchPopularClass, fetchPublicNotes, fetchTopCreators]);
 
   return (
-    <div className="flex flex-1 flex-col gap-6 p-8">
+    <div className="flex flex-1 flex-col gap-6 p-4 md:p-8">
 
       {/* Welcome header */}
       {user && (

@@ -34,6 +34,8 @@ const Class = () => {
   const classData = useClassStore((state) => state.classes.find((c) => c.id === Number(id)));
   const getClassById = useClassStore((state) => state.getClassById);
   const [openClassSettings, setClassSettings] = useState(false)
+  const [openMobileClassSettings, setMobileClassSettings] = useState(false)
+
   const setLoading = useLoadingStore((state) => state.setLoading);
 
   const user = useUserStore((state) => state.user);
@@ -157,9 +159,37 @@ const Class = () => {
   };
 
   return (
-    <div className="flex flex-1 flex-col gap-4 p-8">
-      <div className="bg-sidebar rounded-lg flex justify-between p-4">
+    <div className="flex flex-1 flex-col gap-4 p-3 md:p-8">
+      <div className="bg-sidebar rounded-lg justify-between p-4 md:flex">
         <div>
+          <Popover open={openMobileClassSettings} onOpenChange={setMobileClassSettings}>
+            <PopoverTrigger asChild>
+              <EllipsisVertical className="cursor-pointer absolute right-5 md:hidden" />
+            </PopoverTrigger>
+            <PopoverContent className="w-[150px] p-0">
+              <Command>
+                <CommandList>
+                  <CommandEmpty>Not found</CommandEmpty>
+                  <CommandGroup>
+                    {(isTeacher ? classSettings : classSettings.filter(option => option.value === 'report')).map((option) => (
+                      <CommandItem
+                        key={option.label}
+                        value={option.value}
+                        onSelect={() => {
+                          handleClassSettings(option.value);
+                          setMobileClassSettings(false);
+                        }}
+                        className="hover:cursor-pointer"
+                      >
+                        <option.icon className="mr-2 h-4 w-4" />
+                        {option.label}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
           <h1 className="text-2xl">{classData?.title}</h1>
           <strong>{classData?.name}</strong>
           <p>{classData?.class_time}</p>
@@ -170,10 +200,10 @@ const Class = () => {
           </div>
         </div>
 
-        <div className="flex flex-col text-right">
+        <div className="flex flex-col md:text-right">
           <Popover open={openClassSettings} onOpenChange={setClassSettings}>
             <PopoverTrigger asChild>
-              <EllipsisVertical className="me-0 ms-auto cursor-pointer" />
+              <EllipsisVertical className="me-0 ms-auto cursor-pointer hidden md:flex" />
             </PopoverTrigger>
             <PopoverContent className="w-[150px] p-0">
               <Command>
@@ -199,7 +229,6 @@ const Class = () => {
               </Command>
             </PopoverContent>
           </Popover>
-
           <strong>{classData?.created_by.name}</strong>
           <p>{classData?.year}</p>
           <p>{classData?.members?.length ?? 0} {(classData?.members?.length ?? 0) > 1 ? "Members" : "Member"}</p>

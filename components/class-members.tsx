@@ -123,7 +123,7 @@ const ClassMembers = () => {
     <div className="space-y-6 relative z-10">
       <Dialog open={open} onOpenChange={setOpen}>
         {isTeacher && (
-          <DialogTrigger className='absolute right-0 top-[-75px]'>
+          <DialogTrigger className='md:absolute right-0 top-[-75px]'>
             <Button className="bg-purple hover:bg-violet-500 text-white" onClick={() => setOpen(true)}>
               <CirclePlus size={20} /> Add Student
             </Button>
@@ -203,7 +203,7 @@ const ClassMembers = () => {
             {students.map((student) => (
               <div
                 key={student.id}
-                className="flex items-center justify-between border-b pb-3 last:border-none"
+                className="md:flex items-center justify-between border-b pb-3 last:border-none"
               >
                 <div>
                   <div onClick={() => { router.push(`/profile/${student.username}`) }} className='flex items-center gap-2 cursor-pointer hover:text-gray-500'>

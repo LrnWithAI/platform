@@ -7,13 +7,13 @@ import { TeamSection } from "@/components/layout/sections/team";
 
 export default function Home() {
   return (
-    <>
+    <div className="p-2">
       <HeroSection />
       <BenefitsSection />
       <FeaturesSection />
       <TeamSection />
       <CommunitySection />
       <FooterSection />
-    </>
+    </div>
   );
 }

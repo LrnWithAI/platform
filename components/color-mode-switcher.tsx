@@ -27,7 +27,7 @@ export function ModeToggle({ compact = false }: Props) {
           size={compact ? "sm" : "icon"}
           className={cn(
             "gap-2 items-center",
-            compact ? "h-7 p-0" : "w-10"
+            compact ? "h-7 p-0" : "w-10 hidden md:flex"
           )}
         >
           <Sun className="h-4 w-4 dark:hidden" />

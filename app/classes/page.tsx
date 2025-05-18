@@ -82,7 +82,7 @@ export default function Classes() {
   }, [user, setLoading, setClasses]);
 
   return (
-    <div className="flex flex-1 flex-col gap-4 p-8">
+    <div className="flex flex-1 flex-col gap-4 p-4 md:p-8">
       <h1 className="text-2xl font-bold">Your Classes</h1>
 
       <div className="flex justify-between">

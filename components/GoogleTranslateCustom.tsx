@@ -54,7 +54,7 @@ export default function CustomLanguageSwitcher({ compact = false }: Props) {
           size={compact ? "sm" : "default"}
           className={cn(
             "gap-2 items-center",
-            compact ? "px-2 h-7 p-0" : "w-[70px]"
+            compact ? "px-2 h-7 p-0" : "w-[70px] hidden md:flex"
           )}
         >
           {isTranslating ? <Loader2 className="animate-spin h-4 w-4" /> : <Globe size={16} />}

@@ -218,7 +218,7 @@ const ClassDashboard = () => {
   return (
     <div className="space-y-6 relative z-10">
       {isTeacher && (
-        <Button className="bg-purple hover:bg-violet-500 text-white absolute right-0 top-[-75px]" onClick={() => {
+        <Button className="bg-purple hover:bg-violet-500 text-white md:absolute right-0 top-[-75px]" onClick={() => {
           setPostData({ id: null, title: '', content: '', files: [], created_at: new Date(), updated_at: new Date() });
           setIsEditing(false);
           setOpenPostDialog(true);
@@ -361,7 +361,7 @@ const ClassDashboard = () => {
               </div>
 
               {post.files?.map((file) => (
-                <div key={file.id} className="flex items-center gap-2 mt-2">
+                <div key={file.id} className="md:flex items-center gap-2 mt-2">
                   <div className="flex items-center gap-2 cursor-pointer hover:opacity-75" onClick={() => { }}>
                     <button
                       onClick={() => handleDownloadFileFromPost(file.url, file.name)}

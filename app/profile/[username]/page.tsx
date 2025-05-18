@@ -56,7 +56,7 @@ const Profile = () => {
   }
 
   return (
-    <div className="space-y-8 p-6 shadow-md rounded-lg bg-sidebar w-3/4 mx-auto mt-10">
+    <div className="space-y-8 p-3 md:p-6 shadow-md rounded-lg bg-sidebar md:w-3/4 md:mx-auto m-3 md:m-0 md:mt-10">
       <div className="flex items-center gap-6">
         <Avatar className="w-24 h-24">
           <AvatarImage
@@ -134,13 +134,13 @@ const Profile = () => {
 
       <Tabs defaultValue="whatido" className="w-full">
         <TabsList className="flex gap-4 border-b">
-          <TabsTrigger value="whatido" className="px-4 py-2 rounded-md">
+          <TabsTrigger value="whatido" className="p-2 py-2 md:px-4 rounded-md ">
             What I Do
           </TabsTrigger>
-          <TabsTrigger value="announcements" className="px-4 py-2 rounded-md">
+          <TabsTrigger value="announcements" className="p-2 py-2 md:px-4 rounded-md">
             Announcements
           </TabsTrigger>
-          <TabsTrigger value="files" className="px-4 py-2 rounded-md">
+          <TabsTrigger value="files" className="py-2 md:px-4 rounded-md">
             Files
           </TabsTrigger>
         </TabsList>
