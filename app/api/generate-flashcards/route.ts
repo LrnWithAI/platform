@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { OpenAI } from "openai";
-import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf";
+import pdf from "pdf-parse";
 
 export async function POST(req: NextRequest) {
   try {
@@ -11,24 +11,16 @@ export async function POST(req: NextRequest) {
     }
 
     const response = await fetch(pdfUrl);
-    if (!response.ok) throw new Error(`Failed to download PDF`);
-
-    const buffer = await response.arrayBuffer();
-    const data = new Uint8Array(buffer);
-
-    const loadingTask = pdfjsLib.getDocument({ data });
-    const pdf = await loadingTask.promise;
-
-    let textContent = "";
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
-      const content = await page.getTextContent();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const pageText = content.items.map((item: any) => item.str).join(" ");
-      textContent += pageText + "\n";
+    if (!response.ok) {
+      throw new Error(`Failed to download PDF: ${response.statusText}`);
     }
 
-    const trimmedText = textContent.slice(0, 10000);
+    // ✅ Ensure we're using Uint8Array, not Buffer (Vercel-compatible)
+    const arrayBuffer = await response.arrayBuffer();
+    const data = new Uint8Array(arrayBuffer);
+
+    const pdfData = await pdf(data);
+    const trimmedText = pdfData.text.slice(0, 10000); // Limit to safe size
 
     const prompt = `You are an AI assistant. Your task is to generate ${numFlashcards} flashcards based on the provided text content.
 
@@ -43,26 +35,34 @@ Return the flashcards in JSON format using this structure:
   }
 ]
 
+Flashcards must be relevant to the text. Use the same language as the text. Do not include metadata or explanations.
+
 # Text:
 ${trimmedText}`;
 
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
+
     const chatResponse = await openai.chat.completions.create({
       model: "gpt-4",
       messages: [{ role: "user", content: prompt }],
     });
 
     const raw = chatResponse.choices[0]?.message?.content || "[]";
+
     let flashcards;
     try {
       flashcards = JSON.parse(raw);
     } catch {
+      console.error("Failed to parse OpenAI response:", raw);
       flashcards = [{ error: "Invalid JSON from OpenAI" }];
     }
 
     return NextResponse.json({ flashcards });
   } catch (error: unknown) {
-    console.error("Error generating flashcards:", error);
+    console.error(
+      "Error generating flashcards:",
+      error instanceof Error ? error.message : error
+    );
     return NextResponse.json(
       { error: "Failed to process PDF and generate flashcards" },
       { status: 500 }

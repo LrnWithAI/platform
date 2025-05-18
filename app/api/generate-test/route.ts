@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { OpenAI } from "openai";
-import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf";
+import pdf from "pdf-parse";
 
 export async function POST(req: NextRequest) {
   try {
@@ -15,23 +15,15 @@ export async function POST(req: NextRequest) {
       throw new Error(`Failed to download PDF: ${response.statusText}`);
     }
 
-    const buffer = await response.arrayBuffer();
-    const data = new Uint8Array(buffer); // ✅ Must use Uint8Array
+    const arrayBuffer = await response.arrayBuffer();
 
-    const loadingTask = pdfjsLib.getDocument({ data });
-    const pdf = await loadingTask.promise;
+    // ✅ Ensure you're passing a valid Uint8Array
+    const uint8Array = new Uint8Array(arrayBuffer);
 
-    let fullText = "";
-    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-      const page = await pdf.getPage(pageNum);
-      const content = await page.getTextContent();
+    // ✅ Use pdf-parse directly with buffer data
+    const pdfData = await pdf(uint8Array);
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const pageText = content.items.map((item: any) => item.str).join(" ");
-      fullText += pageText + "\n";
-    }
-
-    const trimmedText = fullText.slice(0, 10000);
+    const trimmedText = pdfData.text.slice(0, 10000);
 
     const prompt = `You are an AI assistant. Your task is to generate ${numQuestions} multiple-choice questions based on the provided text content.
 
@@ -51,7 +43,6 @@ Return the questions in JSON format using the following structure:
 Use the same language as the source text. Do not say "Based on the text". Keep questions clear and direct.
 
 # Text:
-
 ${trimmedText}`;
 
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
@@ -73,10 +64,9 @@ ${trimmedText}`;
 
     return NextResponse.json({ questions });
   } catch (error: unknown) {
-    console.error(
-      "Error generating test:",
-      error instanceof Error ? error.message : error
-    );
+    const message =
+      error instanceof Error ? error.message : "Unknown error occurred";
+    console.error("Error generating test:", message);
     return NextResponse.json(
       { error: "Failed to process PDF and generate questions" },
       { status: 500 }
