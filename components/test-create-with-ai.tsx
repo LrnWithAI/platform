@@ -25,6 +25,7 @@ import { toast } from "react-toastify";
 import { createTest, updateTest } from "@/actions/testActions";
 import { useUserStore } from "@/stores/userStore";
 import { uploadFileToTestFilesBucket } from "@/actions/storageActions";
+import { extractTextFromPdfUrl } from "@/utils/pdfTextExtract";
 
 type FileUploadFormValues = {
   uploadedFile: File[];
@@ -67,11 +68,13 @@ const CreateTestWithAIForm = () => {
     setGeneratedQuestions(null);
 
     try {
+      const prompt = await extractTextFromPdfUrl(fileUrl);
+
       const res = await fetch("/api/generate-test", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          pdfUrl: fileUrl,
+          prompt: prompt,
           numQuestions: numQuestions,
         }),
       });
@@ -448,20 +451,24 @@ const CreateTestWithAIForm = () => {
                                 key={question.id || idx}
                                 className="p-4 border rounded bg-white"
                               >
-                                <p className="font-medium">{question.question}</p>
+                                <p className="font-medium">
+                                  {question.question}
+                                </p>
                                 <ul className="mt-2 list-disc ml-6 space-y-1">
-                                  {question.answers?.map((ans: string, i: number) => (
-                                    <li
-                                      key={i}
-                                      className={
-                                        i === question.correct
-                                          ? "font-bold text-green-600"
-                                          : ""
-                                      }
-                                    >
-                                      {ans}
-                                    </li>
-                                  ))}
+                                  {question.answers?.map(
+                                    (ans: string, i: number) => (
+                                      <li
+                                        key={i}
+                                        className={
+                                          i === question.correct
+                                            ? "font-bold text-green-600"
+                                            : ""
+                                        }
+                                      >
+                                        {ans}
+                                      </li>
+                                    )
+                                  )}
                                 </ul>
                               </div>
                             );

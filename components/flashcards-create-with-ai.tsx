@@ -28,6 +28,7 @@ import {
 } from "@/actions/flashcardsActions";
 import { useUserStore } from "@/stores/userStore";
 import { uploadFileToFlashcardsFilesBucket } from "@/actions/storageActions";
+import { extractTextFromPdfUrl } from "@/utils/pdfTextExtract";
 
 type FileUploadFormValues = {
   uploadedFile: File[];
@@ -74,11 +75,13 @@ const CreateFlashcardsWithAIForm = () => {
     setGeneratedFlashcards(null);
 
     try {
+      const prompt = await extractTextFromPdfUrl(fileUrl);
+
       const res = await fetch("/api/generate-flashcards", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          pdfUrl: fileUrl,
+          prompt: prompt,
           numFlashcards: numFlashcards,
         }),
       });
@@ -445,7 +448,11 @@ const CreateFlashcardsWithAIForm = () => {
                             Generated Flashcards
                           </h3>
                           {generatedFlashcards.map((f, idx) => {
-                            const flashcard = f as { id?: string | number; term: string; definition: string };
+                            const flashcard = f as {
+                              id?: string | number;
+                              term: string;
+                              definition: string;
+                            };
                             return (
                               <div
                                 key={flashcard.id || idx}
