@@ -16,7 +16,8 @@ import { Class } from '@/types/class';
 export function ClassesCards({ orderOption, filterOption }: { orderOption: string, filterOption: Record<string, string> }) {
   const setLoading = useLoadingStore((state) => state.setLoading);
   const setClasses = useClassStore((state) => state.setClasses);
-  const classes = useClassStore((state) => state.classes)
+  const classes = useClassStore((state) => state.classes);
+
   const [openDialogs, setOpenDialogs] = useState<{ [key: number]: boolean }>({});
   const user = useUserStore((state) => state.user);
 

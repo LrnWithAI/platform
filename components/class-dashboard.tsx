@@ -25,12 +25,12 @@ const ClassDashboard = () => {
   const router = useRouter();
   const params = useParams();
   const id = params.id;
-  const classData = useClassStore((state) => state.classes.find((c) => c.id === Number(id)));
 
+  const classData = useClassStore((state) => state.classes.find((c) => c.id === Number(id)));
   const setLoading = useLoadingStore((state) => state.setLoading);
   const setClasses = useClassStore((state) => state.setClasses);
-
   const user = useUserStore((state) => state.user);
+
   const isTeacher = classData?.members.some((member) => member.role === 'teacher' && member.id === user?.id);
 
   const [postData, setPostData] = useState<{ id: number | null, title: string, content: string, files: File[], created_at: Date, updated_at: Date }>({ id: null, title: '', content: '', files: [], created_at: new Date(), updated_at: new Date() });
@@ -43,6 +43,7 @@ const ClassDashboard = () => {
     { label: 'Report', value: 'report', icon: CircleAlert },
     { label: 'Delete', value: 'delete', icon: Trash2 },
   ]
+
   // @ts-expect-error complex structure with mixed content types in updatedContent
   const handleUpdateClass = async (updatedContent) => {
     if (!classData) return;

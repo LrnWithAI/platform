@@ -151,7 +151,6 @@ const ClassDialog: React.FC<ClassDialogProps> = ({ type, onClose, isOpen, initia
     }
   }, [isOpen, initialData, reset]);
 
-
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>

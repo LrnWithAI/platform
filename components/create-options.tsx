@@ -3,18 +3,9 @@
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { ClipboardPlus, FilePlus, Plus, SquarePlus, Users } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import ClassDialog from "@/components/class-dialog";
-import {
-  CreateTestDialog,
-  CreateFlashcardsDialog,
-  CreateNotesDialog,
-} from "@/components/create-test-dialog";
+import { CreateTestDialog, CreateFlashcardsDialog, CreateNotesDialog } from "@/components/create-test-dialog";
 import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
 import { useUserStore } from "@/stores/userStore";

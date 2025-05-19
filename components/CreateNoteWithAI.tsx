@@ -34,14 +34,8 @@ export default function CreateNoteWithAI() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  async function generateNoteAI({
-    prompt,
-    pdfUrl,
-    options,
-  }: {
-    prompt?: string;
-    pdfUrl?: string;
-    options: { length: string; style: string; language: string };
+  async function generateNoteAI({ prompt, pdfUrl, options }: {
+    prompt?: string; pdfUrl?: string; options: { length: string; style: string; language: string };
   }): Promise<string | null> {
     try {
       let inputText = prompt;

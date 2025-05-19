@@ -26,11 +26,10 @@ const ClassMembers = () => {
   const router = useRouter();
   const params = useParams<{ id: string }>();
   const id = params.id;
-  const classData = useClassStore((state) => state.classes.find((c) => c.id === Number(id)));
 
+  const classData = useClassStore((state) => state.classes.find((c) => c.id === Number(id)));
   const setLoading = useLoadingStore((state) => state.setLoading);
   const setClasses = useClassStore((state) => state.setClasses);
-
   const user = useUserStore((state) => state.user);
 
   const teachers = classData?.members.filter((member) => member.role === 'teacher');
