@@ -1,22 +1,20 @@
-import { createRequire } from "module";
-const require = createRequire(import.meta.url);
+'use client';
 
-// Dynamically load the CommonJS-compatible wrapper
-const pdfjsLib = require("pdfjs-dist/legacy/build/pdf.js");
+import * as pdfjsLib from 'pdfjs-dist';
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@5.2.133/build/pdf.worker.min.mjs';
 
-export async function extractTextFromPdf(buffer: Buffer): Promise<string> {
-  const loadingTask = pdfjsLib.getDocument({ data: buffer });
+export const extractTextFromPdfUrl = async (url: string) => {
+  const loadingTask = pdfjsLib.getDocument(url);
   const pdf = await loadingTask.promise;
-  const maxPages = pdf.numPages;
+  let textContent = "";
 
-  let fullText = "";
-
-  for (let i = 1; i <= maxPages; i++) {
-    const page = await pdf.getPage(i);
-    const content = await page.getTextContent();
-    const strings = content.items.map((item: any) => item.str);
-    fullText += strings.join(" ") + "\n";
+  for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+    const page = await pdf.getPage(pageNum);
+    const text = await page.getTextContent();
+    text.items.forEach(item => {
+      textContent += (item as any).str + " ";
+    });
   }
 
-  return fullText.trim();
-}
+  return textContent.slice(0, 15000);
+};

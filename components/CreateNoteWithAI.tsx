@@ -16,6 +16,7 @@ import { uploadAiFileToNotesBucket } from "@/actions/storageActions";
 import { FileUpload } from "./ui/file-upload";
 import { languages } from "@/lib/consts";
 import { Globe } from "lucide-react";
+import { extractTextFromPdfUrl } from "@/utils/pdfTextExtract";
 
 export default function CreateNoteWithAI() {
   const user = useUserStore((state) => state.user);
@@ -43,10 +44,16 @@ export default function CreateNoteWithAI() {
     options: { length: string; style: string; language: string };
   }): Promise<string | null> {
     try {
+      let inputText = prompt;
+
+      if (pdfUrl) {
+        inputText = await extractTextFromPdfUrl(pdfUrl);
+      }
+
       const res = await fetch("/api/generate-notes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt, pdfUrl, options }),
+        body: JSON.stringify({ prompt: inputText, options }),
       });
 
       const data = await res.json();
@@ -88,19 +95,23 @@ export default function CreateNoteWithAI() {
     }
     const noteId = res.data.id;
 
-    let source = "";
-    if (pdf) {
+    let aiInputText = "";
+
+    if (inputType === "pdf" && pdf) {
+      aiInputText = await extractTextFromPdfUrl(URL.createObjectURL(pdf));
+
       const url = await uploadAiFileToNotesBucket(pdf, user.id, noteId);
       if (!url) {
+        toast.error("Failed to upload PDF file.");
         setIsGenerating(false);
         return;
       }
-      source = url;
+    } else if (inputType === "prompt") {
+      aiInputText = prompt;
     }
 
     const aiContent = await generateNoteAI({
-      prompt: inputType === "prompt" ? prompt : undefined,
-      pdfUrl: inputType === "pdf" ? source : undefined,
+      prompt: aiInputText,
       options: {
         length,
         style,

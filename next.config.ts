@@ -9,7 +9,6 @@ const nextConfig: NextConfig = {
     domains: [
       "jqzyiqnsulcfvylzxrbp.supabase.co",
       "images.unsplash.com",
-      // Add any other external domains you use
     ],
   },
 };

@@ -3,31 +3,12 @@ import { OpenAI } from "openai";
 
 export async function POST(req: NextRequest) {
   try {
-    const { pdfUrl, prompt, options } = await req.json();
-    const {
-      length = "medium",
-      style = "summary",
-      language = "en",
-    } = options || {};
+    const { prompt, options } = await req.json();
 
-    let inputText = "";
+    const { length = "medium", style = "summary", language = "en" } = options || {};
 
-    if (pdfUrl) {
-      const response = await fetch(pdfUrl);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch PDF: ${response.statusText}`);
-      }
-
-      const arrayBuffer = await response.arrayBuffer();
-      const dataBuffer = Buffer.from(arrayBuffer);
-
-      const pdf = (await import("pdf-parse")).default;
-      const pdfData = await pdf(dataBuffer);
-      inputText = pdfData.text.slice(0, 15000); // truncate to avoid token overflow
-    } else if (prompt) {
-      inputText = prompt;
-    } else {
-      return NextResponse.json({ error: "Missing input" }, { status: 400 });
+    if (!prompt) {
+      return NextResponse.json({ error: "Missing input text" }, { status: 400 });
     }
 
     const aiPrompt = `You are an AI assistant. Your task is to generate structured study notes based on the input below.
@@ -36,8 +17,8 @@ export async function POST(req: NextRequest) {
     Length: ${length}
 
     Input:
-    ${inputText}
-
+    ${prompt}
+    
     Output format:
     - Use markdown formatting.
     - Use bullet points for lists if style is 'bullet'.
@@ -56,14 +37,10 @@ export async function POST(req: NextRequest) {
     });
 
     const content = chatResponse.choices[0]?.message?.content || "";
+
     return NextResponse.json({ success: true, content });
   } catch (error: unknown) {
-    if (error instanceof Error) {
-      console.error("Error generating note:", error.message);
-    } else {
-      console.error("Unknown error:", error);
-    }
-
+    console.error("Error generating note:", error);
     return NextResponse.json(
       { error: "Failed to generate note" },
       { status: 500 }
