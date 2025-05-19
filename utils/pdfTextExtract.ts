@@ -1,23 +1,22 @@
-const PDFParser = require("pdf2json");
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+
+// Dynamically load the CommonJS-compatible wrapper
+const pdfjsLib = require("pdfjs-dist/legacy/build/pdf.js");
 
 export async function extractTextFromPdf(buffer: Buffer): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const pdfParser = new PDFParser();
+  const loadingTask = pdfjsLib.getDocument({ data: buffer });
+  const pdf = await loadingTask.promise;
+  const maxPages = pdf.numPages;
 
-    pdfParser.on("pdfParser_dataError", (errData: any) => {
-      reject(errData.parserError);
-    });
+  let fullText = "";
 
-    pdfParser.on("pdfParser_dataReady", (pdfData: any) => {
-      const texts = pdfData?.formImage?.Pages?.flatMap((page: any) =>
-        page.Texts.map((textObj: any) =>
-          decodeURIComponent(textObj.R[0].T)
-        )
-      );
+  for (let i = 1; i <= maxPages; i++) {
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    const strings = content.items.map((item: any) => item.str);
+    fullText += strings.join(" ") + "\n";
+  }
 
-      resolve(texts?.join(" ") ?? "");
-    });
-
-    pdfParser.parseBuffer(buffer);
-  });
+  return fullText.trim();
 }

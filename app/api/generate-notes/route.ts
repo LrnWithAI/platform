@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { OpenAI } from "openai";
-import { extractTextFromPdf } from "@/utils/pdfTextExtract";
 
 export async function POST(req: NextRequest) {
   try {
     const { pdfUrl, prompt, options } = await req.json();
-    const { length = "medium", style = "summary", language = "en" } = options || {};
+    const {
+      length = "medium",
+      style = "summary",
+      language = "en",
+    } = options || {};
 
     let inputText = "";
 
@@ -18,8 +21,9 @@ export async function POST(req: NextRequest) {
       const arrayBuffer = await response.arrayBuffer();
       const dataBuffer = Buffer.from(arrayBuffer);
 
-      const pdfData = await extractTextFromPdf(dataBuffer);
-      inputText = pdfData.slice(0, 15000);
+      const pdf = (await import("pdf-parse")).default;
+      const pdfData = await pdf(dataBuffer);
+      inputText = pdfData.text.slice(0, 15000); // truncate to avoid token overflow
     } else if (prompt) {
       inputText = prompt;
     } else {
@@ -60,6 +64,9 @@ export async function POST(req: NextRequest) {
       console.error("Unknown error:", error);
     }
 
-    return NextResponse.json({ error: "Failed to generate note" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to generate note" },
+      { status: 500 }
+    );
   }
 }

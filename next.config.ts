@@ -1,13 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  webpack: (config, { isServer }) => {
-    if (isServer) {
-      // Avoid canvas native module
-      config.externals.push({
-        canvas: "commonjs canvas",
-      });
-    }
+  webpack(config) {
+    config.resolve.extensions.push(".mjs");
     return config;
   },
   images: {
