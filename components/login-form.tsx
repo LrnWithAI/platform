@@ -16,7 +16,10 @@ import { login } from "@/actions/authActions";
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
-export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRef<"div">) {
+export function LoginForm({
+  className,
+  ...props
+}: React.ComponentPropsWithoutRef<"div">) {
   const router = useRouter();
 
   const {
@@ -107,6 +110,20 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
               </div>
             </div>
           </form>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader className="text-center">
+          <CardTitle className="text-lg">Try with Demo Account</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p>
+            <span className="font-semibold">Email:</span>{" "}
+            mastershifu117@gmail.com
+          </p>
+          <p>
+            <span className="font-semibold">Password:</span> Demo123
+          </p>
         </CardContent>
       </Card>
     </div>
