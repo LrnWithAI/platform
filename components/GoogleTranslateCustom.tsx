@@ -30,19 +30,24 @@ export default function CustomLanguageSwitcher({ compact = false }: Props) {
     setIsDropdownOpen(false)
 
     if (code === "en") {
-      document.cookie = "googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;"
-      location.reload()
-      return
+      document.cookie = "googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+      document.cookie = "googtrans=; domain=" + window.location.hostname + "; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+      document.cookie = "googtrans=; domain=." + window.location.hostname + "; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+      setTimeout(() => {
+        location.reload();
+      }, 300);
+      return;
     }
 
-    const googTransValue = `/en/${code}`
-    document.cookie = `googtrans=${googTransValue}; path=/;`
-    document.cookie = `googtrans=${googTransValue}; domain=${window.location.hostname}; path=/;`
+    const googTransValue = `/en/${code}`;
+    document.cookie = `googtrans=${googTransValue}; path=/;`;
+    document.cookie = `googtrans=${googTransValue}; domain=${window.location.hostname}; path=/;`;
+    document.cookie = `googtrans=${googTransValue}; domain=.${window.location.hostname}; path=/;`;
 
     setTimeout(() => {
-      location.reload()
-    }, 500)
-  }
+      location.reload();
+    }, 500);
+  };
 
   const currentLang = languages.find((l) => l.code === selected)
 
