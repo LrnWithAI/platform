@@ -76,7 +76,7 @@ export async function updateNote(note: Note) {
 }
 
 /* GET Latest created notes */
-export async function getLatestPublicNotes(limit = 3) {
+export async function getLatestPublicNotes(limit = 4) {
   const supabase = await createClient();
 
   const { data, error } = await supabase
@@ -94,7 +94,7 @@ export async function getLatestPublicNotes(limit = 3) {
 }
 
 /* GET Notes top creators */
-export async function getTopNoteCreators(limit = 3) {
+export async function getTopNoteCreators(limit = 4) {
   const supabase = await createClient();
 
   const { data, error } = await supabase
