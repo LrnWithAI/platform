@@ -16,6 +16,12 @@ const benefitList: BenefitsProps[] = [
       "Quickly create multiple-choice quizzes from your PDFs using advanced AI — perfect for students and educators.",
   },
   {
+    icon: "NotebookText",
+    title: "Notes powered by AI",
+    description:
+      "Transform your PDFs into concise notes with AI. Highlight key points, summarize chapters, and extract important information.",
+  },
+  {
     icon: "LineChart",
     title: "Track Learning Progress",
     description:
@@ -33,6 +39,12 @@ const benefitList: BenefitsProps[] = [
     description:
       "Easily group students and materials by class. Share tests, track progress, and manage everything in one place.",
   },
+  {
+    icon: "User",
+    title: "Public profiles",
+    description:
+      "Share your knowledge and resources with the world. Create a public profile to showcase your work and connect with others.",
+  }
 ];
 
 export const BenefitsSection = () => {

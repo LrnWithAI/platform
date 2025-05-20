@@ -113,10 +113,14 @@ export function Cards({
           key={card.id}
           className="relative p-5 border rounded-lg shadow bg-sidebar hover:cursor-pointer hover:scale-105 duration-300"
         >
-          {"created_by" in card &&
-            typeof card.created_by === "object" &&
-            "id" in card.created_by &&
-            card.created_by?.id === user?.id && (
+          {(
+            (typeof card.created_by === "object" &&
+              card.created_by !== null &&
+              "id" in card.created_by &&
+              card.created_by.id === user?.id) ||
+            (typeof card.created_by === "string" && card.created_by === user?.id) ||
+            (typeof card.created_by === "number" && card.created_by === user?.id)
+          ) && (
               <div className="absolute top-2 right-2 flex gap-1">
                 <Button
                   className="bg-red-500 rounded-sm text-sm hover:bg-red-600 h-7 w-7"
