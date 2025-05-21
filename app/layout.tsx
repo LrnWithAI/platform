@@ -10,6 +10,7 @@ import { createClient } from "@/utils/supabase/server";
 import ClientProvider from "./ClientProvider";
 
 import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -77,6 +78,7 @@ export default async function RootLayout({
             theme="light"
           />
           <Analytics />
+          <SpeedInsights />
         </ThemeProvider>
       </body>
     </html>
