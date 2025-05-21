@@ -6,9 +6,9 @@ import { useEffect, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify";
 import { getTestById, getTestSubmissionById } from "@/actions/testActions";
+import { getUserProfile } from "@/actions/userActions";
 import { Test } from "@/types/test";
-import { useUserStore } from "@/stores/userStore";
-
+import { User } from "@/types/user";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { CheckCircle, XCircle } from "lucide-react"; // Icons for check and cross
@@ -18,12 +18,12 @@ const TestSubmitPageWithId = () => {
   const params = useParams<{ id: string; submit_id: string }>();
   const testId = Number(params.id);
   const submitId = Number(params.submit_id);
-  const user = useUserStore((state) => state.user);
 
   const [test, setTest] = useState<Test | null>(null);
   const [testSubmission, setTestSubmission] = useState<TestSubmission | null>(
     null
   );
+  const [testCreator, setTestCreator] = useState<User>(null);
 
   const fetchTestByIdAndSubmission = useCallback(async () => {
     try {
@@ -38,7 +38,6 @@ const TestSubmitPageWithId = () => {
 
       if (submissionResponse?.success) {
         setTestSubmission(() => submissionResponse.data);
-        console.log("testSubmission", submissionResponse.data);
       } else {
         toast.error(
           submissionResponse?.message || "Failed to fetch submission."
@@ -50,9 +49,32 @@ const TestSubmitPageWithId = () => {
     }
   }, [testId, submitId]);
 
+  const fetchCreatorProfile = useCallback(async () => {
+    if (!testSubmission?.user_id) return;
+
+    try {
+      const response = await getUserProfile(testSubmission.user_id);
+
+      if (response.success) {
+        setTestCreator(() => response.data);
+      } else {
+        toast.error(response.message || "Failed to fetch user profile.");
+      }
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+      toast.error("An error occurred while fetching user profile.");
+    }
+  }, [testSubmission?.user_id]);
+
   useEffect(() => {
     fetchTestByIdAndSubmission();
   }, [params, fetchTestByIdAndSubmission]);
+
+  useEffect(() => {
+    if (testSubmission?.user_id) {
+      fetchCreatorProfile();
+    }
+  }, [testSubmission?.user_id]);
 
   return (
     <div className="mx-4 mb-20 mt-0 md:mt-6">
@@ -87,12 +109,10 @@ const TestSubmitPageWithId = () => {
             <p>
               by{" "}
               <Link
-                href={`/profile/${user?.username}`}
+                href={`/profile/${testCreator?.username}`}
                 className="hover:cursor-pointer hover:opacity-75"
               >
-                {user?.id === test?.created_by
-                  ? user?.username
-                  : "some nickname"}
+                {testCreator?.username}
               </Link>
             </p>
           </div>
@@ -133,10 +153,10 @@ const TestSubmitPageWithId = () => {
                         key={aIndex}
                         className={`flex flex-row justify-between space-x-2 p-2 rounded-md ${
                           isCorrect
-                            ? "bg-green-200" // Highlight correct answer in green
+                            ? "dark:bg-green-800 bg-green-200" // Highlight correct answer in green
                             : isUserAnswer
-                            ? "bg-red-200" // Highlight wrong submitted answer in red
-                            : "bg-white"
+                            ? "dark:bg-red-800 bg-red-200" // Highlight wrong submitted answer in red
+                            : "dark:bg-neutral-900 bg-white"
                         }`}
                       >
                         <div className="flex flex-row align-center space-x-2">

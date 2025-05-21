@@ -7,7 +7,11 @@ export const getUserProfile = async (id: string) => {
   const supabase = await createClient();
 
   try {
-    const { data, error } = await supabase.from("profiles").select("*").eq("id", id).single();
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", id)
+      .single();
 
     if (error) throw new Error(error.message);
 
@@ -23,7 +27,11 @@ export const getUserByUsername = async (username: string) => {
   const supabase = await createClient();
 
   try {
-    const { data, error } = await supabase.from("profiles").select("*").eq("username", username).single();
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("username", username)
+      .single();
 
     if (error) throw new Error(error.message);
 
@@ -32,7 +40,7 @@ export const getUserByUsername = async (username: string) => {
     console.error("Error fetching user:", error);
     return { success: false, message: (error as Error).message, data: {} };
   }
-}
+};
 
 /* UPDATE User */
 export const updateUserProfile = async (id: string, data: any) => {

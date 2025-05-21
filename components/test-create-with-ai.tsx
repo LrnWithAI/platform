@@ -254,7 +254,10 @@ const CreateTestWithAIForm = () => {
 
           {/* Submit Button */}
           <div className="flex justify-center my-8">
-            <Button type="submit" className="bg-purple hover:bg-purple-500">
+            <Button
+              type="submit"
+              className="bg-purple hover:bg-purple-500 dark:text-white"
+            >
               Save and Continue
             </Button>
           </div>
