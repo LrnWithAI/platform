@@ -23,7 +23,7 @@ Return the questions in valid JSON format using the following structure:
     "id": 1,
     "question": "What is the capital of France?",
     "answers": ["Berlin", "Madrid", "Paris", "Rome"],
-    "correct": 2
+    "correct": 2 (index should vary from 0 to 3)
   }
 ]
 
@@ -32,7 +32,8 @@ Guidelines:
 - Do not include explanations or metadata.
 - Return only a JSON array of question objects.
 - Do not say "Based on the text".
-- Maintain the original language used in the input.
+- Maintain the original language used in the input text (e.g. if text is in Slovak language the test questions and answers should be in Slovak as well).
+- Do not put correct answer on same index for every question, make it randomly from 0 to 3 for each question (The point it to not have every questinos with the same correct answer index).
 
 # Text:
 ${prompt}`;

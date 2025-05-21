@@ -28,8 +28,8 @@ Output format:
 Guidelines:
 - All flashcards must be directly derived from the source text.
 - Do not include any notes, explanations, or context outside the JSON array.
-- Keep questions and definitions in the **same language** as the input (e.g. Slovak → Slovak).
-- Do **not** use phrases like "Based on the text".
+- Keep terms and definitions in the exactly same language as the input (e.g. if text is in Slovak language the flashcards both term and definition should be in Slovak as well).
+- Do not use phrases like "Based on the text" in the flashcards.
 
 # Text:
 ${prompt}`;
