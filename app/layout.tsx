@@ -9,6 +9,8 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { createClient } from "@/utils/supabase/server";
 import ClientProvider from "./ClientProvider";
 
+import { SpeedInsights } from "@vercel/speed-insights/next"
+import { Analytics } from "@vercel/analytics/react"
 import "./globals.css";
 
 const geistSans = Geist({
@@ -71,6 +73,8 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
             pauseOnHover
             theme="light"
           />
+          <SpeedInsights />
+          <Analytics />
         </ThemeProvider>
       </body>
     </html>
