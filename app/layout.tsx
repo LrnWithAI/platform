@@ -9,8 +9,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { createClient } from "@/utils/supabase/server";
 import ClientProvider from "./ClientProvider";
 
-import { SpeedInsights } from "@vercel/speed-insights/next"
-import { Analytics } from "@vercel/analytics/react"
+import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -28,9 +27,13 @@ export const metadata: Metadata = {
   description: "Make learning fun & easier with AI",
 };
 
-export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -73,7 +76,6 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
             pauseOnHover
             theme="light"
           />
-          <SpeedInsights />
           <Analytics />
         </ThemeProvider>
       </body>
