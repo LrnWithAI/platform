@@ -58,8 +58,11 @@ export const CreateTestDialog = ({
           </DialogTitle>
           <DialogDescription className="flex flex-row gap-5 py-5">
             <div
-              className={`border rounded-md flex justify-center items-center align-center w-1/2 hover:cursor-pointer ${createTestOption == "withAI" ? "bg-slate-200" : "bg-white"
-                }`}
+              className={`border rounded-md flex justify-center items-center align-center w-1/2 hover:cursor-pointer dark:bg-neutral-900 dark:text-white ${
+                createTestOption == "withAI"
+                  ? "bg-slate-200 dark:bg-neutral-700"
+                  : "bg-white"
+              }`}
             >
               <button
                 className="text-4xl py-24 w-full h-full"
@@ -71,8 +74,11 @@ export const CreateTestDialog = ({
               </button>
             </div>
             <div
-              className={`border rounded-md flex justify-center items-center align-center w-1/2 hover:cursor-pointer ${createTestOption == "manually" ? "bg-slate-200" : "bg-white"
-                }`}
+              className={`border rounded-md flex justify-center items-center align-center w-1/2 hover:cursor-pointer dark:bg-neutral-900 dark:text-white ${
+                createTestOption == "manually"
+                  ? "bg-slate-200 dark:bg-neutral-700"
+                  : "bg-white"
+              }`}
             >
               <button
                 className="text-4xl py-24 w-full h-full"
@@ -137,8 +143,9 @@ export const CreateFlashcardsDialog = ({
           </DialogTitle>
           <DialogDescription className="flex flex-row gap-5 py-5">
             <div
-              className={`border rounded-md flex justify-center items-center align-center w-1/2 hover:cursor-pointer ${createFlashcardsOption == "withAI" ? "bg-slate-200" : "bg-white"
-                }`}
+              className={`border rounded-md flex justify-center items-center align-center w-1/2 hover:cursor-pointer ${
+                createFlashcardsOption == "withAI" ? "bg-slate-200" : "bg-white"
+              }`}
             >
               <button
                 className="text-4xl py-24 w-full h-full"
@@ -150,10 +157,11 @@ export const CreateFlashcardsDialog = ({
               </button>
             </div>
             <div
-              className={`border rounded-md flex justify-center items-center align-center w-1/2 hover:cursor-pointer ${createFlashcardsOption == "manually"
-                ? "bg-slate-200"
-                : "bg-white"
-                }`}
+              className={`border rounded-md flex justify-center items-center align-center w-1/2 hover:cursor-pointer ${
+                createFlashcardsOption == "manually"
+                  ? "bg-slate-200"
+                  : "bg-white"
+              }`}
             >
               <button
                 className="text-4xl py-24 w-full h-full"
@@ -192,9 +200,15 @@ export const CreateFlashcardsDialog = ({
   );
 };
 
-export const CreateNotesDialog = ({ isOpen, onClose, isInMenu }: NotesDialogType) => {
+export const CreateNotesDialog = ({
+  isOpen,
+  onClose,
+  isInMenu,
+}: NotesDialogType) => {
   const router = useRouter();
-  const [createNotesOption, setCreateNotesOption] = useState<"withAI" | "manually" | "">("");
+  const [createNotesOption, setCreateNotesOption] = useState<
+    "withAI" | "manually" | ""
+  >("");
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -207,26 +221,34 @@ export const CreateNotesDialog = ({ isOpen, onClose, isInMenu }: NotesDialogType
         <DialogHeader>
           <DialogTitle>
             <div className="text-center">
-              <strong className="font-bold text-2xl">
-                Create Notes
-              </strong>
+              <strong className="font-bold text-2xl">Create Notes</strong>
             </div>
           </DialogTitle>
           <DialogDescription className="flex flex-row gap-5 py-5">
-            <div className={`border rounded-md flex justify-center items-center align-center w-1/2 hover:cursor-pointer ${createNotesOption == "withAI" ? "bg-slate-200" : "bg-white"}`}>
+            <div
+              className={`border rounded-md flex justify-center items-center align-center w-1/2 hover:cursor-pointer ${
+                createNotesOption == "withAI" ? "bg-slate-200" : "bg-white"
+              }`}
+            >
               <button
                 className="text-4xl py-24 w-full h-full"
-                onClick={() => { setCreateNotesOption("withAI"); }}
+                onClick={() => {
+                  setCreateNotesOption("withAI");
+                }}
               >
                 With AI
               </button>
             </div>
             <div
-              className={`border rounded-md flex justify-center items-center align-center w-1/2 hover:cursor-pointer ${createNotesOption == "manually" ? "bg-slate-200" : "bg-white"}`}
+              className={`border rounded-md flex justify-center items-center align-center w-1/2 hover:cursor-pointer ${
+                createNotesOption == "manually" ? "bg-slate-200" : "bg-white"
+              }`}
             >
               <button
                 className="text-4xl py-24 w-full h-full"
-                onClick={() => { setCreateNotesOption("manually"); }}
+                onClick={() => {
+                  setCreateNotesOption("manually");
+                }}
               >
                 Manually
               </button>
@@ -244,7 +266,9 @@ export const CreateNotesDialog = ({ isOpen, onClose, isInMenu }: NotesDialogType
               type="button"
               variant="default"
               disabled={createNotesOption == "" ? true : false}
-              onClick={() => { router.push(`../notes/create?option=${createNotesOption}`); }}
+              onClick={() => {
+                router.push(`../notes/create?option=${createNotesOption}`);
+              }}
             >
               Ok
             </Button>

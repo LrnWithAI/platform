@@ -25,6 +25,8 @@ import {
   createTestSubmission,
 } from "@/actions/testActions";
 import { Test } from "@/types/test";
+import { User } from "@/types/user";
+import { getUserProfile } from "@/actions/userActions";
 import { useUserStore } from "@/stores/userStore";
 import { useForm, Controller, useFieldArray } from "react-hook-form";
 import { testSchema } from "@/schema/test";
@@ -49,6 +51,8 @@ const TestPage = () => {
     Record<number, number>
   >({});
 
+  const [testCreator, setTestCreator] = useState<User>(null);
+
   const {
     control,
     handleSubmit,
@@ -69,6 +73,23 @@ const TestPage = () => {
       toast.error("An error occurred while fetching tests.");
     }
   }, [testId]);
+
+  const fetchCreatorProfile = useCallback(async () => {
+    if (!test?.created_by) return;
+
+    try {
+      const response = await getUserProfile(test?.created_by as string);
+
+      if (response.success) {
+        setTestCreator(() => response.data);
+      } else {
+        toast.error(response.message || "Failed to fetch user profile.");
+      }
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+      toast.error("An error occurred while fetching user profile.");
+    }
+  }, [test?.created_by]);
 
   const {
     register: registerEdit,
@@ -132,6 +153,10 @@ const TestPage = () => {
   useEffect(() => {
     fetchTestById();
   }, [params, fetchTestById]);
+
+  useEffect(() => {
+    if (test?.created_by) fetchCreatorProfile();
+  }, [test?.created_by]);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmitTestAnswers = async (data: any) => {
@@ -354,12 +379,10 @@ const TestPage = () => {
               <p>
                 by{" "}
                 <Link
-                  href={`/profile/${user?.username}`}
+                  href={`/profile/${testCreator?.username}`}
                   className="hover:cursor-pointer hover:opacity-75"
                 >
-                  {user?.id === test?.created_by
-                    ? user?.username
-                    : "some nickname"}
+                  {testCreator?.username}
                 </Link>
               </p>
             </div>
