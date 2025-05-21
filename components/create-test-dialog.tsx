@@ -60,7 +60,7 @@ export const CreateTestDialog = ({
             <div
               className={`border rounded-md flex justify-center items-center align-center w-1/2 hover:cursor-pointer dark:bg-neutral-900 dark:text-white ${
                 createTestOption == "withAI"
-                  ? "bg-slate-200 dark:bg-neutral-700"
+                  ? "bg-slate-200 dark:bg-neutral-600"
                   : "bg-white"
               }`}
             >
@@ -76,7 +76,7 @@ export const CreateTestDialog = ({
             <div
               className={`border rounded-md flex justify-center items-center align-center w-1/2 hover:cursor-pointer dark:bg-neutral-900 dark:text-white ${
                 createTestOption == "manually"
-                  ? "bg-slate-200 dark:bg-neutral-700"
+                  ? "bg-slate-200 dark:bg-neutral-600"
                   : "bg-white"
               }`}
             >
@@ -143,8 +143,10 @@ export const CreateFlashcardsDialog = ({
           </DialogTitle>
           <DialogDescription className="flex flex-row gap-5 py-5">
             <div
-              className={`border rounded-md flex justify-center items-center align-center w-1/2 hover:cursor-pointer ${
-                createFlashcardsOption == "withAI" ? "bg-slate-200" : "bg-white"
+              className={`border rounded-md flex justify-center items-center align-center w-1/2 hover:cursor-pointer dark:bg-neutral-900 dark:text-white ${
+                createFlashcardsOption == "withAI"
+                  ? "bg-slate-200 dark:bg-neutral-600"
+                  : "bg-white"
               }`}
             >
               <button
@@ -157,9 +159,9 @@ export const CreateFlashcardsDialog = ({
               </button>
             </div>
             <div
-              className={`border rounded-md flex justify-center items-center align-center w-1/2 hover:cursor-pointer ${
+              className={`border rounded-md flex justify-center items-center align-center w-1/2 hover:cursor-pointer dark:bg-neutral-900 dark:text-white ${
                 createFlashcardsOption == "manually"
-                  ? "bg-slate-200"
+                  ? "bg-slate-200 dark:bg-neutral-600"
                   : "bg-white"
               }`}
             >
@@ -226,8 +228,10 @@ export const CreateNotesDialog = ({
           </DialogTitle>
           <DialogDescription className="flex flex-row gap-5 py-5">
             <div
-              className={`border rounded-md flex justify-center items-center align-center w-1/2 hover:cursor-pointer ${
-                createNotesOption == "withAI" ? "bg-slate-200" : "bg-white"
+              className={`border rounded-md flex justify-center items-center align-center w-1/2 hover:cursor-pointer dark:bg-neutral-900 dark:text-white ${
+                createNotesOption == "withAI"
+                  ? "bg-slate-200 dark:bg-neutral-600"
+                  : "bg-white"
               }`}
             >
               <button
@@ -240,8 +244,10 @@ export const CreateNotesDialog = ({
               </button>
             </div>
             <div
-              className={`border rounded-md flex justify-center items-center align-center w-1/2 hover:cursor-pointer ${
-                createNotesOption == "manually" ? "bg-slate-200" : "bg-white"
+              className={`border rounded-md flex justify-center items-center align-center w-1/2 hover:cursor-pointer dark:bg-neutral-900 dark:text-white ${
+                createNotesOption == "manually"
+                  ? "bg-slate-200 dark:bg-neutral-600"
+                  : "bg-white"
               }`}
             >
               <button

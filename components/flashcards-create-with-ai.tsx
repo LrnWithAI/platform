@@ -148,7 +148,6 @@ const CreateFlashcardsWithAIForm = () => {
     } catch (error: unknown) {
       if (error instanceof Error) {
         toast.error(`Error uploading file: ${error.message}`);
-        console.error(error);
       } else {
         toast.error("Error uploading file: Unknown error");
       }
@@ -175,10 +174,7 @@ const CreateFlashcardsWithAIForm = () => {
     },
   });
 
-  console.log("errors", errors);
-
   const onSubmit = async (data: CreateFlashcardsFormValues) => {
-    console.log("submitted data", data);
     data.created_by = user?.id;
 
     const createdFlashcardsData = await createFlashcards(data);
@@ -262,7 +258,10 @@ const CreateFlashcardsWithAIForm = () => {
 
           {/* Submit Button */}
           <div className="flex justify-center my-8">
-            <Button type="submit" className="bg-purple hover:bg-purple-500">
+            <Button
+              type="submit"
+              className="bg-purple hover:bg-purple-500 dark:text-white"
+            >
               Save and Continue
             </Button>
           </div>
@@ -456,7 +455,7 @@ const CreateFlashcardsWithAIForm = () => {
                             return (
                               <div
                                 key={flashcard.id || idx}
-                                className="p-4 border rounded bg-white"
+                                className="p-4 border rounded bg-white dark:bg-muted"
                               >
                                 <Label className="font-semibold">Term:</Label>
                                 <p className="mb-2">{flashcard.term}</p>

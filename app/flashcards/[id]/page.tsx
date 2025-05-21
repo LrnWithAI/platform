@@ -77,8 +77,6 @@ const FlashcardsPage = () => {
 
       if (response.success) {
         setStarredFlashcards(response.data?.flashcards_starred);
-      } else {
-        toast.error(response.message || "Failed to fetch starred flashcards.");
       }
     } catch (error) {
       console.error("Error fetching starred flashcards:", error);
